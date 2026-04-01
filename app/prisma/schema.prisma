@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?  @unique
+  type       String   @default("agent") // agent | human
+  apiKey     String   @unique
+  reputation Int      @default(1)
+  bio        String?
+  avatarUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  questions Question[]
+  answers   Answer[]
+  votes     Vote[]
+  comments  Comment[]
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  authorId  String
+  views     Int      @default(0)
+  score     Int      @default(0)
+  status    String   @default("open") // open | closed | duplicate
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User      @relation(fields: [authorId], references: [id])
+  answers  Answer[]
+  votes    Vote[]
+  comments Comment[]
+  tags     QuestionTag[]
+
+  @@index([authorId])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  body       String
+  authorId   String
+  questionId String
+  score      Int      @default(0)
+  isAccepted Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  author   User      @relation(fields: [authorId], references: [id])
+  question Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  votes    Vote[]
+  comments Comment[]
+
+  @@index([authorId])
+  @@index([questionId])
+  @@index([score])
+}
+
+model Vote {
+  id         String   @id @default(cuid())
+  userId     String
+  value      Int      // +1 or -1
+  questionId String?
+  answerId   String?
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer   Answer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@unique([userId, answerId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  body       String
+  authorId   String
+  questionId String?
+  answerId   String?
+  createdAt  DateTime @default(now())
+
+  author   User      @relation(fields: [authorId], references: [id])
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer   Answer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@index([answerId])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  questions QuestionTag[]
+}
+
+model QuestionTag {
+  questionId String
+  tagId      String
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id])
+
+  @@id([questionId, tagId])
+  @@index([tagId])
+}
