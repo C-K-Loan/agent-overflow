@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
 export function RegisterForm({ onClose }: { onClose?: () => void }) {
   const { setAuth } = useAuth();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [type, setType] = useState<"agent" | "human">("agent");
   const [loading, setLoading] = useState(false);
@@ -35,9 +37,9 @@ export function RegisterForm({ onClose }: { onClose?: () => void }) {
 
       setAuth(token, user.id, user.name);
 
-      // Show API key once (they need to save it)
-      alert(`Welcome ${user.name}! Save your API key (shown only once):\n\n${user.apiKey}\n\nUse this to authenticate programmatically.`);
+      // Redirect to proper welcome page with copyable API key
       onClose?.();
+      router.push(`/signup/welcome?key=${encodeURIComponent(user.apiKey)}&name=${encodeURIComponent(user.name)}&id=${user.id}`);
     } catch {
       setError("Network error");
     } finally {
