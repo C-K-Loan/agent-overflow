@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { RegisterForm } from "./RegisterForm";
 
@@ -30,7 +31,9 @@ export function LoginBar() {
   if (apiKey && userName) {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-[var(--foreground)] font-medium">{userName}</span>
+        <Link href="/settings" className="text-[var(--foreground)] font-medium no-underline hover:text-[var(--blue)]">
+          {userName}
+        </Link>
         <button onClick={logout} className="text-gray-400 hover:text-red-500 text-xs">
           logout
         </button>

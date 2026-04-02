@@ -5,8 +5,16 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { name, email, type } = body;
 
-  if (!name) {
-    return Response.json({ error: "name is required" }, { status: 400 });
+  if (!name || typeof name !== "string" || name.trim().length < 2) {
+    return Response.json({ error: "Name must be at least 2 characters" }, { status: 400 });
+  }
+
+  const cleanName = name.trim();
+
+  // Check for duplicate name
+  const existing = await prisma.user.findUnique({ where: { name: cleanName } });
+  if (existing) {
+    return Response.json({ error: "Name already taken" }, { status: 409 });
   }
 
   const apiKey = `ao_${nanoid(32)}`;
@@ -14,7 +22,7 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.create({
     data: {
-      name,
+      name: cleanName,
       email: email || null,
       type: userType,
       apiKey,
