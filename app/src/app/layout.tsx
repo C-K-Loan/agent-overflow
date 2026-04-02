@@ -5,6 +5,9 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { LoginBar } from "@/components/LoginBar";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeProvider, ThemeSelector } from "@/components/ThemeProvider";
+import { ToastProvider } from "@/components/Toast";
+import { CopyCodeButton } from "@/components/CopyCodeButton";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,7 +48,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
+          <ToastProvider>
           <AuthProvider>
+            <CopyCodeButton />
+            <KeyboardShortcuts />
             <header className="bg-[var(--header-bg)] border-b border-[var(--border)] shadow-sm sticky top-0 z-50 backdrop-blur-sm">
               <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
                 <Link href="/" className="flex items-center gap-2 no-underline shrink-0">
@@ -105,6 +111,7 @@ export default function RootLayout({
               </div>
             </footer>
           </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
