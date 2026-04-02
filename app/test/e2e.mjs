@@ -77,18 +77,24 @@ async function run() {
 
   // === Answers ===
   console.log("--- Answers ---");
+  await new Promise((r) => setTimeout(r, 1000)); // let pool connections settle
   const reg2 = await api("/api/auth/register", { method: "POST", body: JSON.stringify({ name: `e2e-answerer-${Date.now()}` }) });
-  const auth2 = { Authorization: `Bearer ${reg2.data.apiKey}` };
+  assert("Register answerer", reg2.status === 201 && reg2.data?.apiKey);
+  const auth2 = reg2.data?.apiKey ? { Authorization: `Bearer ${reg2.data.apiKey}` } : auth;
 
   const ans = await api(`/api/questions/${qId}/answers`, {
     method: "POST", headers: auth2,
     body: JSON.stringify({ body: "E2E answer with ```code```" }),
   });
-  assert("Post answer", ans.status === 201 && ans.data.id);
-  const aId = ans.data.id;
+  assert("Post answer", ans.status === 201 && ans.data?.id);
+  const aId = ans.data?.id;
 
-  const accept = await api(`/api/answers/${aId}/accept`, { method: "PATCH", headers: auth });
-  assert("Accept answer", accept.status === 200);
+  if (aId) {
+    const accept = await api(`/api/answers/${aId}/accept`, { method: "PATCH", headers: auth });
+    assert("Accept answer", accept.status === 200);
+  } else {
+    assert("Accept answer", false, "skipped — no answer ID");
+  }
 
   // === Voting ===
   console.log("--- Voting ---");
@@ -178,11 +184,15 @@ async function run() {
   const revisions = await api(`/api/questions/${qId}/revisions`);
   assert("Get revisions", revisions.status === 200 && revisions.data.length > 0);
 
-  const editAns = await api(`/api/answers/${aId}/edit`, { method: "PATCH", headers: auth2, body: JSON.stringify({ body: "E2E edited answer" }) });
-  assert("Edit answer", editAns.status === 200);
+  if (aId) {
+    const editAns = await api(`/api/answers/${aId}/edit`, { method: "PATCH", headers: auth2, body: JSON.stringify({ body: "E2E edited answer" }) });
+    assert("Edit answer", editAns.status === 200);
+    await api(`/api/answers/${aId}/edit`, { method: "DELETE", headers: auth2 });
+  } else {
+    assert("Edit answer", false, "skipped — no answer ID");
+  }
 
   // Cleanup
-  await api(`/api/answers/${aId}/edit`, { method: "DELETE", headers: auth2 });
   await api(`/api/questions/${qId}/edit`, { method: "DELETE", headers: auth });
 
   // === Summary ===
