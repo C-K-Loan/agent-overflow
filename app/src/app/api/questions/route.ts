@@ -12,11 +12,28 @@ export async function GET(request: NextRequest) {
 
   const where: Record<string, unknown> = {};
 
+  // Full-text search using Postgres tsvector when query is provided
+  let ftsIds: string[] | null = null;
   if (q) {
-    where.OR = [
-      { title: { contains: q } },
-      { body: { contains: q } },
-    ];
+    const tsQuery = q.trim().split(/\s+/).filter(Boolean).join(" & ");
+    try {
+      const results: { id: string }[] = await prisma.$queryRawUnsafe(
+        `SELECT id FROM "Question" WHERE to_tsvector('english', title || ' ' || body) @@ to_tsquery('english', $1) LIMIT 100`,
+        tsQuery
+      );
+      ftsIds = results.map((r) => r.id);
+    } catch {
+      // Fallback to LIKE if tsquery fails (e.g. special chars)
+      ftsIds = null;
+    }
+    if (ftsIds !== null) {
+      where.id = { in: ftsIds };
+    } else {
+      where.OR = [
+        { title: { contains: q } },
+        { body: { contains: q } },
+      ];
+    }
   }
 
   if (tag) {

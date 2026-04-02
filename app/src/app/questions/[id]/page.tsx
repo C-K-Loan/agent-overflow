@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { timeAgo } from "@/lib/time";
+import { MarkdownBody } from "@/components/MarkdownBody";
+import { VoteButtons } from "@/components/VoteButtons";
+import { AnswerForm } from "@/components/AnswerForm";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -47,25 +50,15 @@ export default async function QuestionPage({
         <div className="flex gap-4 text-sm text-gray-500">
           <span>Asked {timeAgo(question.createdAt)}</span>
           <span>Viewed {question.views} times</span>
-          <span className={question.score > 0 ? "text-[var(--green)]" : question.score < 0 ? "text-red-500" : ""}>
-            Score: {question.score}
-          </span>
         </div>
       </div>
 
       {/* Question body */}
       <div className="flex gap-6">
-        {/* Vote column */}
-        <div className="flex flex-col items-center gap-1 pt-1 min-w-[40px]">
-          <button className="text-gray-400 hover:text-[var(--accent)] text-2xl leading-none">&#9650;</button>
-          <span className="text-xl font-medium">{question.score}</span>
-          <button className="text-gray-400 hover:text-[var(--accent)] text-2xl leading-none">&#9660;</button>
-        </div>
+        <VoteButtons targetId={question.id} targetType="question" initialScore={question.score} />
 
         <div className="flex-1">
-          <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-            {question.body}
-          </div>
+          <MarkdownBody content={question.body} />
 
           <div className="flex gap-2 mt-4">
             {question.tags.map((t) => (
@@ -97,7 +90,7 @@ export default async function QuestionPage({
               {question.comments.map((c) => (
                 <div key={c.id} className="text-sm py-1 border-b border-gray-100">
                   <span className="text-gray-600">{c.body}</span>
-                  {" &ndash; "}
+                  {" \u2013 "}
                   <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">
                     {c.author.name}
                   </Link>
@@ -117,20 +110,15 @@ export default async function QuestionPage({
 
         {question.answers.map((a) => (
           <div key={a.id} className="flex gap-6 py-6 border-t border-[var(--border)]">
-            {/* Vote column */}
-            <div className="flex flex-col items-center gap-1 pt-1 min-w-[40px]">
-              <button className="text-gray-400 hover:text-[var(--accent)] text-2xl leading-none">&#9650;</button>
-              <span className="text-xl font-medium">{a.score}</span>
-              <button className="text-gray-400 hover:text-[var(--accent)] text-2xl leading-none">&#9660;</button>
-              {a.isAccepted && (
-                <div className="text-[var(--green)] text-2xl mt-1" title="Accepted answer">&#10003;</div>
-              )}
-            </div>
+            <VoteButtons
+              targetId={a.id}
+              targetType="answer"
+              initialScore={a.score}
+              isAccepted={a.isAccepted}
+            />
 
             <div className="flex-1">
-              <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-                {a.body}
-              </div>
+              <MarkdownBody content={a.body} />
 
               <div className="flex justify-end mt-4">
                 <div className={`rounded px-3 py-2 text-sm ${a.isAccepted ? "bg-green-50" : "bg-gray-50"}`}>
@@ -150,7 +138,7 @@ export default async function QuestionPage({
                   {a.comments.map((c) => (
                     <div key={c.id} className="text-sm py-1 border-b border-gray-100">
                       <span className="text-gray-600">{c.body}</span>
-                      {" &ndash; "}
+                      {" \u2013 "}
                       <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">
                         {c.author.name}
                       </Link>
@@ -163,6 +151,9 @@ export default async function QuestionPage({
           </div>
         ))}
       </div>
+
+      {/* Answer form */}
+      <AnswerForm questionId={question.id} />
     </div>
   );
 }

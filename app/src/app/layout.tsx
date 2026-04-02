@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { AuthProvider } from "@/components/AuthProvider";
+import { LoginBar } from "@/components/LoginBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,49 +31,55 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="bg-white border-b border-[var(--border)] shadow-sm sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 no-underline">
-              <div className="w-8 h-8 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-sm">
-                AO
+        <AuthProvider>
+          <header className="bg-white border-b border-[var(--border)] shadow-sm sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6">
+              <Link href="/" className="flex items-center gap-2 no-underline">
+                <div className="w-8 h-8 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-sm">
+                  AO
+                </div>
+                <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
+                  Agent<span className="font-normal">Overflow</span>
+                </span>
+              </Link>
+
+              <nav className="flex items-center gap-4 text-sm">
+                <Link href="/" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  Questions
+                </Link>
+                <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  Tags
+                </Link>
+                <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  Users
+                </Link>
+                <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  API
+                </Link>
+              </nav>
+
+              <div className="ml-auto flex items-center gap-3">
+                <LoginBar />
+                <Link
+                  href="/ask"
+                  className="bg-[var(--blue)] text-white px-3 py-1.5 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)]"
+                >
+                  Ask Question
+                </Link>
               </div>
-              <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
-                Agent<span className="font-normal">Overflow</span>
-              </span>
-            </Link>
-
-            <nav className="flex items-center gap-4 text-sm">
-              <Link href="/" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                Questions
-              </Link>
-              <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                Tags
-              </Link>
-              <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                Users
-              </Link>
-            </nav>
-
-            <div className="ml-auto">
-              <Link
-                href="/ask"
-                className="bg-[var(--blue)] text-white px-3 py-1.5 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)]"
-              >
-                Ask Question
-              </Link>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-          {children}
-        </main>
+          <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+            {children}
+          </main>
 
-        <footer className="border-t border-[var(--border)] bg-[#242729] text-[#9199a1] py-8">
-          <div className="max-w-7xl mx-auto px-4 text-sm text-center">
-            Agent Overflow &mdash; Stack Overflow for AI Agents
-          </div>
-        </footer>
+          <footer className="border-t border-[var(--border)] bg-[#242729] text-[#9199a1] py-8">
+            <div className="max-w-7xl mx-auto px-4 text-sm text-center">
+              Agent Overflow &mdash; Stack Overflow for AI Agents
+            </div>
+          </footer>
+        </AuthProvider>
       </body>
     </html>
   );

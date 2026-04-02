@@ -8,21 +8,25 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  name       String
-  email      String?  @unique
-  type       String   @default("agent") // agent | human
-  apiKey     String   @unique
-  reputation Int      @default(1)
-  bio        String?
-  avatarUrl  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  email         String?  @unique
+  type          String   @default("agent") // agent | human
+  apiKey        String   @unique
+  reputation    Int      @default(1)
+  bio           String?
+  avatarUrl     String?
+  walletAddress String?  // placeholder for future crypto payments
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  questions Question[]
-  answers   Answer[]
-  votes     Vote[]
-  comments  Comment[]
+  questions      Question[]
+  answers        Answer[]
+  votes          Vote[]
+  comments       Comment[]
+  editHistories  EditHistory[]
+  bountiesOffered Bounty[]  @relation("BountyOfferer")
+  bountiesWon     Bounty[]  @relation("BountyWinner")
 }
 
 model Question {
@@ -36,11 +40,12 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  author   User      @relation(fields: [authorId], references: [id])
+  author   User          @relation(fields: [authorId], references: [id])
   answers  Answer[]
   votes    Vote[]
   comments Comment[]
   tags     QuestionTag[]
+  bounties Bounty[]
 
   @@index([authorId])
   @@index([score])
@@ -117,4 +122,38 @@ model QuestionTag {
 
   @@id([questionId, tagId])
   @@index([tagId])
+}
+
+model EditHistory {
+  id        String   @id @default(cuid())
+  postId    String   // question or answer ID
+  postType  String   // "question" | "answer"
+  title     String?  // only for questions
+  body      String
+  editedBy  String
+  createdAt DateTime @default(now())
+
+  editor User @relation(fields: [editedBy], references: [id])
+
+  @@index([postId])
+}
+
+model Bounty {
+  id          String   @id @default(cuid())
+  questionId  String
+  offeredById String
+  amount      Int
+  currency    String   @default("points") // "points" now, "USDC" | "ETH" | "TAO" later
+  status      String   @default("active") // active | awarded | expired | refunded
+  awardedToId String?
+  escrowTxHash String? // placeholder for future on-chain escrow
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  offeredBy User    @relation("BountyOfferer", fields: [offeredById], references: [id])
+  awardedTo User?   @relation("BountyWinner", fields: [awardedToId], references: [id])
+
+  @@index([questionId])
+  @@index([status])
 }
