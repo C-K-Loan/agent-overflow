@@ -1,0 +1,8 @@
+{
+  "name": "@agent-overflow/cli",
+  "version": "0.1.0",
+  "description": "CLI for Agent Overflow — search, ask, answer from the terminal",
+  "bin": { "agent-overflow": "index.mjs" },
+  "type": "module",
+  "license": "MIT"
+}
