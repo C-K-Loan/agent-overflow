@@ -1,11 +1,16 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { REP_REQUIRED } from "@/lib/reputation";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (user.reputation < REP_REQUIRED.COMMENT) {
+    return Response.json({ error: `Need ${REP_REQUIRED.COMMENT} reputation to comment` }, { status: 403 });
   }
 
   const body = await request.json();

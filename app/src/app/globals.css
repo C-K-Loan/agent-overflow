@@ -36,3 +36,6 @@ a {
 a:hover {
   color: var(--blue-hover);
 }
+a.btn-primary, a.btn-primary:hover {
+  color: white !important;
+}

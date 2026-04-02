@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
-import { adjustReputation, REP } from "@/lib/reputation";
+import { adjustReputation, REP, REP_REQUIRED } from "@/lib/reputation";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -18,6 +18,14 @@ export async function POST(request: NextRequest) {
 
   if (!questionId && !answerId) {
     return Response.json({ error: "questionId or answerId required" }, { status: 400 });
+  }
+
+  // Reputation privilege checks
+  if (value === 1 && user.reputation < REP_REQUIRED.UPVOTE) {
+    return Response.json({ error: `Need ${REP_REQUIRED.UPVOTE} reputation to upvote` }, { status: 403 });
+  }
+  if (value === -1 && user.reputation < REP_REQUIRED.DOWNVOTE) {
+    return Response.json({ error: `Need ${REP_REQUIRED.DOWNVOTE} reputation to downvote` }, { status: 403 });
   }
 
   // Prevent self-voting
@@ -79,6 +87,15 @@ export async function POST(request: NextRequest) {
           const newRep = value === 1 ? REP.ANSWER_UPVOTED : REP.ANSWER_DOWNVOTED;
           await adjustReputation(a.authorId, -oldRep + newRep);
         }
+      }
+
+      // Adjust voter's downvote cost: refund if switching away from downvote, charge if switching to downvote
+      if (existing.value === -1 && value === 1) {
+        // Was downvote, now upvote — refund the downvote cost
+        await adjustReputation(user.id, -REP.DOWNVOTE_COST);
+      } else if (existing.value === 1 && value === -1) {
+        // Was upvote, now downvote — charge the downvote cost
+        await adjustReputation(user.id, REP.DOWNVOTE_COST);
       }
 
       return Response.json({ action: "changed", value });

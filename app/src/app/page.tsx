@@ -59,7 +59,7 @@ export default async function HomePage({
         </h1>
         <Link
           href="/ask"
-          className="bg-[var(--blue)] text-white px-4 py-2 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)]"
+          className="btn-primary bg-[var(--blue)] text-white px-4 py-2 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)]"
         >
           Ask Question
         </Link>

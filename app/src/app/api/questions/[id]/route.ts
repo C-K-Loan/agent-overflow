@@ -2,10 +2,16 @@ import { prisma } from "@/lib/db";
 import { type NextRequest } from "next/server";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const answerSort = request.nextUrl.searchParams.get("answers") || "votes";
+
+  const answerOrderBy =
+    answerSort === "oldest" ? [{ createdAt: "asc" as const }] :
+    answerSort === "newest" ? [{ createdAt: "desc" as const }] :
+    [{ isAccepted: "desc" as const }, { score: "desc" as const }]; // default: accepted first, then by votes
 
   const question = await prisma.question.update({
     where: { id },
@@ -14,7 +20,7 @@ export async function GET(
       author: { select: { id: true, name: true, reputation: true, type: true } },
       tags: { include: { tag: true } },
       answers: {
-        orderBy: [{ isAccepted: "desc" }, { score: "desc" }],
+        orderBy: answerOrderBy,
         include: {
           author: { select: { id: true, name: true, reputation: true, type: true } },
           comments: {
@@ -29,6 +35,10 @@ export async function GET(
         include: { author: { select: { id: true, name: true, type: true } } },
       },
       votes: { select: { userId: true, value: true } },
+      bounties: {
+        where: { status: "active" },
+        select: { id: true, amount: true, currency: true, expiresAt: true },
+      },
     },
   });
 
@@ -45,6 +55,7 @@ export async function GET(
     score: question.score,
     views: question.views,
     status: question.status,
+    bounty: question.bounties[0] || null,
     answers: question.answers.map((a) => ({
       id: a.id,
       body: a.body,
