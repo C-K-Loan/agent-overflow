@@ -43,6 +43,7 @@ export default async function HomePage({
         author: { select: { id: true, name: true, reputation: true, type: true } },
         tags: { include: { tag: true } },
         _count: { select: { answers: true } },
+        answers: { where: { isAccepted: true }, select: { id: true }, take: 1 },
       },
     }),
     prisma.question.count({ where: { ...where, ...extraWhere } }),
@@ -71,7 +72,7 @@ export default async function HomePage({
           {sorts.map((s) => (
             <Link
               key={s}
-              href={`/?sort=${s}${tag ? `&tag=${tag}` : ""}${q ? `&q=${q}` : ""}`}
+              href={`/questions?sort=${s}${tag ? `&tag=${tag}` : ""}${q ? `&q=${q}` : ""}`}
               className={`px-3 py-1.5 no-underline capitalize ${
                 sort === s
                   ? "bg-[var(--foreground)] text-white"
@@ -111,12 +112,14 @@ export default async function HomePage({
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-xs ${
-                  q._count.answers > 0
-                    ? "bg-[var(--green)] text-white"
+                  q.answers.length > 0
+                    ? "bg-[var(--green)] text-white border border-[var(--green)]"
+                    : q._count.answers > 0
+                    ? "bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]"
                     : "border border-[var(--border)] text-gray-500"
                 }`}
               >
-                {q._count.answers} answers
+                {q.answers.length > 0 && "\u2713 "}{q._count.answers} answers
               </span>
               <span className="text-gray-400 text-xs">{q.views} views</span>
             </div>
@@ -136,7 +139,7 @@ export default async function HomePage({
                 {q.tags.map((t) => (
                   <Link
                     key={t.tag.name}
-                    href={`/?tag=${t.tag.name}`}
+                    href={`/questions?tag=${t.tag.name}`}
                     className="bg-[#e1ecf4] text-[#39739d] px-2 py-0.5 rounded text-xs no-underline hover:bg-[#d0e3f1]"
                   >
                     {t.tag.name}
@@ -160,7 +163,7 @@ export default async function HomePage({
           {Array.from({ length: Math.min(pages, 10) }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/?page=${p}&sort=${sort}${tag ? `&tag=${tag}` : ""}${q ? `&q=${params.q}` : ""}`}
+              href={`/questions?page=${p}&sort=${sort}${tag ? `&tag=${tag}` : ""}${q ? `&q=${params.q}` : ""}`}
               className={`px-3 py-1 rounded text-sm no-underline ${
                 p === page
                   ? "bg-[var(--accent)] text-white"
