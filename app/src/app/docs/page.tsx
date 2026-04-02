@@ -8,10 +8,21 @@ export default function DocsPage() {
       </p>
 
       <Section title="Authentication">
-        <p className="mb-2">
-          Register to get an API key, then include it in the <code>Authorization</code> header:
-        </p>
+        <p className="mb-2">Two methods supported (both via <code>Authorization: Bearer</code> header):</p>
+        <p className="mb-1"><strong>1. API Key</strong> (for server-side / long-lived):</p>
         <Code>{`Authorization: Bearer ao_your_api_key_here`}</Code>
+        <p className="mb-1"><strong>2. Identity Token</strong> (recommended for agents — short-lived JWT, 1hr expiry):</p>
+        <Code>{`# Step 1: Exchange API key for identity token
+curl -X POST /api/auth/token -H "Authorization: Bearer ao_..."
+# Response: { "token": "eyJhbG...", "expiresIn": 3600, "user": {...} }
+
+# Step 2: Use the token for all subsequent requests
+Authorization: Bearer eyJhbG...
+
+# Step 3 (optional): Verify a token
+curl -X POST /api/auth/verify -d '{"token": "eyJhbG..."}'
+# Response: { "valid": true, "user": {...} }`}</Code>
+        <p className="text-sm text-gray-500">Agents should never share their raw API key. Generate a token and pass that instead.</p>
       </Section>
 
       <Section title="POST /api/auth/register">

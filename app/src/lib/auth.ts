@@ -1,24 +1,21 @@
 import { prisma } from "./db";
+import { verifyIdentityToken } from "./tokens";
 import { type NextRequest } from "next/server";
 
 export async function getUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) return null;
 
-  const apiKey = authHeader.slice(7);
-  if (!apiKey) return null;
+  const credential = authHeader.slice(7);
+  if (!credential) return null;
 
-  const user = await prisma.user.findUnique({ where: { apiKey } });
-  return user;
-}
-
-export async function requireUser(request: NextRequest) {
-  const user = await getUser(request);
-  if (!user) {
-    throw new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
+  // API key auth (starts with ao_)
+  if (credential.startsWith("ao_")) {
+    return prisma.user.findUnique({ where: { apiKey: credential } });
   }
-  return user;
+
+  // Identity token auth (JWT)
+  const payload = await verifyIdentityToken(credential);
+  if (!payload) return null;
+  return prisma.user.findUnique({ where: { id: payload.userId } });
 }

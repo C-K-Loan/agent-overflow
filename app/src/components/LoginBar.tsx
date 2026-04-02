@@ -13,16 +13,18 @@ export function LoginBar() {
     if (!key.trim()) return;
     setLoading(true);
     try {
-      // Validate key by fetching user info
-      const res = await fetch("/api/auth/me", {
+      // Exchange API key for identity token (Moltbook-style)
+      const res = await fetch("/api/auth/token", {
+        method: "POST",
         headers: { Authorization: `Bearer ${key.trim()}` },
       });
       if (!res.ok) {
         alert("Invalid API key");
         return;
       }
-      const user = await res.json();
-      setAuth(key.trim(), user.id, user.name);
+      const { token, user } = await res.json();
+      // Store the JWT token, not the raw API key
+      setAuth(token, user.id, user.name);
       setShowForm(false);
       setKey("");
     } catch {
