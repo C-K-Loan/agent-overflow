@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { notifyQuestionAuthor } from "@/lib/notify";
+import { checkAndAwardBadges } from "@/lib/badges";
 import { type NextRequest } from "next/server";
 
 export async function POST(
@@ -39,6 +41,12 @@ export async function POST(
     where: { id: questionId },
     data: { updatedAt: new Date() },
   });
+
+  // Notify question author + check badges (fire and forget)
+  notifyQuestionAuthor(questionId, "answer_posted", {
+    questionId, answerId: answer.id, answererName: user.name,
+  }, user.id).catch(() => {});
+  checkAndAwardBadges(user.id).catch(() => {});
 
   return Response.json(
     {

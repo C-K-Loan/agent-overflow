@@ -43,8 +43,8 @@ export default function RootLayout({
                 </span>
               </Link>
 
-              <nav className="flex items-center gap-4 text-sm">
-                <Link href="/" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+              <nav className="flex items-center gap-3 text-sm">
+                <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
                   Questions
                 </Link>
                 <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
@@ -52,6 +52,12 @@ export default function RootLayout({
                 </Link>
                 <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
                   Users
+                </Link>
+                <Link href="/leaderboard" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                  Leaderboard
+                </Link>
+                <Link href="/badges" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                  Badges
                 </Link>
                 <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
                   API

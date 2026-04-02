@@ -20,34 +20,41 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  questions      Question[]
-  answers        Answer[]
-  votes          Vote[]
-  comments       Comment[]
-  editHistories  EditHistory[]
-  bountiesOffered Bounty[]    @relation("BountyOfferer")
-  bountiesWon     Bounty[]    @relation("BountyWinner")
+  questions       Question[]
+  answers         Answer[]
+  votes           Vote[]
+  comments        Comment[]
+  editHistories   EditHistory[]
+  bountiesOffered Bounty[]       @relation("BountyOfferer")
+  bountiesWon     Bounty[]       @relation("BountyWinner")
   bookmarks       Bookmark[]
+  notifications   Notification[]
+  userBadges      UserBadge[]
+  webhooks        Webhook[]
+  closeVotes      CloseVote[]
 }
 
 model Question {
-  id        String   @id @default(cuid())
-  title     String
-  body      String
-  authorId  String
-  views     Int      @default(0)
-  score     Int      @default(0)
-  status    String   @default("open") // open | closed | duplicate
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  body          String
+  authorId      String
+  views         Int      @default(0)
+  score         Int      @default(0)
+  status        String   @default("open") // open | closed | duplicate
+  closedReason  String?
+  duplicateOfId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  author   User          @relation(fields: [authorId], references: [id])
-  answers   Answer[]
-  votes     Vote[]
-  comments  Comment[]
-  tags      QuestionTag[]
-  bounties  Bounty[]
-  bookmarks Bookmark[]
+  author     User          @relation(fields: [authorId], references: [id])
+  answers    Answer[]
+  votes      Vote[]
+  comments   Comment[]
+  tags       QuestionTag[]
+  bounties   Bounty[]
+  bookmarks  Bookmark[]
+  closeVotes CloseVote[]
 
   @@index([authorId])
   @@index([score])
@@ -110,6 +117,7 @@ model Tag {
   id          String   @id @default(cuid())
   name        String   @unique
   description String?
+  wikiBody    String?
   createdAt   DateTime @default(now())
 
   questions QuestionTag[]
@@ -128,9 +136,9 @@ model QuestionTag {
 
 model EditHistory {
   id        String   @id @default(cuid())
-  postId    String   // question or answer ID
+  postId    String
   postType  String   // "question" | "answer"
-  title     String?  // only for questions
+  title     String?
   body      String
   editedBy  String
   createdAt DateTime @default(now())
@@ -141,20 +149,20 @@ model EditHistory {
 }
 
 model Bounty {
-  id          String   @id @default(cuid())
-  questionId  String
-  offeredById String
-  amount      Int
-  currency    String   @default("points") // "points" now, "USDC" | "ETH" | "TAO" later
-  status      String   @default("active") // active | awarded | expired | refunded
-  awardedToId String?
-  escrowTxHash String? // placeholder for future on-chain escrow
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime
+  id           String   @id @default(cuid())
+  questionId   String
+  offeredById  String
+  amount       Int
+  currency     String   @default("points")
+  status       String   @default("active") // active | awarded | expired | refunded
+  awardedToId  String?
+  escrowTxHash String?
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
 
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  offeredBy User    @relation("BountyOfferer", fields: [offeredById], references: [id])
-  awardedTo User?   @relation("BountyWinner", fields: [awardedToId], references: [id])
+  question  Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  offeredBy User     @relation("BountyOfferer", fields: [offeredById], references: [id])
+  awardedTo User?    @relation("BountyWinner", fields: [awardedToId], references: [id])
 
   @@index([questionId])
   @@index([status])
@@ -175,12 +183,76 @@ model Bookmark {
 model Flag {
   id        String   @id @default(cuid())
   postId    String
-  postType  String   // "question" | "answer" | "comment"
+  postType  String
   reason    String
   flaggedBy String
-  status    String   @default("pending") // pending | reviewed | dismissed
+  status    String   @default("pending")
   createdAt DateTime @default(now())
 
   @@index([postId])
   @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // answer_posted | answer_accepted | comment_added | badge_earned | bounty_awarded | question_upvoted
+  data      String   // JSON payload
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  icon        String   @default("star")
+  tier        String   // gold | silver | bronze
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  badge Badge @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+}
+
+model Webhook {
+  id        String   @id @default(cuid())
+  userId    String
+  url       String
+  events    String   // comma-separated: question.created,answer.created,answer.accepted,bounty.awarded
+  secret    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model CloseVote {
+  id         String   @id @default(cuid())
+  questionId String
+  userId     String
+  reason     String   // duplicate | off-topic | unclear | too-broad | opinion-based
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([questionId, userId])
 }
