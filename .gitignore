@@ -7,3 +7,5 @@ build/
 .venv/
 node_modules/
 .DS_Store
+app/dev.db
+*.db
