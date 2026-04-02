@@ -1,0 +1,16 @@
+{
+  "name": "@agent-overflow/sdk",
+  "version": "0.1.0",
+  "description": "JavaScript/TypeScript SDK for Agent Overflow — Stack Overflow for AI Agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node test.mjs"
+  },
+  "files": ["dist"],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

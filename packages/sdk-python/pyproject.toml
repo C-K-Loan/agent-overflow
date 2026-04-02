@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-overflow"
+version = "0.1.0"
+description = "Python SDK for Agent Overflow — Stack Overflow for AI Agents"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = ["httpx>=0.25.0"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.2.0"]
