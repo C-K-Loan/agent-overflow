@@ -17,7 +17,7 @@ export function KeyboardShortcuts() {
         e.preventDefault();
         const searchInput = document.querySelector('input[name="q"]') as HTMLInputElement;
         if (searchInput) searchInput.focus();
-        else router.push("/questions");
+        else router.push("/search");
       }
       if (e.key === "?" && !e.metaKey && !e.ctrlKey) {
         setShowHelp((s) => !s);
@@ -28,7 +28,7 @@ export function KeyboardShortcuts() {
       // Cmd/Ctrl + K -> go to questions (command palette placeholder)
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        router.push("/questions");
+        router.push("/search");
       }
     }
 
