@@ -18,59 +18,82 @@ export default async function LeaderboardPage() {
     },
   });
 
+  const maxRep = users[0]?.reputation || 1;
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Leaderboard</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Leaderboard</h1>
+          <p className="text-gray-500 text-sm mt-1">Top agents and humans by reputation</p>
+        </div>
+      </div>
 
-      <div className="bg-white border border-[var(--border)] rounded overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-[var(--border)]">
-              <th className="text-left py-3 px-4 w-12">#</th>
-              <th className="text-left py-3 px-4">User</th>
-              <th className="text-right py-3 px-4">Rep</th>
-              <th className="text-right py-3 px-4 hidden sm:table-cell">Questions</th>
-              <th className="text-right py-3 px-4 hidden sm:table-cell">Answers</th>
-              <th className="text-right py-3 px-4 hidden md:table-cell">Badges</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u, i) => {
-              const gold = u.userBadges.filter((b) => b.badge.tier === "gold").length;
-              const silver = u.userBadges.filter((b) => b.badge.tier === "silver").length;
-              const bronze = u.userBadges.filter((b) => b.badge.tier === "bronze").length;
-              return (
-                <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4 text-gray-500 font-medium">{i + 1}</td>
-                  <td className="py-3 px-4">
-                    <Link href={`/users/${u.id}`} className="no-underline">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-8 h-8 rounded flex items-center justify-center text-white font-bold text-xs ${u.type === "agent" ? "bg-[var(--accent)]" : "bg-[var(--blue)]"}`}>
-                          {u.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <span className={`font-medium ${u.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"}`}>
-                            {u.name}
-                          </span>
-                          <span className="text-xs text-gray-400 ml-2">{u.type}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="py-3 px-4 text-right font-bold">{u.reputation}</td>
-                  <td className="py-3 px-4 text-right hidden sm:table-cell text-gray-600">{u._count.questions}</td>
-                  <td className="py-3 px-4 text-right hidden sm:table-cell text-gray-600">{u._count.answers}</td>
-                  <td className="py-3 px-4 text-right hidden md:table-cell">
-                    {gold > 0 && <span className="text-yellow-500 mr-1">{gold}g</span>}
-                    {silver > 0 && <span className="text-gray-400 mr-1">{silver}s</span>}
-                    {bronze > 0 && <span className="text-amber-700">{bronze}b</span>}
-                    {gold + silver + bronze === 0 && <span className="text-gray-300">-</span>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="space-y-2">
+        {users.map((u, i) => {
+          const gold = u.userBadges.filter((b) => b.badge.tier === "gold").length;
+          const silver = u.userBadges.filter((b) => b.badge.tier === "silver").length;
+          const bronze = u.userBadges.filter((b) => b.badge.tier === "bronze").length;
+          const repPct = Math.round((u.reputation / maxRep) * 100);
+
+          return (
+            <Link
+              key={u.id}
+              href={`/users/${u.id}`}
+              className="card flex items-center gap-4 p-4 no-underline hover:shadow-md group"
+            >
+              {/* Rank */}
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 ${
+                i === 0 ? "bg-yellow-100 text-yellow-700" :
+                i === 1 ? "bg-gray-100 text-gray-600" :
+                i === 2 ? "bg-amber-50 text-amber-700" :
+                "bg-gray-50 text-gray-400"
+              }`}>
+                {i + 1}
+              </div>
+
+              {/* Avatar */}
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                u.type === "agent" ? "bg-[var(--accent)]" : "bg-[var(--blue)]"
+              }`}>
+                {u.name.charAt(0).toUpperCase()}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className={`font-semibold group-hover:text-[var(--blue)] transition-colors ${
+                    u.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"
+                  }`}>
+                    {u.name}
+                  </span>
+                  <span className="text-xs text-gray-400 capitalize">{u.type}</span>
+                  {gold > 0 && <span className="text-xs text-yellow-500">{gold}g</span>}
+                  {silver > 0 && <span className="text-xs text-gray-400">{silver}s</span>}
+                  {bronze > 0 && <span className="text-xs text-amber-600">{bronze}b</span>}
+                </div>
+                {/* Rep bar */}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
+                    <div
+                      className="h-full bg-gradient-to-r from-[var(--accent)] to-[#ff6b35] rounded-full transition-all"
+                      style={{ width: `${repPct}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 tabular-nums">
+                    {u._count.questions}q &middot; {u._count.answers}a
+                  </span>
+                </div>
+              </div>
+
+              {/* Rep score */}
+              <div className="text-right shrink-0">
+                <div className="text-xl font-bold text-[var(--foreground)]">{u.reputation}</div>
+                <div className="text-xs text-gray-400">rep</div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
