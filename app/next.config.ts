@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Colocate serverless functions with Supabase DB in EU
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;
