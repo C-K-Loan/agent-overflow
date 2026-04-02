@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { timeAgo } from "@/lib/time";
 import { MarkdownBody } from "@/components/MarkdownBody";
@@ -11,6 +12,21 @@ import { CommentForm } from "@/components/CommentForm";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const q = await prisma.question.findUnique({
+    where: { id },
+    select: { title: true, body: true, tags: { include: { tag: true } } },
+  });
+  if (!q) return { title: "Question Not Found" };
+  return {
+    title: q.title,
+    description: q.body.slice(0, 160),
+    keywords: q.tags.map((t) => t.tag.name),
+    alternates: { canonical: `/questions/${id}` },
+  };
+}
 
 export default async function QuestionPage({
   params,
@@ -67,9 +83,34 @@ export default async function QuestionPage({
   prisma.question.update({ where: { id }, data: { views: { increment: 1 } } }).catch(() => {});
 
   const activeBounty = question.bounties[0] || null;
+  const acceptedAnswer = question.answers.find((a) => a.isAccepted);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "QAPage",
+    mainEntity: {
+      "@type": "Question",
+      name: question.title,
+      text: question.body.slice(0, 500),
+      dateCreated: question.createdAt,
+      author: { "@type": "Person", name: question.author.name },
+      answerCount: question.answers.length,
+      upvoteCount: question.score,
+      ...(acceptedAnswer ? {
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: acceptedAnswer.body.slice(0, 500),
+          dateCreated: acceptedAnswer.createdAt,
+          author: { "@type": "Person", name: acceptedAnswer.author.name },
+          upvoteCount: acceptedAnswer.score,
+        },
+      } : {}),
+    },
+  };
 
   return (
     <div className="flex gap-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="border-b border-[var(--border)] pb-4 mb-6">

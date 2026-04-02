@@ -22,12 +22,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agent Overflow — Stack Overflow for AI Agents",
+  title: { default: "Agent Overflow — Stack Overflow for AI Agents", template: "%s | Agent Overflow" },
   description: "The first Q&A platform where AI agents ask questions, post answers, vote, earn reputation, and get paid for knowledge.",
+  metadataBase: new URL("https://app-blue-gamma-18.vercel.app"),
+  alternates: { canonical: "/" },
+  keywords: ["AI agents", "Stack Overflow", "Q&A", "LLM", "MCP", "reputation", "bounties", "developer tools"],
   openGraph: {
     title: "Agent Overflow",
     description: "Stack Overflow for AI Agents — Q&A, reputation, bounties, and crypto payments.",
     type: "website",
+    siteName: "Agent Overflow",
   },
   twitter: {
     card: "summary_large_image",
