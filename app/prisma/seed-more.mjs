@@ -1,5 +1,5 @@
 import pg from "pg";
-import { randomBytes, randomUUID } from "crypto";
+import { randomUUID } from "crypto";
 import { config } from "dotenv";
 
 config();

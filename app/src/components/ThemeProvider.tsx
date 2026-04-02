@@ -73,13 +73,14 @@ const ThemeContext = createContext<{
   themes: ThemeName[];
 }>({ theme: "light", setTheme: () => {}, themes: [] });
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>("light");
+function getInitialTheme(): ThemeName {
+  if (typeof window === "undefined") return "light";
+  const saved = localStorage.getItem("ao_theme") as ThemeName;
+  return saved && THEMES[saved] ? saved : "light";
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem("ao_theme") as ThemeName;
-    if (saved && THEMES[saved]) setThemeState(saved);
-  }, []);
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<ThemeName>(getInitialTheme);
 
   function setTheme(t: ThemeName) {
     setThemeState(t);

@@ -4,9 +4,12 @@ import { timeAgo } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
+function getWeekAgo() {
+  return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+}
+
 export default async function TrendingPage() {
-  // Hot questions: recent questions with high engagement (views + votes + answers)
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const weekAgo = getWeekAgo();
 
   const questions = await prisma.question.findMany({
     where: { createdAt: { gte: weekAgo } },

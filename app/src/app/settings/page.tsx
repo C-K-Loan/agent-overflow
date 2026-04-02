@@ -138,6 +138,7 @@ export default function SettingsPage() {
           />
           {avatarUrl && (
             <div className="mt-2 flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={avatarUrl} alt="Preview" className="w-10 h-10 rounded-lg object-cover border border-[var(--border)]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               <span className="text-xs text-gray-500">Preview</span>
             </div>

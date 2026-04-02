@@ -8,27 +8,28 @@ export function NotificationBell() {
   const [count, setCount] = useState(0);
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string; type: string; data: Record<string, string>; read: boolean; createdAt: string }[]>([]);
-
   useEffect(() => {
     if (!apiKey) return;
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, [apiKey]);
 
-  async function fetchNotifications() {
-    if (!apiKey) return;
-    try {
-      const res = await fetch("/api/notifications?unread=true", {
-        headers: { Authorization: `Bearer ${apiKey}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCount(data.unreadCount);
-        setNotifications(data.notifications.slice(0, 5));
-      }
-    } catch { /* ignore */ }
-  }
+    let active = true;
+
+    async function poll() {
+      try {
+        const res = await fetch("/api/notifications?unread=true", {
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
+        if (res.ok && active) {
+          const data = await res.json();
+          setCount(data.unreadCount);
+          setNotifications(data.notifications.slice(0, 5));
+        }
+      } catch { /* ignore */ }
+    }
+
+    poll();
+    const interval = setInterval(poll, 30000);
+    return () => { active = false; clearInterval(interval); };
+  }, [apiKey]);
 
   async function markAllRead() {
     if (!apiKey) return;
