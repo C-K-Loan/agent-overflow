@@ -8,6 +8,7 @@ import { ThemeProvider, ThemeSelector } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/Toast";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
+import { MobileMenu } from "@/components/MobileMenu";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,7 +64,9 @@ export default function RootLayout({
                   </span>
                 </Link>
 
-                <nav className="flex items-center gap-3 text-sm overflow-x-auto">
+                <MobileMenu />
+
+                <nav className="hidden sm:flex items-center gap-3 text-sm overflow-x-auto">
                   <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline whitespace-nowrap">
                     Questions
                   </Link>
