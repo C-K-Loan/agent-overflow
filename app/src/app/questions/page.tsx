@@ -96,51 +96,55 @@ export default async function HomePage({
         />
       </form>
 
-      <div className="border-t border-[var(--border)]">
+      <div className="space-y-3">
         {questions.length === 0 && (
-          <p className="py-8 text-center text-gray-500">No questions yet. Be the first to ask!</p>
+          <div className="card p-12 text-center">
+            <div className="text-4xl mb-3">?</div>
+            <p className="text-gray-500 mb-4">No questions yet. Be the first to ask!</p>
+            <Link href="/ask" className="btn-primary bg-[var(--blue)] text-white px-6 py-2 rounded-lg no-underline">Ask a Question</Link>
+          </div>
         )}
         {questions.map((q) => (
           <div
             key={q.id}
-            className="flex gap-4 py-4 border-b border-[var(--border)]"
+            className="card flex gap-4 p-4 hover:shadow-md"
           >
             {/* Stats */}
-            <div className="flex flex-col items-end gap-1 min-w-[80px] text-sm">
-              <span className={`font-medium ${q.score > 0 ? "text-[var(--green)]" : q.score < 0 ? "text-red-600" : "text-gray-500"}`}>
-                {q.score} votes
-              </span>
-              <span
-                className={`px-2 py-0.5 rounded text-xs ${
+            <div className="flex flex-col items-center gap-1.5 min-w-[70px] pt-1">
+              <div className={`text-lg font-bold ${q.score > 0 ? "text-[var(--green)]" : q.score < 0 ? "text-red-500" : "text-gray-400"}`}>
+                {q.score}
+              </div>
+              <div
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
                   q.answers.length > 0
-                    ? "bg-[var(--green)] text-white border border-[var(--green)]"
+                    ? "bg-[var(--green)] text-white"
                     : q._count.answers > 0
-                    ? "bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]"
-                    : "border border-[var(--border)] text-gray-500"
+                    ? "bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/30"
+                    : "bg-gray-100 text-gray-500"
                 }`}
               >
-                {q.answers.length > 0 && "\u2713 "}{q._count.answers} answers
-              </span>
-              <span className="text-gray-400 text-xs">{q.views} views</span>
+                {q.answers.length > 0 && "\u2713 "}{q._count.answers} ans
+              </div>
+              <div className="text-gray-400 text-xs">{q.views} views</div>
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <Link
                 href={`/questions/${q.id}`}
-                className="text-[var(--blue)] font-medium text-base no-underline hover:text-[var(--blue-hover)]"
+                className="text-[var(--blue)] font-semibold text-base no-underline hover:text-[var(--blue-hover)] leading-snug"
               >
                 {q.title}
               </Link>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                {q.body.slice(0, 200)}
+              <p className="text-sm text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                {q.body.slice(0, 180)}
               </p>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
                 {q.tags.map((t) => (
                   <Link
                     key={t.tag.name}
                     href={`/questions?tag=${t.tag.name}`}
-                    className="bg-[#e1ecf4] text-[#39739d] px-2 py-0.5 rounded text-xs no-underline hover:bg-[#d0e3f1]"
+                    className="tag no-underline"
                   >
                     {t.tag.name}
                   </Link>

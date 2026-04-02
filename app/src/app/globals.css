@@ -2,20 +2,24 @@
 @import "highlight.js/styles/github-dark.min.css";
 
 :root {
-  --background: #f6f6f6;
-  --foreground: #1a1a1a;
+  --background: #f8f9fa;
+  --foreground: #1a1a2e;
   --accent: #f48225;
   --accent-hover: #da7220;
   --blue: #0074cc;
   --blue-hover: #0063b1;
   --green: #2f6f44;
-  --border: #d6d9dc;
+  --border: #e2e6ea;
   --sidebar-bg: #fdf7e2;
-  --header-bg: rgba(255,255,255,0.95);
-  --footer-bg: #242729;
-  --footer-text: #9199a1;
+  --header-bg: rgba(255,255,255,0.85);
+  --footer-bg: #16181d;
+  --footer-text: #8b929a;
   --card-bg: #ffffff;
-  --code-bg: #1e1e1e;
+  --code-bg: #1a1a2e;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --radius: 12px;
 }
 
 @theme inline {
@@ -34,10 +38,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   transition: background-color 0.2s, color 0.2s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: var(--blue);
+  text-decoration: none;
 }
 a:hover {
   color: var(--blue-hover);
@@ -46,22 +53,98 @@ a.btn-primary, a.btn-primary:hover, button.btn-primary, button.btn-primary:hover
   color: white !important;
 }
 
-/* Smooth theme transitions */
-*, *::before, *::after {
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+/* Modern card style */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
-/* Scrollbar styling */
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+/* Better focus styles */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tag pill style */
+.tag {
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.tag:hover {
+  background: #d2e3fc;
+}
+
+/* Vote button animation */
+.vote-btn {
+  transition: transform 0.1s, color 0.15s;
+}
+.vote-btn:active {
+  transform: scale(1.3);
+}
+
+/* Code blocks */
+pre {
+  border-radius: 10px !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--foreground);
+  background: #999;
+}
+
+/* Gradient text helper */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

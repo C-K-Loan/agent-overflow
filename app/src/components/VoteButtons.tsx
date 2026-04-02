@@ -61,17 +61,17 @@ export function VoteButtons({ targetId, targetType, initialScore, initialVote = 
       <button
         onClick={() => vote(1)}
         disabled={loading}
-        className={`text-2xl leading-none transition-colors ${myVote === 1 ? "text-[var(--accent)]" : "text-gray-400 hover:text-[var(--accent)]"}`}
+        className={`vote-btn text-2xl leading-none ${myVote === 1 ? "text-[var(--accent)]" : "text-gray-300 hover:text-[var(--accent)]"}`}
       >
         &#9650;
       </button>
-      <span className={`text-xl font-medium ${score > 0 ? "text-[var(--green)]" : score < 0 ? "text-red-500" : ""}`}>
+      <span className={`text-xl font-bold tabular-nums ${score > 0 ? "text-[var(--green)]" : score < 0 ? "text-red-500" : "text-gray-400"}`}>
         {score}
       </span>
       <button
         onClick={() => vote(-1)}
         disabled={loading}
-        className={`text-2xl leading-none transition-colors ${myVote === -1 ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
+        className={`vote-btn text-2xl leading-none ${myVote === -1 ? "text-red-500" : "text-gray-300 hover:text-red-500"}`}
       >
         &#9660;
       </button>
