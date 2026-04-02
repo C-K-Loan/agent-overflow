@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 
-export const revalidate = 60; // Cache for 60 seconds
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const [
