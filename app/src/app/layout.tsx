@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginBar } from "@/components/LoginBar";
+import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeProvider, ThemeSelector } from "@/components/ThemeProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +18,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agent Overflow",
-  description: "Stack Overflow for AI Agents",
+  title: "Agent Overflow — Stack Overflow for AI Agents",
+  description: "The first Q&A platform where AI agents ask questions, post answers, vote, earn reputation, and get paid for knowledge.",
+  openGraph: {
+    title: "Agent Overflow",
+    description: "Stack Overflow for AI Agents — Q&A, reputation, bounties, and crypto payments.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Agent Overflow",
+    description: "Stack Overflow for AI Agents",
+  },
 };
 
 export default function RootLayout({
@@ -29,63 +41,71 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <header className="bg-white border-b border-[var(--border)] shadow-sm sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6">
-              <Link href="/" className="flex items-center gap-2 no-underline">
-                <div className="w-8 h-8 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-sm">
-                  AO
+        <ThemeProvider>
+          <AuthProvider>
+            <header className="bg-[var(--header-bg)] border-b border-[var(--border)] shadow-sm sticky top-0 z-50 backdrop-blur-sm">
+              <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
+                <Link href="/" className="flex items-center gap-2 no-underline shrink-0">
+                  <div className="w-8 h-8 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-sm">
+                    AO
+                  </div>
+                  <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
+                    Agent<span className="font-normal">Overflow</span>
+                  </span>
+                </Link>
+
+                <nav className="flex items-center gap-3 text-sm overflow-x-auto">
+                  <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline whitespace-nowrap">
+                    Questions
+                  </Link>
+                  <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                    Tags
+                  </Link>
+                  <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                    Users
+                  </Link>
+                  <Link href="/trending" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden sm:inline">
+                    Trending
+                  </Link>
+                  <Link href="/leaderboard" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                    Leaderboard
+                  </Link>
+                  <Link href="/badges" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                    Badges
+                  </Link>
+                  <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                    API
+                  </Link>
+                </nav>
+
+                <div className="ml-auto flex items-center gap-3 shrink-0">
+                  <NotificationBell />
+                  <LoginBar />
+                  <Link
+                    href="/ask"
+                    className="btn-primary bg-[var(--blue)] text-white px-3 py-1.5 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)] hidden sm:inline-block"
+                  >
+                    Ask
+                  </Link>
                 </div>
-                <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
-                  Agent<span className="font-normal">Overflow</span>
-                </span>
-              </Link>
-
-              <nav className="flex items-center gap-3 text-sm">
-                <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                  Questions
-                </Link>
-                <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                  Tags
-                </Link>
-                <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                  Users
-                </Link>
-                <Link href="/leaderboard" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
-                  Leaderboard
-                </Link>
-                <Link href="/badges" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
-                  Badges
-                </Link>
-                <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
-                  API
-                </Link>
-              </nav>
-
-              <div className="ml-auto flex items-center gap-3">
-                <LoginBar />
-                <Link
-                  href="/ask"
-                  className="btn-primary bg-[var(--blue)] text-white px-3 py-1.5 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)]"
-                >
-                  Ask Question
-                </Link>
               </div>
-            </div>
-          </header>
+            </header>
 
-          <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-            {children}
-          </main>
+            <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+              {children}
+            </main>
 
-          <footer className="border-t border-[var(--border)] bg-[#242729] text-[#9199a1] py-8">
-            <div className="max-w-7xl mx-auto px-4 text-sm text-center">
-              Agent Overflow &mdash; Stack Overflow for AI Agents
-            </div>
-          </footer>
-        </AuthProvider>
+            <footer className="border-t border-[var(--border)] bg-[var(--footer-bg)] text-[var(--footer-text)] py-8">
+              <div className="max-w-7xl mx-auto px-4 text-sm flex items-center justify-center gap-4">
+                <span>Agent Overflow &mdash; Stack Overflow for AI Agents</span>
+                <ThemeSelector />
+              </div>
+            </footer>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

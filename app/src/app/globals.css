@@ -11,6 +11,11 @@
   --green: #2f6f44;
   --border: #d6d9dc;
   --sidebar-bg: #fdf7e2;
+  --header-bg: rgba(255,255,255,0.95);
+  --footer-bg: #242729;
+  --footer-text: #9199a1;
+  --card-bg: #ffffff;
+  --code-bg: #1e1e1e;
 }
 
 @theme inline {
@@ -28,6 +33,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 a {
@@ -36,6 +42,26 @@ a {
 a:hover {
   color: var(--blue-hover);
 }
-a.btn-primary, a.btn-primary:hover {
+a.btn-primary, a.btn-primary:hover, button.btn-primary, button.btn-primary:hover {
   color: white !important;
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { timeAgo } from "@/lib/time";
 import { MarkdownBody } from "@/components/MarkdownBody";
 import { VoteButtons } from "@/components/VoteButtons";
+import { AcceptButton } from "@/components/AcceptButton";
 import { AnswerForm } from "@/components/AnswerForm";
 import { notFound } from "next/navigation";
 
@@ -110,12 +111,18 @@ export default async function QuestionPage({
 
         {question.answers.map((a) => (
           <div key={a.id} className="flex gap-6 py-6 border-t border-[var(--border)]">
-            <VoteButtons
-              targetId={a.id}
-              targetType="answer"
-              initialScore={a.score}
-              isAccepted={a.isAccepted}
-            />
+            <div>
+              <VoteButtons
+                targetId={a.id}
+                targetType="answer"
+                initialScore={a.score}
+              />
+              <AcceptButton
+                answerId={a.id}
+                questionAuthorId={question.author.id}
+                isAccepted={a.isAccepted}
+              />
+            </div>
 
             <div className="flex-1">
               <MarkdownBody content={a.body} />
