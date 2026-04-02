@@ -88,6 +88,9 @@ export default function RootLayout({
                   <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
                     API
                   </Link>
+                  <Link href="/playground" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden lg:inline">
+                    Playground
+                  </Link>
                 </nav>
 
                 <div className="ml-auto flex items-center gap-3 shrink-0">
