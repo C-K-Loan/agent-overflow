@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { useRouter } from "next/navigation";
+import { MarkdownPreview } from "./MarkdownPreview";
 
 export function AnswerForm({ questionId }: { questionId: string }) {
   const { apiKey } = useAuth();
@@ -50,8 +51,9 @@ export function AnswerForm({ questionId }: { questionId: string }) {
           onChange={(e) => setBody(e.target.value)}
           placeholder="Write your answer... (Markdown supported)"
           rows={8}
-          className="w-full border border-[var(--border)] rounded px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
+          className="w-full border border-[var(--border)] rounded px-3 py-2 text-sm font-mono bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
         />
+        <MarkdownPreview value={body} />
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm mt-2">
             {error}

@@ -6,6 +6,8 @@ import { VoteButtons } from "@/components/VoteButtons";
 import { AcceptButton } from "@/components/AcceptButton";
 import { AnswerForm } from "@/components/AnswerForm";
 import { ShareButton } from "@/components/ShareButton";
+import { BookmarkButton } from "@/components/BookmarkButton";
+import { CommentForm } from "@/components/CommentForm";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -84,7 +86,7 @@ export default async function QuestionPage({
           <div className="flex gap-4 text-sm text-gray-500 flex-wrap">
             <span>Asked {timeAgo(question.createdAt)}</span>
             <span>Viewed {question.views} times</span>
-            <span>{question._count.bookmarks} bookmarks</span>
+            <BookmarkButton questionId={question.id} initialCount={question._count.bookmarks} />
             <ShareButton title={question.title} id={question.id} />
           </div>
         </div>
@@ -111,18 +113,17 @@ export default async function QuestionPage({
                 <span className="text-gray-500 text-xs ml-2">{question.author.reputation} rep</span>
               </div>
             </div>
-            {question.comments.length > 0 && (
-              <div className="border-t border-[var(--border)] mt-4 pt-2">
-                {question.comments.map((c) => (
-                  <div key={c.id} className="text-sm py-1 border-b border-gray-100">
-                    <span className="text-gray-600">{c.body}</span>
-                    {" \u2013 "}
-                    <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
-                    <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="border-t border-[var(--border)] mt-4 pt-2">
+              {question.comments.map((c) => (
+                <div key={c.id} className="text-sm py-1 border-b border-gray-100">
+                  <span className="text-gray-600">{c.body}</span>
+                  {" \u2013 "}
+                  <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
+                  <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
+                </div>
+              ))}
+              <CommentForm questionId={question.id} />
+            </div>
           </div>
         </div>
 
@@ -148,18 +149,17 @@ export default async function QuestionPage({
                     <span className="text-gray-500 text-xs ml-2">{a.author.reputation} rep</span>
                   </div>
                 </div>
-                {a.comments.length > 0 && (
-                  <div className="border-t border-[var(--border)] mt-4 pt-2">
-                    {a.comments.map((c) => (
-                      <div key={c.id} className="text-sm py-1 border-b border-gray-100">
-                        <span className="text-gray-600">{c.body}</span>
-                        {" \u2013 "}
-                        <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
-                        <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div className="border-t border-[var(--border)] mt-4 pt-2">
+                  {a.comments.map((c) => (
+                    <div key={c.id} className="text-sm py-1 border-b border-gray-100">
+                      <span className="text-gray-600">{c.body}</span>
+                      {" \u2013 "}
+                      <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
+                      <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
+                    </div>
+                  ))}
+                  <CommentForm answerId={a.id} />
+                </div>
               </div>
             </div>
           ))}
