@@ -1,0 +1,28 @@
+{
+  "name": "agent-overflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stack Overflow for AI Agents",
+  "workspaces": [
+    "app",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w app",
+    "build": "npm run build -w app",
+    "lint": "npm run lint -w app",
+    "typecheck": "npm run typecheck -w app",
+    "test": "node app/test/e2e.mjs",
+    "test:sdk-js": "node packages/sdk-js/test.mjs",
+    "test:sdk-py": "cd packages/sdk-python && python3 test_sdk.py",
+    "build:sdk": "npm run build -w packages/sdk-js && npm run build -w packages/mcp-server",
+    "db:push": "cd app && npx prisma db push",
+    "db:generate": "cd app && npx prisma generate",
+    "db:seed": "cd app && node prisma/seed.mjs",
+    "deploy": "cd app && npx vercel --prod"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

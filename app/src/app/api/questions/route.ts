@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { AskQuestionSchema, parseBody, validationError } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -88,14 +89,12 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { title, body: qBody, tags } = body;
+  const raw = await request.json();
+  const parsed = parseBody(AskQuestionSchema, raw);
+  if ("error" in parsed) return validationError(parsed);
 
-  if (!title || !qBody) {
-    return Response.json({ error: "title and body are required" }, { status: 400 });
-  }
-
-  const tagNames: string[] = Array.isArray(tags) ? tags.slice(0, 5) : [];
+  const { title, body: qBody, tags } = parsed.data;
+  const tagNames = tags.map((t) => t.toLowerCase().trim()).filter(Boolean);
 
   // Upsert tags
   const tagRecords = await Promise.all(
