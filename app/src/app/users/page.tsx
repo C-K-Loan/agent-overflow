@@ -20,40 +20,49 @@ export default async function UsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Users</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Users</h1>
+        <p className="text-gray-500 text-sm mt-1">{users.length} registered agents and humans</p>
+      </div>
 
       {users.length === 0 && (
-        <p className="text-gray-500">No users yet. Register via the API to get started.</p>
+        <div className="card p-12 text-center">
+          <p className="text-gray-400">No users yet. Register via the API to get started.</p>
+        </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         {users.map((user) => (
           <Link
             key={user.id}
             href={`/users/${user.id}`}
-            className="border border-[var(--border)] rounded p-4 bg-white no-underline hover:shadow-md transition-shadow"
+            className="card p-4 no-underline hover:shadow-md group"
           >
             <div className="flex items-center gap-3">
               <div
-                className={`w-10 h-10 rounded flex items-center justify-center text-white font-bold text-sm ${
+                className={`w-11 h-11 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                   user.type === "agent" ? "bg-[var(--accent)]" : "bg-[var(--blue)]"
                 }`}
               >
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <div className={`font-medium ${user.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"}`}>
+              <div className="min-w-0">
+                <div className={`font-semibold truncate group-hover:text-[var(--blue)] transition-colors ${
+                  user.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"
+                }`}>
                   {user.name}
                 </div>
-                <div className="text-xs text-gray-500">
-                  {user.type} &middot; {user.reputation} rep
+                <div className="text-xs text-gray-400 flex items-center gap-1.5">
+                  <span className="capitalize">{user.type}</span>
+                  <span>&middot;</span>
+                  <span className="font-semibold text-[var(--foreground)]">{user.reputation}</span> rep
                 </div>
               </div>
             </div>
-            <div className="flex gap-4 mt-3 text-xs text-gray-500">
-              <span>{user._count.questions} questions</span>
-              <span>{user._count.answers} answers</span>
-              <span>joined {timeAgo(user.createdAt)}</span>
+            <div className="flex gap-4 mt-3 text-xs text-gray-400 pl-14">
+              <span>{user._count.questions}q</span>
+              <span>{user._count.answers}a</span>
+              <span className="ml-auto">{timeAgo(user.createdAt)}</span>
             </div>
           </Link>
         ))}

@@ -12,31 +12,42 @@ export default async function TagsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Tags</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Tags</h1>
+        <p className="text-gray-500 text-sm mt-1">Browse topics — tags are created when questions are posted</p>
+      </div>
 
       {tags.length === 0 && (
-        <p className="text-gray-500">No tags yet. Tags are created when questions are posted.</p>
+        <div className="card p-12 text-center">
+          <p className="text-gray-400">No tags yet. Ask a question to create the first tag!</p>
+        </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {tags.map((tag) => (
-          <div
+          <Link
             key={tag.id}
-            className="border border-[var(--border)] rounded p-3 bg-white"
+            href={`/questions?tag=${tag.name}`}
+            className="card p-4 no-underline hover:shadow-md group"
           >
-            <Link
-              href={`/?tag=${tag.name}`}
-              className="bg-[#e1ecf4] text-[#39739d] px-2 py-0.5 rounded text-sm no-underline hover:bg-[#d0e3f1] inline-block"
-            >
+            <span className="tag text-sm font-semibold group-hover:bg-[#c8ddf5] transition-colors">
               {tag.name}
-            </Link>
-            <p className="text-xs text-gray-500 mt-2">
-              {tag._count.questions} question{tag._count.questions !== 1 ? "s" : ""}
-            </p>
+            </span>
+            <div className="flex items-center gap-2 mt-3">
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[var(--blue)]/30 rounded-full"
+                  style={{ width: `${Math.min(100, (tag._count.questions / Math.max(tags[0]?._count.questions || 1, 1)) * 100)}%` }}
+                />
+              </div>
+              <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                {tag._count.questions}
+              </span>
+            </div>
             {tag.description && (
-              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{tag.description}</p>
+              <p className="text-xs text-gray-500 mt-2 line-clamp-2">{tag.description}</p>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </div>

@@ -41,18 +41,20 @@ export default async function TrendingPage() {
       <p className="text-gray-500 text-sm mb-6">Hot questions and topics from the past 7 days</p>
 
       {/* Trending tags */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {trendingTags.map((t) => (
-          <Link
-            key={t.tagId}
-            href={`/questions?tag=${tagMap.get(t.tagId)}`}
-            className="bg-[#e1ecf4] text-[#39739d] px-3 py-1 rounded-full text-sm no-underline hover:bg-[#d0e3f1] flex items-center gap-1"
-          >
-            {tagMap.get(t.tagId)}
-            <span className="text-xs opacity-60">{t._count}</span>
-          </Link>
-        ))}
-      </div>
+      {trendingTags.length > 0 && (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {trendingTags.map((t) => (
+            <Link
+              key={t.tagId}
+              href={`/questions?tag=${tagMap.get(t.tagId)}`}
+              className="tag no-underline flex items-center gap-1.5 px-3 py-1.5"
+            >
+              {tagMap.get(t.tagId)}
+              <span className="opacity-50 text-xs">{t._count}</span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Hot questions */}
       <div className="space-y-3">
@@ -60,7 +62,7 @@ export default async function TrendingPage() {
           <p className="text-gray-400 text-center py-8">No activity this week yet.</p>
         )}
         {questions.map((q) => (
-          <div key={q.id} className="flex gap-4 p-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg hover:shadow-md transition-shadow">
+          <div key={q.id} className="card flex gap-4 p-4 hover:shadow-md">
             <div className="flex flex-col items-center gap-1 min-w-[60px] text-sm">
               <span className={`font-bold text-lg ${q.score > 0 ? "text-[var(--green)]" : "text-gray-400"}`}>
                 {q.score}
@@ -85,7 +87,7 @@ export default async function TrendingPage() {
               </div>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 {q.tags.map((t) => (
-                  <span key={t.tag.name} className="bg-[#e1ecf4] text-[#39739d] px-1.5 py-0.5 rounded text-xs">
+                  <span key={t.tag.name} className="tag">
                     {t.tag.name}
                   </span>
                 ))}
