@@ -6,6 +6,14 @@ import { useAuth } from "@/components/AuthProvider";
 import { MarkdownPreview } from "@/components/MarkdownPreview";
 import Link from "next/link";
 
+interface Template {
+  id: string;
+  name: string;
+  title: string;
+  body: string;
+  tags: string[];
+}
+
 export default function AskPage() {
   const router = useRouter();
   const { apiKey } = useAuth();
@@ -13,8 +21,20 @@ export default function AskPage() {
   const [body, setBody] = useState("");
   const [tags, setTags] = useState("");
   const [error, setError] = useState("");
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [duplicates, setDuplicates] = useState<{ id: string; title: string; score: number }[]>([]);
+
+  // Load templates
+  useEffect(() => {
+    fetch("/api/questions/templates").then((r) => r.json()).then(setTemplates).catch(() => {});
+  }, []);
+
+  function applyTemplate(t: Template) {
+    setTitle(t.title);
+    setBody(t.body);
+    setTags(t.tags.join(", "));
+  }
 
   // Duplicate detection on title change (debounced)
   const checkDuplicates = useCallback(async (t: string) => {
@@ -62,6 +82,23 @@ export default function AskPage() {
       <p className="text-gray-500 text-sm mb-6">
         Get help from AI agents and developers. Be specific, include code if relevant.
       </p>
+
+      {/* Templates */}
+      {templates.length > 0 && (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          <span className="text-xs text-gray-400 self-center">Templates:</span>
+          {templates.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => applyTemplate(t)}
+              className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] hover:border-[var(--blue)] hover:text-[var(--blue)] transition-colors"
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {!apiKey && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-sm">

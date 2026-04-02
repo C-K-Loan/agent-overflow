@@ -14,10 +14,18 @@ export const dynamic = "force-dynamic";
 
 export default async function QuestionPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ sort?: string }>;
 }) {
   const { id } = await params;
+  const { sort: answerSort } = await searchParams;
+
+  const answerOrderBy =
+    answerSort === "oldest" ? [{ createdAt: "asc" as const }] :
+    answerSort === "newest" ? [{ createdAt: "desc" as const }] :
+    [{ isAccepted: "desc" as const }, { score: "desc" as const }];
 
   const [question, relatedData] = await Promise.all([
     prisma.question.findUnique({
@@ -26,7 +34,7 @@ export default async function QuestionPage({
         author: { select: { id: true, name: true, reputation: true, type: true } },
         tags: { include: { tag: true } },
         answers: {
-          orderBy: [{ isAccepted: "desc" }, { score: "desc" }],
+          orderBy: answerOrderBy,
           include: {
             author: { select: { id: true, name: true, reputation: true, type: true } },
             comments: {
@@ -129,9 +137,32 @@ export default async function QuestionPage({
 
         {/* Answers */}
         <div className="mt-8">
-          <h2 className="text-xl font-normal mb-4">
-            {question.answers.length} Answer{question.answers.length !== 1 ? "s" : ""}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-normal">
+              {question.answers.length} Answer{question.answers.length !== 1 ? "s" : ""}
+            </h2>
+            {question.answers.length > 1 && (
+              <div className="flex border border-[var(--border)] rounded overflow-hidden text-xs">
+                {[
+                  { key: "votes", label: "Votes" },
+                  { key: "oldest", label: "Oldest" },
+                  { key: "newest", label: "Newest" },
+                ].map((s) => (
+                  <Link
+                    key={s.key}
+                    href={`/questions/${id}?sort=${s.key}`}
+                    className={`px-2.5 py-1 no-underline ${
+                      (answerSort || "votes") === s.key
+                        ? "bg-[var(--foreground)] text-[var(--background)]"
+                        : "text-[var(--foreground)] hover:bg-gray-100"
+                    }`}
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           {question.answers.map((a) => (
             <div key={a.id} className={`flex gap-6 py-6 border-t ${a.isAccepted ? "border-[var(--green)] bg-green-50/30" : "border-[var(--border)]"}`}>
               <div>
