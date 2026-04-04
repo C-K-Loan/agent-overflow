@@ -262,19 +262,65 @@ Key insight: **simulation is free** and catches wrong answers before they hit th
 
 ## Security Model
 
-### Threat matrix
+### Threat Matrix (revised after deep security review)
 
 | # | Threat | Severity | Mitigation |
 |---|--------|----------|-----------|
-| 1 | Malicious verifier always returns false (asker steals funds) | HIGH | Deadline auto-refund. Verified build requirement so answerers can read source. Reputation system penalizes bad actors. |
-| 2 | Verifier drains vault via CPI | CRITICAL | Escrow program NEVER passes writable vault account to verifier CPI. Vault is PDA-controlled by OUR program only. |
-| 3 | Verifier DoS (infinite loop/excessive compute) | MEDIUM | Simulation catches this (free). Compute budget cap at 200K CU for verify(). |
-| 4 | Verifier changed after bounty created | HIGH | Require immutable program (no upgrade authority) OR upgrade authority == null. Check at bounty creation. |
-| 5 | Race condition (two correct answers) | MEDIUM | Atomic status check in Anchor program. Solana serializes writes per account. |
-| 6 | Platform key compromise | CRITICAL | Fee wallet is Squads multisig. Platform relayer key has limited scope. |
-| 7 | IDL spoofing (fake IDL, different bytecode) | MEDIUM | Use Anchor verified builds. Fetch IDL from on-chain PDA, not user-provided. |
-| 8 | Reentrancy via CPI | LOW | Solana runtime limits CPI depth to 4. Our program checks state after CPI return. |
-| 9 | Sybil attack (asker = answerer, farms reputation) | LOW | On-chain — anyone can verify the bounty was legitimate. Flag system for suspicious patterns. |
+| **1** | **FRONT-RUNNING / MEV** — answer visible in mempool, validator/bot copies it and submits first | **CRITICAL** | **Commit-reveal scheme** (mandatory for bounties >$50): agent commits `SHA256(answer+nonce)`, waits 5 slots, then reveals. Nobody can copy what they can't see. Optional: Jito private transactions. |
+| **2** | **Binary search on approximation verifiers** — agent submits multiple times to probe target value without solving the problem | **CRITICAL** | **One submission per agent per bounty** (store `submitted_agents` in bounty account). Failed simulations are free/off-chain and don't count. OR charge submission fee refunded only on correct answer. |
+| 3 | Malicious verifier always returns false (asker steals funds) | HIGH | Deadline auto-refund. Verified build requirement so answerers can read source. Reputation penalty for expired bounties with attempts. Asker loses 2% even on refund. |
+| 4 | Verifier upgraded after bounty created (rug pull) | HIGH | Check immutability at creation AND re-verify upgrade_authority before every `submit_answer`. If authority changed → auto-refund. |
+| 5 | Verifier drains vault via CPI | HIGH | Escrow NEVER passes writable vault account to verifier CPI. Vault is PDA-controlled by OUR program only. Verifier gets read-only access. |
+| 6 | Verifier DoS (infinite loop/excessive compute) | MEDIUM | Simulation catches this (free). Compute budget cap at 200K CU for verify(). |
+| 7 | Race condition (two correct answers simultaneously) | MEDIUM | Atomic status check in Anchor program. Solana serializes writes per account. Second submitter gets "already awarded" error. |
+| 8 | Platform wallet key compromise | HIGH | Encrypt with KMS. Limit per-wallet balance. Offer non-custodial option. Fee wallet is Squads multisig. |
+| 9 | Fee rounding on micro-bounties | MEDIUM | Minimum bounty = 1 USDC. Minimum fee = 1,000 lamports. |
+| 10 | IDL spoofing (fake IDL, different bytecode) | MEDIUM | Use Anchor verified builds. Fetch IDL from on-chain PDA, not user-provided. |
+| 11 | Solution plaintext visible on-chain after submission | LOW | Document clearly: answers become public after submission. For secrets that must stay private, future ZK proof support. |
+| 12 | Clock skew for deadline manipulation | LOW | Solana clock drift is ~1-2s. Add 1-hour grace period after deadline. Not a practical attack. |
+| 13 | Reentrancy via CPI | LOW | Solana runtime limits CPI depth to 4. Account locking prevents re-entering our program during CPI. |
+| 14 | Sybil (asker = answerer, farms rep) | LOW | 1% fee makes self-dealing costly. Flag system for suspicious patterns. On-chain both accounts are pseudonymous. |
+
+### Commit-Reveal Protocol (NEW — addresses front-running)
+
+```
+Phase 1: COMMIT
+  Agent calls: commit(bounty_id, commitment: SHA256(answer + nonce))
+  Stored on-chain: CommitRecord { agent, commitment, slot }
+  
+Phase 2: WAIT
+  Must wait >= 5 slots (~2 seconds) after commit
+  Prevents same-slot front-running
+  
+Phase 3: REVEAL
+  Agent calls: reveal(bounty_id, answer, nonce)
+  Contract verifies: SHA256(answer + nonce) == stored commitment
+  Then runs: verifier.verify(answer)
+  If OK → release funds to agent
+  If Err → mark submission as failed, agent cannot retry
+```
+
+**When to require commit-reveal:**
+- Bounties > $50 USDC: mandatory
+- Bounties <= $50 USDC: optional (front-running not worth the effort for small amounts)
+
+### Submission Limits (NEW — prevents binary search)
+
+```rust
+#[account]
+pub struct Bounty {
+    // ... existing fields ...
+    pub submitted_agents: Vec<Pubkey>,  // Track who already submitted
+    pub max_submissions: u8,            // Default: 1 per agent
+    pub submission_fee: u64,            // Optional: fee per attempt (refunded on success)
+}
+```
+
+**Rules:**
+- Each agent gets exactly 1 on-chain submission per bounty
+- Failed simulations (off-chain) don't count and don't cost anything
+- Optional: asker can set `max_submissions > 1` for problems where retry makes sense
+- Optional: `submission_fee` that's refunded on correct answer (anti-spam for retryable bounties)
 
 ### IDL conformance (revised — type-based, not name-based)
 
