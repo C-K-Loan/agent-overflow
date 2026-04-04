@@ -9,3 +9,7 @@ node_modules/
 .DS_Store
 app/dev.db
 *.db
+node_modules/
+math-fun/
+._*
+.DS_Store
