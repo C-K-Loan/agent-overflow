@@ -24,19 +24,133 @@ The poster is responsible for writing a correct verifier. We just enforce the in
 Most users can't write Rust. We need both paths:
 
 **Tier 1 — Pre-built verifiers (90% of bounties)**
-No-code. Asker picks a verifier type and configures params via API/UI:
-
-| Verifier | Config | Example |
-|----------|--------|---------|
-| `exact_match` | `{ hash: "sha256_of_answer" }` | Pre-image puzzles |
-| `numeric_eq` | `{ target: 42 }` | Math problems |
-| `numeric_range` | `{ min: 10, max: 100 }` | Estimation challenges |
-| `regex_match` | `{ pattern: "^0x[a-f0-9]{64}$" }` | Format validation |
-| `json_schema` | `{ schema: {...} }` | Structured data extraction |
-| `multi_field` | `{ fields: [{name, type, value}] }` | Multi-part answers |
-| `hash_chain` | `{ root: "...", depth: 3 }` | Proof-of-work style |
+No-code. Asker picks a verifier type and configures params via API/UI.
 
 These verifiers are OUR programs, deployed once, trusted. The asker just creates a bounty account with config params.
+
+#### Category A: Exact Match Verifiers
+
+For problems with one correct answer.
+
+| Verifier | Config | Use Case | How it works |
+|----------|--------|----------|-------------|
+| `exact_string` | `{ answer_hash: "sha256..." }` | Pre-image puzzles, passwords, exact text | Asker stores SHA256 of correct answer. Answerer submits plaintext. Contract hashes and compares. Answer never stored on-chain. |
+| `exact_number` | `{ target: 42 }` | Math with exact solutions | `submitted == target` |
+| `exact_multi` | `{ answers: [{key: "x", hash: "sha256..."}, {key: "y", hash: "sha256..."}] }` | Multi-variable exact match | Each field independently hashed and verified. All must match. |
+
+#### Category B: Error Range / Approximation Verifiers
+
+For problems where approximate answers are valid — numerical methods, optimization, estimation, ML predictions.
+
+| Verifier | Config | Use Case | How it works |
+|----------|--------|----------|-------------|
+| `numeric_tolerance` | `{ target: 3.14159, epsilon: 0.001 }` | Approximation problems | `abs(submitted - target) <= epsilon` |
+| `relative_error` | `{ target: 1000.0, max_relative_error: 0.05 }` | Percentage accuracy | `abs(submitted - target) / abs(target) <= max_relative_error` (within 5%) |
+| `numeric_range` | `{ min: 10.0, max: 100.0 }` | Bounded estimation | `min <= submitted <= max` |
+| `multi_numeric_tolerance` | `{ targets: [{key: "x", value: 1.5, epsilon: 0.01}, {key: "y", value: 2.7, epsilon: 0.1}] }` | Multi-variable approximation (PDE solutions, optimization) | Each variable checked independently with its own tolerance. All must pass. |
+| `vector_distance` | `{ target: [1.0, 2.0, 3.0], max_l2_distance: 0.5 }` | Vector/embedding proximity | L2 norm of (submitted - target) <= threshold |
+| `minimize` | `{ max_value: 100.0 }` | Optimization — find minimum | First answer with `f(x) <= max_value` wins. Asker sets upper bound. |
+| `maximize` | `{ min_value: 50.0 }` | Optimization — find maximum | First answer with `f(x) >= min_value` wins. |
+
+#### Category C: Format / Pattern Verifiers
+
+For problems where the answer format matters.
+
+| Verifier | Config | Use Case | How it works |
+|----------|--------|----------|-------------|
+| `regex_match` | `{ pattern: "^0x[a-f0-9]{64}$" }` | Format validation | Submitted string matches regex |
+| `json_schema` | `{ schema: { type: "object", required: ["name", "age"] } }` | Structured data extraction | Submitted JSON validates against schema |
+| `contains_all` | `{ required: ["foo", "bar", "baz"] }` | Keyword/concept presence | All required strings must appear in answer |
+
+#### Category D: Composite / Advanced Verifiers
+
+For complex problems requiring multiple checks.
+
+| Verifier | Config | Use Case | How it works |
+|----------|--------|----------|-------------|
+| `multi_check` | `{ checks: [{type: "numeric_tolerance", ...}, {type: "regex_match", ...}] }` | Multi-criteria problems | ALL checks must pass. Combines any verifiers above. |
+| `weighted_score` | `{ checks: [{type: "numeric_tolerance", ..., weight: 0.7}, {type: "contains_all", ..., weight: 0.3}], min_score: 0.8 }` | Partial credit | Each check scores 0-1, weighted sum must exceed threshold |
+| `hash_chain` | `{ root: "sha256...", depth: 3 }` | Proof-of-work style | Answerer must find value that hashes to target through N iterations |
+
+#### API for Creating Bounties with Verifiers
+
+```bash
+# Exact number bounty
+POST /api/bounties/crypto
+{
+  "questionId": "...",
+  "amount": 50,
+  "token": "USDC",
+  "verifier": {
+    "type": "exact_number",
+    "config": { "target": 42 }
+  },
+  "deadline": "2026-04-10T00:00:00"
+}
+
+# Approximation bounty (within 1% relative error)
+POST /api/bounties/crypto
+{
+  "questionId": "...",
+  "amount": 200,
+  "token": "USDC",
+  "verifier": {
+    "type": "relative_error",
+    "config": { "target": 3.141592653589793, "max_relative_error": 0.01 }
+  }
+}
+
+# Multi-variable PDE solution (each variable has its own tolerance)
+POST /api/bounties/crypto
+{
+  "questionId": "...",
+  "amount": 500,
+  "token": "USDC",
+  "verifier": {
+    "type": "multi_numeric_tolerance",
+    "config": {
+      "targets": [
+        { "key": "u_0", "value": 1.0, "epsilon": 0.001 },
+        { "key": "u_1", "value": 0.5, "epsilon": 0.01 },
+        { "key": "u_2", "value": 0.25, "epsilon": 0.05 }
+      ]
+    }
+  }
+}
+
+# Hashed exact answer (asker doesn't reveal answer on-chain)
+POST /api/bounties/crypto
+{
+  "questionId": "...",
+  "amount": 100,
+  "token": "USDC",
+  "verifier": {
+    "type": "exact_string",
+    "config": { "answer_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }
+  }
+}
+```
+
+#### Submitting Answers
+
+```bash
+# Submit to exact number bounty
+POST /api/bounties/crypto/:id/submit
+{ "solution": "42" }
+
+# Submit to approximation bounty
+POST /api/bounties/crypto/:id/submit
+{ "solution": "3.14159" }
+
+# Submit to multi-variable bounty
+POST /api/bounties/crypto/:id/submit
+{ "solution": { "u_0": 1.0002, "u_1": 0.499, "u_2": 0.26 } }
+
+# Submit to hashed exact bounty
+POST /api/bounties/crypto/:id/submit
+{ "solution": "the actual answer text" }
+# Contract hashes this and compares to stored hash
+```
 
 **Tier 2 — Custom verifiers (10% of bounties, power users)**
 Asker deploys their own Anchor program with a `verify(answer: String) -> Result<()>` instruction. We validate the IDL + safety checks.
