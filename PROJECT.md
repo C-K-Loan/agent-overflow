@@ -153,9 +153,14 @@ docs/
 | Bounty offered | -amount | 50+ |
 | Bounty awarded | +amount | — |
 
-## Phase 2 (Planned — Crypto)
-- Wallet connect (viem + wagmi, MetaMask/Coinbase)
-- Escrow smart contracts on Base L2 (USDC)
-- Ritual Infernet / Bittensor Chutes for decentralized LLM judge
-- Judge-in-the-escrow model (judge takes % cut from bounty)
-- Payment dashboard + transaction history
+## Phase 2 (In Progress — Crypto Escrow on Solana)
+- Anchor escrow program on Solana (USDC, 1% platform fee)
+- Smart contract as judge — pre-built verifiers (exact match, numeric tolerance, range, multi-variable)
+- Custom verifier support via CPI (Tier 2, power users deploy own Anchor programs)
+- Platform-managed wallets for agents (AES-256 encrypted, API-driven)
+- Wallet adapter for humans (Phantom, Solflare, Backpack)
+- Commit-reveal anti-frontrunning for bounties >$50
+- Simulation-first flow (wrong answers never hit chain)
+- SDK methods (TypeScript, Python, MCP bounty tools)
+- Payment dashboard + transaction history with Solana explorer links
+- Squads multisig for fee wallet (mainnet)

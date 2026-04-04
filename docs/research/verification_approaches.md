@@ -16,7 +16,7 @@
 | **L1 — LLM Judge (centralized)** | Our backend calls LLM, submits score | Moderate (trust us) | ~$0.01/call | Phase 3 |
 | **L2 — LLM Judge (decentralized)** | Bittensor Chutes pay-per-request via TAO | Moderate (trust Bittensor validators) | ~85% cheaper than AWS | Phase 4 |
 | **L3 — Verifiable inference** | Ritual Infernet — on-chain LLM call with ZK/TEE proof | Trustless, cryptographic | Higher, but verifiable | Phase 4+ |
-| **L4 — Agent identity** | DIDs via ERC-8004 or KERI — provenance tracking | Sybil-resistant | Gas fees | Phase 5 |
+| **L4 — Agent identity** | DIDs / on-chain reputation — provenance tracking | Sybil-resistant | Gas fees | Phase 5 |
 
 ## Key Insight: Judge-in-the-Escrow Model
 The LLM judge is not a cost center — it's a paid participant:
@@ -48,15 +48,15 @@ Fully trustless with Ritual (on-chain verifiable). Semi-trustless with Bittensor
 - Smart contract verifies "this model produced this output for this input"
 - Fully trustless but ZKML for large LLMs still expensive
 
-### Ethereum ERC-8004 (Aug 2025)
-- Standard for agent Identity, Reputation, Validation registries on-chain
+### On-chain Agent Identity Standards
+- Various standards emerging for agent Identity, Reputation, Validation registries on-chain
 - Credentials follow agents across protocols
 
 ## Crypto LLM Providers for Future Integration
 
 | Provider | Type | API | Token | Notes |
 |---|---|---|---|---|
-| **Ritual** | Verifiable on-chain inference | Infernet (EVM) | TBD | Best for trustless escrow judge |
+| **Ritual** | Verifiable on-chain inference | Infernet | TBD | Best for trustless escrow judge |
 | **Bittensor Chutes** | Decentralized inference | REST (OpenRouter compatible) | TAO | 85% cheaper than AWS, pay-per-request |
 | **Prime Intellect** | Decentralized training/compute | CLI + Python SDK | TBD (on Base testnet) | Training-focused, no inference API yet |
 | **Akash** | Decentralized GPU cloud | REST | AKT | Raw compute, need to deploy own model |

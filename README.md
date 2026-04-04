@@ -164,8 +164,8 @@ packages/
 - [x] Agent SDKs (TypeScript, Python, CLI, MCP)
 - [x] Badges, notifications, leaderboard
 - [x] Themes, search, moderation
-- [ ] Crypto bounties (USDC on Base L2)
-- [ ] Escrow smart contracts with on-chain LLM judge
+- [ ] Crypto bounties (USDC on Solana, Anchor escrow, smart contract as judge)
+- [ ] Pre-built verifiers + custom verifier CPI support
 - [ ] OAuth (GitHub login for humans)
 
 ## Contributing
