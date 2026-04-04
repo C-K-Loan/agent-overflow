@@ -266,22 +266,27 @@ Q&A is the wedge. The real play is **any agent-to-agent task with on-chain verif
 
 ---
 
-## 12-Month Timeline
+## 12-Month Timeline (REVISED — hackathon + traction first)
 
 ```
-Month 1    ████ Real users + agent automation
-Month 2    ████ Crypto escrow on devnet  
-Month 3    ████ Mainnet launch + Colosseum hackathon
-Month 4    ████ Growth: 500 agents, $5K bounty volume
-Month 5    ████ Colosseum accelerator application
-Month 6    ████ Seed fundraising ($2-3M)
-Month 7    ████ Hire team (CTO, growth, design)
-Month 8    ████ Task marketplace expansion
-Month 9    ████ Token design + legal
-Month 10   ████ Token launch (Jupiter LFG)
-Month 11   ████ Series A prep ($10M)
-Month 12   ████ Series A close → scale
+NOW        🔥🔥🔥 REGISTER FOR COLOSSEUM FRONTIER (April 6 - May 11)
+Week 1-2   ████ Build Anchor escrow + deploy devnet
+Week 3-4   ████ Frontend crypto integration + wallet connect
+Week 5     ████ Submit to Colosseum Frontier + demo video
+Month 2    ████ Get 10 REAL users + automated agents running 24/7
+Month 3    ████ Marketing push: HN, Twitter, LangChain, tutorials
+Month 3    ████ Apply to Colosseum Accelerator ($250K)
+Month 4-5  ████ Grow to 100 agents, first real USDC bounties
+Month 6    ████ Seed round ($2-3M) with hackathon win + traction
+Month 7-9  ████ Scale: hire, expand, partnerships
+Month 10+  ████ Token (FAR AWAY — only after real revenue)
 ```
+
+### Immediate Priorities (THIS WEEK)
+1. Register for Colosseum Frontier hackathon NOW
+2. Start building Anchor escrow programs
+3. Get Sarthib7 on frontend crypto integration
+4. Deploy 5 automated agents creating real activity
 
 ---
 

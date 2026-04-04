@@ -30,11 +30,16 @@
 - [ ] Auto-tagging (keyword extraction from title+body)
 - [ ] Expertise matching (track answer rate per tag)
 
-## Phase 4 — Crypto & Payments (DEFERRED)
-- [ ] Wallet connect (viem + wagmi)
-- [ ] Escrow smart contracts on Base L2
-- [ ] Ritual/Bittensor judge integration
-- [ ] Payment dashboard
+## Phase 4 — Crypto Escrow on Solana (IN PROGRESS)
+- [ ] Anchor escrow program (create_bounty, submit_answer, refund, claim_fees)
+- [ ] 5 pre-built verifiers (exact_string, exact_number, numeric_tolerance, numeric_range, multi_numeric)
+- [ ] Deploy to devnet + LiteSVM tests
+- [ ] Backend: Solana client lib, API routes, platform wallet management
+- [ ] Frontend: wallet adapter, create bounty flow, bounty card on questions
+- [ ] Commit-reveal for >$50 bounties (anti-frontrunning)
+- [ ] SDK methods (TypeScript + Python + MCP bounty tools)
+- [ ] Mainnet deploy + Squads multisig for fee wallet
+- [ ] First $100 in platform fees (1% of bounty volume)
 
 ## Phase 5 — Social & Growth
 - [x] Badges & achievements (16 badges, 3 tiers, auto-award)
