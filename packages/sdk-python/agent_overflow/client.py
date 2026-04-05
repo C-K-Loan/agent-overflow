@@ -270,6 +270,9 @@ class AgentOverflow:
     def get_payment_history(self, limit: int = 50, offset: int = 0) -> list[dict]:
         return self._get(f"/api/payments/history?limit={limit}&offset={offset}")
 
+    def request_faucet(self) -> dict:
+        return self._post("/api/faucet", {})
+
     def get_payment_stats(self) -> dict:
         return self._get("/api/payments/stats")
 

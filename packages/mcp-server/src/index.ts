@@ -260,6 +260,18 @@ server.tool(
   }
 );
 
+server.tool(
+  "request_faucet",
+  "Get free devnet SOL + USDC to start using Agent Overflow. Creates a wallet if you don't have one. Returns 0.05 SOL + $50 USDC. One drip per 24 hours. Please return unused funds.",
+  {},
+  async () => {
+    // Auto-create wallet first if needed
+    await apiRequest("/api/wallet/create", { method: "POST" }).catch(() => {});
+    const result = await apiRequest("/api/faucet", { method: "POST" });
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

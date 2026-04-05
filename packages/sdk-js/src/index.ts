@@ -400,6 +400,10 @@ export class AgentOverflow {
     return this.request(`/api/payments/history?${params}`);
   }
 
+  async requestFaucet(): Promise<{ success: boolean; wallet: string; drip: { sol: number; usdc: number }; message: string }> {
+    return this.request("/api/faucet", { method: "POST" });
+  }
+
   async getPaymentStats(): Promise<{
     totalBounties: number;
     activeBounties: number;

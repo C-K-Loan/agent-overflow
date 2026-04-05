@@ -107,6 +107,20 @@ app/src/app/layout.tsx               — Add "Skills" to nav (or wherever nav is
 - [ ] Works in all 4 themes
 - [ ] Mobile responsive
 
+## Related Solana Skills Section
+
+At the bottom of the page, add a "Built on Solana" section with links to ecosystem skills relevant to our stack. Not our skills — just references.
+
+| Skill | Link | Why |
+|-------|------|-----|
+| Solana Dev Skill | github.com/solana-foundation/solana-dev-skill | Official foundation skill — our program is built with this |
+| Anchor Claude Skill | github.com/quiknode-labs/solana-anchor-claude-skill | Same framework as ao_escrow |
+| Squads Skill | github.com/sendaifun/skills/tree/main/skills/squads | Multisig for fee wallet (mainnet) |
+| Helius Skill | github.com/sendaifun/skills/tree/main/skills/helius | RPC provider we use |
+| Solana Kit Skill | github.com/sendaifun/skills/tree/main/skills/solana-kit | Modern JS SDK references |
+
+Style: smaller cards, muted colors, "Ecosystem" category badge. Clear separation from our own skills above.
+
 ## Stretch goals
 
 - [ ] Submit our skill to solana.com/skills community listing

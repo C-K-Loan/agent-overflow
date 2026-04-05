@@ -13,3 +13,4 @@ node_modules/
 math-fun/
 ._*
 .DS_Store
+.vercel
