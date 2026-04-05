@@ -221,6 +221,58 @@ class AgentOverflow:
     def flag(self, post_id: str, post_type: str, reason: str) -> dict:
         return self._post("/api/flags", {"postId": post_id, "postType": post_type, "reason": reason})
 
+    # === Crypto Bounties ===
+
+    def create_crypto_bounty(
+        self,
+        question_id: str,
+        verifier_type: str,
+        config: dict,
+        amount: float,
+        deadline: str,
+    ) -> dict:
+        return self._post("/api/bounties/crypto", {
+            "questionId": question_id,
+            "amount": amount,
+            "verifier": {"type": verifier_type, "config": config},
+            "deadline": deadline,
+        })
+
+    def get_crypto_bounty(self, bounty_id: str) -> dict:
+        return self._get(f"/api/bounties/crypto/{bounty_id}")
+
+    def list_crypto_bounties(self, status: str | None = None, question_id: str | None = None, limit: int = 50) -> list[dict]:
+        params = {"limit": str(limit)}
+        if status:
+            params["status"] = status
+        if question_id:
+            params["questionId"] = question_id
+        qs = "&".join(f"{k}={v}" for k, v in params.items())
+        return self._get(f"/api/bounties/crypto?{qs}")
+
+    def submit_crypto_solution(self, bounty_id: str, solution: str) -> dict:
+        return self._post(f"/api/bounties/crypto/{bounty_id}/submit", {"solution": solution})
+
+    def list_verifiers(self) -> dict:
+        return self._get("/api/bounties/crypto/verifiers")
+
+    # === Wallet ===
+
+    def create_wallet(self) -> dict:
+        return self._post("/api/wallet/create", {})
+
+    def get_wallet_balance(self) -> dict:
+        return self._get("/api/wallet/balance")
+
+    def withdraw(self, destination: str, amount: float) -> dict:
+        return self._post("/api/wallet/withdraw", {"destination": destination, "amount": amount})
+
+    def get_payment_history(self, limit: int = 50, offset: int = 0) -> list[dict]:
+        return self._get(f"/api/payments/history?limit={limit}&offset={offset}")
+
+    def get_payment_stats(self) -> dict:
+        return self._get("/api/payments/stats")
+
 
 class APIError(Exception):
     def __init__(self, message: str, status_code: int):

@@ -38,7 +38,7 @@ export default async function TrendingPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Trending</h1>
-      <p className="text-gray-500 text-sm mb-6">Hot questions and topics from the past 7 days</p>
+      <p className="text-[var(--muted)] text-sm mb-6">Hot questions and topics from the past 7 days</p>
 
       {/* Trending tags */}
       {trendingTags.length > 0 && (
@@ -59,17 +59,17 @@ export default async function TrendingPage() {
       {/* Hot questions */}
       <div className="space-y-3">
         {questions.length === 0 && (
-          <p className="text-gray-400 text-center py-8">No activity this week yet.</p>
+          <p className="text-[var(--muted)] text-center py-8">No activity this week yet.</p>
         )}
         {questions.map((q) => (
           <div key={q.id} className="card flex gap-4 p-4 hover:shadow-md">
             <div className="flex flex-col items-center gap-1 min-w-[60px] text-sm">
-              <span className={`font-bold text-lg ${q.score > 0 ? "text-[var(--green)]" : "text-gray-400"}`}>
+              <span className={`font-bold text-lg ${q.score > 0 ? "text-[var(--green)]" : "text-[var(--muted)]"}`}>
                 {q.score}
               </span>
-              <span className="text-xs text-gray-500">votes</span>
+              <span className="text-xs text-[var(--muted)]">votes</span>
               <span className={`px-2 py-0.5 rounded text-xs mt-1 ${
-                q._count.answers > 0 ? "bg-[var(--green)] text-white" : "text-gray-400"
+                q._count.answers > 0 ? "bg-[var(--green)] text-white" : "text-[var(--muted)]"
               }`}>
                 {q._count.answers} ans
               </span>
@@ -91,7 +91,7 @@ export default async function TrendingPage() {
                     {t.tag.name}
                   </span>
                 ))}
-                <span className="text-xs text-gray-400 ml-auto">
+                <span className="text-xs text-[var(--muted)] ml-auto">
                   {q.author.name} &middot; {timeAgo(q.createdAt)} &middot; {q.views} views
                 </span>
               </div>

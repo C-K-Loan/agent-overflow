@@ -204,7 +204,7 @@ export function CreateBountyForm() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold mb-2">Create a Crypto Bounty</h1>
-        <p className="text-gray-500 mb-6">Log in to create USDC bounties for questions.</p>
+        <p className="text-[var(--muted)] mb-6">Log in to create USDC bounties for questions.</p>
         <a href="/signup" className="btn-primary bg-[var(--accent)] text-white px-8 py-3 rounded-lg font-semibold no-underline">
           Sign Up
         </a>
@@ -223,7 +223,7 @@ export function CreateBountyForm() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold mb-2">Connect Your Wallet</h1>
-        <p className="text-gray-500 mb-6">Connect a Solana wallet to fund crypto bounties.</p>
+        <p className="text-[var(--muted)] mb-6">Connect a Solana wallet to fund crypto bounties.</p>
       </div>
     );
   }
@@ -252,7 +252,7 @@ export function CreateBountyForm() {
                   ? "text-[var(--accent)]"
                   : i < step
                     ? "text-[var(--blue)] cursor-pointer hover:underline"
-                    : "text-gray-400"
+                    : "text-[var(--muted)]"
               }`}
             >
               {label}
@@ -272,7 +272,7 @@ export function CreateBountyForm() {
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold mb-1">Which question needs a bounty?</h2>
-            <p className="text-sm text-gray-500">Search for an existing question to attach a USDC bounty.</p>
+            <p className="text-sm text-[var(--muted)]">Search for an existing question to attach a USDC bounty.</p>
           </div>
           <div className="relative">
             <input
@@ -300,7 +300,7 @@ export function CreateBountyForm() {
                   }`}
                 >
                   <div className="font-medium text-sm text-[var(--foreground)]">{q.title}</div>
-                  <div className="flex gap-3 mt-1.5 text-xs text-gray-500">
+                  <div className="flex gap-3 mt-1.5 text-xs text-[var(--muted)]">
                     <span>{q.score} votes</span>
                     <span>{q.answerCount} answers</span>
                   </div>
@@ -328,7 +328,7 @@ export function CreateBountyForm() {
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold mb-1">How should answers be verified?</h2>
-            <p className="text-sm text-gray-500">Pick the verification method for this bounty. The smart contract enforces correctness on-chain.</p>
+            <p className="text-sm text-[var(--muted)]">Pick the verification method for this bounty. The smart contract enforces correctness on-chain.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {verifiers.map((v) => (
@@ -345,7 +345,7 @@ export function CreateBountyForm() {
                   </div>
                   <div className="font-semibold text-sm text-[var(--foreground)]">{v.name}</div>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{v.description}</p>
+                <p className="text-xs text-[var(--muted)] leading-relaxed">{v.description}</p>
               </button>
             ))}
           </div>
@@ -358,7 +358,7 @@ export function CreateBountyForm() {
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold mb-1">Configure the verifier</h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[var(--muted)]">
               Set the expected answer. This is locked into the smart contract.
             </p>
           </div>
@@ -418,7 +418,7 @@ export function CreateBountyForm() {
                   className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                   autoFocus
                 />
-                <p className="text-xs text-gray-500 mt-1.5">
+                <p className="text-xs text-[var(--muted)] mt-1.5">
                   Hashed client-side with SHA-256. The plaintext never leaves your browser.
                 </p>
               </div>
@@ -495,7 +495,7 @@ export function CreateBountyForm() {
                     {multiRows.length > 1 && (
                       <button
                         onClick={() => setMultiRows(multiRows.filter((_, j) => j !== i))}
-                        className="text-gray-400 hover:text-red-500 px-1"
+                        className="text-[var(--muted)] hover:text-red-500 px-1"
                       >
                         &times;
                       </button>
@@ -530,7 +530,7 @@ export function CreateBountyForm() {
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold mb-1">Fund your bounty</h2>
-            <p className="text-sm text-gray-500">Set the USDC amount and deadline. Funds are locked in escrow until awarded or expired.</p>
+            <p className="text-sm text-[var(--muted)]">Set the USDC amount and deadline. Funds are locked in escrow until awarded or expired.</p>
           </div>
 
           <div className="card p-5 space-y-4">
@@ -549,7 +549,7 @@ export function CreateBountyForm() {
                 <span className="absolute right-4 top-2.5 text-sm font-semibold text-[var(--accent)]">USDC</span>
               </div>
               {usdcBalance !== null && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[var(--muted)] mt-1">
                   Balance: <span className="font-mono font-semibold">{usdcBalance.toFixed(2)} USDC</span>
                   {usdcBalance < total && (
                     <span className="text-red-500 ml-2">Insufficient balance</span>
@@ -581,21 +581,21 @@ export function CreateBountyForm() {
             <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--accent)]">Summary</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Question</span>
+                <span className="text-[var(--muted)]">Question</span>
                 <span className="font-medium text-right max-w-[60%] truncate">{selectedQuestion?.title}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Verifier</span>
+                <span className="text-[var(--muted)]">Verifier</span>
                 <span className="font-mono text-xs bg-[var(--border)]/40 px-2 py-0.5 rounded">
                   {selectedVerifier.replace(/_/g, " ")}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Bounty amount</span>
+                <span className="text-[var(--muted)]">Bounty amount</span>
                 <span className="font-mono font-semibold">{parseFloat(amount).toFixed(2)} USDC</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Platform fee (1%)</span>
+                <span className="text-[var(--muted)]">Platform fee (1%)</span>
                 <span className="font-mono text-xs">{fee.toFixed(2)} USDC</span>
               </div>
               <div className="border-t border-[var(--border)] pt-2 flex justify-between font-semibold">

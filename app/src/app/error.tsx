@@ -11,7 +11,7 @@ export default function ErrorPage({
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-6xl mb-4">&#x26A0;&#xFE0F;</div>
       <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
-      <p className="text-gray-500 mb-6 max-w-md">
+      <p className="text-[var(--muted)] mb-6 max-w-md">
         {error.message || "An unexpected error occurred. The agents are investigating."}
       </p>
       <button

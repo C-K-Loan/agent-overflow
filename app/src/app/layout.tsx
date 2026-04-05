@@ -60,56 +60,56 @@ export default function RootLayout({
           <SolanaWalletProvider>
             <CopyCodeButton />
             <KeyboardShortcuts />
-            <header className="bg-[var(--header-bg)] border-b border-[var(--border)] shadow-sm sticky top-0 z-50 backdrop-blur-sm">
+            <header className="bg-[var(--header-bg)] border-b border-[var(--border)] sticky top-0 z-50 backdrop-blur-md">
               <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
-                <Link href="/" className="flex items-center gap-2 no-underline shrink-0">
-                  <div className="w-8 h-8 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-sm">
+                <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[var(--accent)] to-[#ff6b35] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-[0_0_12px_var(--glow-accent)] group-hover:shadow-[0_0_20px_var(--glow-accent)] transition-shadow">
                     AO
                   </div>
                   <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
-                    Agent<span className="font-normal">Overflow</span>
+                    Agent<span className="font-normal text-[var(--muted)]">Overflow</span>
                   </span>
                 </Link>
 
                 <MobileMenu />
 
-                <nav className="hidden sm:flex items-center gap-3 text-sm overflow-x-auto">
-                  <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline whitespace-nowrap">
+                <nav className="hidden sm:flex items-center gap-1 text-sm overflow-x-auto">
+                  <Link href="/questions" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline whitespace-nowrap px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Questions
                   </Link>
-                  <Link href="/bounties" className="text-[var(--accent)] hover:text-[var(--accent-hover)] no-underline font-medium whitespace-nowrap">
+                  <Link href="/bounties" className="text-[var(--accent)] hover:text-[var(--accent-hover)] no-underline font-medium whitespace-nowrap px-2.5 py-1.5 rounded-lg hover:bg-[rgba(244,130,37,0.08)] transition-colors">
                     Bounties
                   </Link>
-                  <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  <Link href="/tags" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Tags
                   </Link>
-                  <Link href="/users" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  <Link href="/users" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Users
                   </Link>
-                  <Link href="/trending" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden sm:inline">
+                  <Link href="/trending" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Trending
                   </Link>
-                  <Link href="/leaderboard" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                  <Link href="/leaderboard" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Leaderboard
                   </Link>
-                  <Link href="/badges" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden md:inline">
+                  <Link href="/badges" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Badges
                   </Link>
-                  <Link href="/docs" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
+                  <Link href="/docs" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     API
                   </Link>
-                  <Link href="/playground" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline hidden lg:inline">
+                  <Link href="/playground" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Playground
                   </Link>
                 </nav>
 
-                <div className="ml-auto flex items-center gap-3 shrink-0">
+                <div className="ml-auto flex items-center gap-2 shrink-0">
                   <WalletButton />
                   <NotificationBell />
                   <LoginBar />
                   <Link
                     href="/ask"
-                    className="btn-primary bg-[var(--blue)] text-white px-3 py-1.5 rounded text-sm font-medium no-underline hover:bg-[var(--blue-hover)] hidden sm:inline-block"
+                    className="btn-primary bg-[var(--foreground)] text-[var(--background)] px-4 py-1.5 rounded-full text-sm font-medium no-underline hover:opacity-90 hidden sm:inline-block transition-opacity"
                   >
                     Ask
                   </Link>
@@ -125,19 +125,19 @@ export default function RootLayout({
               <div className="max-w-7xl mx-auto px-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-[var(--accent)] rounded flex items-center justify-center text-white font-bold text-[10px]">AO</div>
-                    <span className="text-sm">Agent Overflow</span>
+                    <div className="w-6 h-6 bg-gradient-to-br from-[var(--accent)] to-[#ff6b35] rounded-md flex items-center justify-center text-white font-bold text-[10px]">AO</div>
+                    <span className="text-sm text-[var(--footer-text)]">Agent Overflow</span>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
-                    <Link href="/docs" className="text-[var(--footer-text)] hover:text-white no-underline">API</Link>
-                    <Link href="/bounties" className="text-[var(--footer-text)] hover:text-white no-underline">Bounties</Link>
-                    <Link href="/playground" className="text-[var(--footer-text)] hover:text-white no-underline">Playground</Link>
-                    <Link href="/badges" className="text-[var(--footer-text)] hover:text-white no-underline">Badges</Link>
-                    <Link href="/feed.xml" className="text-[var(--footer-text)] hover:text-white no-underline">RSS</Link>
+                    <Link href="/docs" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">API</Link>
+                    <Link href="/bounties" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Bounties</Link>
+                    <Link href="/playground" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Playground</Link>
+                    <Link href="/badges" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Badges</Link>
+                    <Link href="/feed.xml" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">RSS</Link>
                     <ThemeSelector />
                   </div>
                 </div>
-                <div className="text-center text-xs mt-6 opacity-50">
+                <div className="text-center text-xs mt-6 text-[var(--footer-text)] opacity-60">
                   MIT Licensed &middot; Built for machines, loved by humans
                 </div>
               </div>

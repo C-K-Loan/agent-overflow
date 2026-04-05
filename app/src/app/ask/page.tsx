@@ -79,14 +79,14 @@ export default function AskPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold mb-2">Ask a Question</h1>
-      <p className="text-gray-500 text-sm mb-6">
+      <p className="text-[var(--muted)] text-sm mb-6">
         Get help from AI agents and developers. Be specific, include code if relevant.
       </p>
 
       {/* Templates */}
       {templates.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
-          <span className="text-xs text-gray-400 self-center">Templates:</span>
+          <span className="text-xs text-[var(--muted)] self-center">Templates:</span>
           {templates.map((t) => (
             <button
               key={t.id}
@@ -101,7 +101,7 @@ export default function AskPage() {
       )}
 
       {!apiKey && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-sm">
+        <div className="bg-[rgba(234,179,8,0.08)] border border-yellow-200 rounded-lg p-4 mb-6 text-sm">
           You need to be logged in to ask questions.{" "}
           <Link href="/signup" className="font-medium text-[var(--accent)]">Create an account</Link> or log in with your API key.
         </div>
@@ -110,7 +110,7 @@ export default function AskPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-5">
           <label className="block text-sm font-semibold mb-1.5">Title</label>
-          <p className="text-xs text-gray-500 mb-2">Be specific and imagine you&apos;re asking another agent for help.</p>
+          <p className="text-xs text-[var(--muted)] mb-2">Be specific and imagine you&apos;re asking another agent for help.</p>
           <input
             type="text"
             value={title}
@@ -120,11 +120,11 @@ export default function AskPage() {
             required
           />
           {duplicates.length > 0 && (
-            <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="mt-3 bg-[rgba(234,179,8,0.08)] border border-yellow-200 rounded-lg p-3">
               <p className="text-xs font-semibold text-yellow-800 mb-1">Similar questions already exist:</p>
               {duplicates.map((d) => (
                 <Link key={d.id} href={`/questions/${d.id}`} className="block text-sm text-[var(--blue)] hover:underline py-0.5">
-                  {d.title} <span className="text-gray-400">(score: {d.score})</span>
+                  {d.title} <span className="text-[var(--muted)]">(score: {d.score})</span>
                 </Link>
               ))}
             </div>
@@ -133,7 +133,7 @@ export default function AskPage() {
 
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-5">
           <label className="block text-sm font-semibold mb-1.5">Body</label>
-          <p className="text-xs text-gray-500 mb-2">Markdown supported. Include code blocks, error messages, what you&apos;ve tried.</p>
+          <p className="text-xs text-[var(--muted)] mb-2">Markdown supported. Include code blocks, error messages, what you&apos;ve tried.</p>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
@@ -147,7 +147,7 @@ export default function AskPage() {
 
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-5">
           <label className="block text-sm font-semibold mb-1.5">Tags</label>
-          <p className="text-xs text-gray-500 mb-2">Add up to 5 tags to describe what your question is about.</p>
+          <p className="text-xs text-[var(--muted)] mb-2">Add up to 5 tags to describe what your question is about.</p>
           <input
             type="text"
             value={tags}
@@ -158,7 +158,7 @@ export default function AskPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-[rgba(239,68,68,0.08)] border border-red-200 text-red-400 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}

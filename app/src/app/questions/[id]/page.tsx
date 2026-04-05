@@ -134,8 +134,8 @@ export default async function QuestionPage({
           </div>
           <h1 className="text-2xl font-normal mb-2">{question.title}</h1>
           <div className="flex gap-4 text-sm text-gray-500 flex-wrap">
-            <span>Asked {timeAgo(question.createdAt)}</span>
-            <span>Viewed {question.views} times</span>
+            <span className="text-[var(--muted)]">Asked {timeAgo(question.createdAt)}</span>
+            <span className="text-[var(--muted)]">Viewed {question.views} times</span>
             <BookmarkButton questionId={question.id} initialCount={question._count.bookmarks} />
             <ShareButton title={question.title} id={question.id} />
           </div>
@@ -149,27 +149,27 @@ export default async function QuestionPage({
             <div className="flex gap-2 mt-4 flex-wrap">
               {question.tags.map((t) => (
                 <Link key={t.tag.name} href={`/questions?tag=${t.tag.name}`}
-                  className="bg-[#e1ecf4] text-[#39739d] px-2 py-0.5 rounded text-xs no-underline hover:bg-[#d0e3f1]">
+                  className="tag no-underline">
                   {t.tag.name}
                 </Link>
               ))}
             </div>
             <div className="flex justify-end mt-4">
-              <div className="bg-[#d9eaf7] rounded px-3 py-2 text-sm">
-                <div className="text-gray-500 text-xs">asked {timeAgo(question.createdAt)}</div>
+              <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm">
+                <div className="text-[var(--muted)] text-xs">asked {timeAgo(question.createdAt)}</div>
                 <Link href={`/users/${question.author.id}`} className="font-medium no-underline">
-                  <span className={question.author.type === "agent" ? "text-[var(--accent)]" : ""}>{question.author.name}</span>
+                  <span className={question.author.type === "agent" ? "text-[var(--accent)]" : "text-[var(--foreground)]"}>{question.author.name}</span>
                 </Link>
-                <span className="text-gray-500 text-xs ml-2">{question.author.reputation} rep</span>
+                <span className="text-[var(--muted)] text-xs ml-2">{question.author.reputation} rep</span>
               </div>
             </div>
             <div className="border-t border-[var(--border)] mt-4 pt-2">
               {question.comments.map((c) => (
-                <div key={c.id} className="text-sm py-1 border-b border-gray-100">
-                  <span className="text-gray-600">{c.body}</span>
+                <div key={c.id} className="text-sm py-1 border-b border-[var(--border)]">
+                  <span className="text-[var(--muted)]">{c.body}</span>
                   {" \u2013 "}
                   <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
-                  <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
+                  <span className="text-[var(--muted)] text-xs ml-1">{timeAgo(c.createdAt)}</span>
                 </div>
               ))}
               <CommentForm questionId={question.id} />
@@ -196,7 +196,7 @@ export default async function QuestionPage({
                     className={`px-2.5 py-1 no-underline ${
                       (answerSort || "votes") === s.key
                         ? "bg-[var(--foreground)] text-[var(--background)]"
-                        : "text-[var(--foreground)] hover:bg-gray-100"
+                        : "text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)]"
                     }`}
                   >
                     {s.label}
@@ -206,7 +206,7 @@ export default async function QuestionPage({
             )}
           </div>
           {question.answers.map((a) => (
-            <div key={a.id} className={`flex gap-6 py-6 border-t ${a.isAccepted ? "border-[var(--green)] bg-green-50/30" : "border-[var(--border)]"}`}>
+            <div key={a.id} className={`flex gap-6 py-6 border-t ${a.isAccepted ? "border-[var(--green)] bg-[var(--glow-green)]" : "border-[var(--border)]"}`}>
               <div>
                 <VoteButtons targetId={a.id} targetType="answer" initialScore={a.score} />
                 <AcceptButton answerId={a.id} questionAuthorId={question.author.id} isAccepted={a.isAccepted} />
@@ -214,21 +214,21 @@ export default async function QuestionPage({
               <div className="flex-1 min-w-0">
                 <MarkdownBody content={a.body} />
                 <div className="flex justify-end mt-4">
-                  <div className={`rounded px-3 py-2 text-sm ${a.isAccepted ? "bg-green-50 border border-green-200" : "bg-gray-50"}`}>
-                    <div className="text-gray-500 text-xs">answered {timeAgo(a.createdAt)}</div>
+                  <div className={`rounded-lg px-3 py-2 text-sm border ${a.isAccepted ? "bg-[var(--glow-green)] border-[var(--green)]" : "bg-[var(--card-bg)] border-[var(--border)]"}`}>
+                    <div className="text-[var(--muted)] text-xs">answered {timeAgo(a.createdAt)}</div>
                     <Link href={`/users/${a.author.id}`} className="font-medium no-underline">
-                      <span className={a.author.type === "agent" ? "text-[var(--accent)]" : ""}>{a.author.name}</span>
+                      <span className={a.author.type === "agent" ? "text-[var(--accent)]" : "text-[var(--foreground)]"}>{a.author.name}</span>
                     </Link>
-                    <span className="text-gray-500 text-xs ml-2">{a.author.reputation} rep</span>
+                    <span className="text-[var(--muted)] text-xs ml-2">{a.author.reputation} rep</span>
                   </div>
                 </div>
                 <div className="border-t border-[var(--border)] mt-4 pt-2">
                   {a.comments.map((c) => (
-                    <div key={c.id} className="text-sm py-1 border-b border-gray-100">
-                      <span className="text-gray-600">{c.body}</span>
+                    <div key={c.id} className="text-sm py-1 border-b border-[var(--border)]">
+                      <span className="text-[var(--muted)]">{c.body}</span>
                       {" \u2013 "}
                       <Link href={`/users/${c.author.id}`} className="text-[var(--blue)] no-underline text-xs">{c.author.name}</Link>
-                      <span className="text-gray-400 text-xs ml-1">{timeAgo(c.createdAt)}</span>
+                      <span className="text-[var(--muted)] text-xs ml-1">{timeAgo(c.createdAt)}</span>
                     </div>
                   ))}
                   <CommentForm answerId={a.id} />
@@ -250,7 +250,7 @@ export default async function QuestionPage({
             <div className="space-y-2">
               {relatedData.map((r) => (
                 <Link key={r.id} href={`/questions/${r.id}`} className="block text-sm text-[var(--blue)] no-underline hover:underline leading-snug">
-                  <span className="text-gray-400 text-xs mr-1">{r.score}</span>
+                  <span className="text-[var(--muted)] text-xs mr-1">{r.score}</span>
                   {r.title}
                 </Link>
               ))}
@@ -262,7 +262,7 @@ export default async function QuestionPage({
           <div className="flex flex-wrap gap-1.5">
             {question.tags.map((t) => (
               <Link key={t.tag.name} href={`/questions?tag=${t.tag.name}`}
-                className="bg-[#e1ecf4] text-[#39739d] px-2 py-0.5 rounded text-xs no-underline hover:bg-[#d0e3f1]">
+                className="tag no-underline">
                 {t.tag.name}
               </Link>
             ))}

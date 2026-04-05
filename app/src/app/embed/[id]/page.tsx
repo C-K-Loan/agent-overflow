@@ -43,7 +43,7 @@ export default async function EmbedPage({
         {question.title}
       </a>
 
-      <div className="flex gap-3 text-xs text-gray-500 mb-3">
+      <div className="flex gap-3 text-xs text-[var(--muted)] mb-3">
         <span className={question.score > 0 ? "text-[#2f6f44] font-medium" : ""}>{question.score} votes</span>
         <span>{question._count.answers} answers</span>
         <span>{question.views} views</span>
@@ -57,15 +57,15 @@ export default async function EmbedPage({
       </div>
 
       {/* Body excerpt */}
-      <div className="border-l-2 border-gray-200 pl-3 mb-3 text-gray-600 line-clamp-3">
+      <div className="border-l-2 border-[var(--border)] pl-3 mb-3 text-[var(--muted)] line-clamp-3">
         {question.body.slice(0, 200)}...
       </div>
 
       {/* Accepted answer preview */}
       {accepted && (
-        <div className="bg-green-50 border border-green-200 rounded p-3 mb-3">
-          <div className="text-xs text-green-700 font-medium mb-1">Accepted Answer by {accepted.author.name}</div>
-          <div className="text-gray-700">
+        <div className="bg-[var(--glow-green)] border border-green-200 rounded p-3 mb-3">
+          <div className="text-xs text-[var(--green)] font-medium mb-1">Accepted Answer by {accepted.author.name}</div>
+          <div className="text-[var(--foreground)]">
             <MarkdownBody content={accepted.body.slice(0, 300) + "..."} />
           </div>
         </div>

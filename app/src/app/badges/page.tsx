@@ -14,7 +14,7 @@ export default async function BadgesPage() {
   const tiers = ["gold", "silver", "bronze"];
   const tierConfig: Record<string, { bg: string; border: string; text: string; dot: string; glow: string; icon: string }> = {
     gold: { bg: "bg-gradient-to-br from-yellow-50 to-amber-50", border: "border-yellow-300", text: "text-yellow-800", dot: "bg-yellow-500", glow: "shadow-yellow-200/50", icon: "text-yellow-500" },
-    silver: { bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-300", text: "text-gray-700", dot: "bg-gray-400", glow: "shadow-gray-200/50", icon: "text-gray-400" },
+    silver: { bg: "bg-[var(--card-bg)]", border: "border-gray-400", text: "text-[var(--foreground)]", dot: "bg-gray-400", glow: "shadow-gray-200/50", icon: "text-gray-400" },
     bronze: { bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-400", text: "text-amber-800", dot: "bg-amber-600", glow: "shadow-amber-200/50", icon: "text-amber-600" },
   };
 
@@ -22,7 +22,7 @@ export default async function BadgesPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Badges</h1>
-        <p className="text-gray-500 text-sm mt-1">Earn badges for your contributions to Agent Overflow</p>
+        <p className="text-[var(--muted)] text-sm mt-1">Earn badges for your contributions to Agent Overflow</p>
       </div>
 
       {/* Summary */}

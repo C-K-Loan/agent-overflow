@@ -25,8 +25,11 @@ model User {
   votes           Vote[]
   comments        Comment[]
   editHistories   EditHistory[]
-  bountiesOffered Bounty[]       @relation("BountyOfferer")
-  bountiesWon     Bounty[]       @relation("BountyWinner")
+  bountiesOffered     Bounty[]        @relation("BountyOfferer")
+  bountiesWon         Bounty[]        @relation("BountyWinner")
+  cryptoBountiesAsked CryptoBounty[]  @relation("CryptoBountyAsker")
+  cryptoBountiesWon   CryptoBounty[]  @relation("CryptoBountyAnswerer")
+  wallet              UserWallet?
   bookmarks       Bookmark[]
   notifications   Notification[]
   userBadges      UserBadge[]
@@ -48,11 +51,12 @@ model Question {
   updatedAt     DateTime @updatedAt
 
   author     User          @relation(fields: [authorId], references: [id])
-  answers    Answer[]
-  votes      Vote[]
-  comments   Comment[]
-  tags       QuestionTag[]
-  bounties   Bounty[]
+  answers        Answer[]
+  votes          Vote[]
+  comments       Comment[]
+  tags           QuestionTag[]
+  bounties       Bounty[]
+  cryptoBounties CryptoBounty[]
   bookmarks  Bookmark[]
   closeVotes CloseVote[]
 
@@ -255,4 +259,69 @@ model CloseVote {
   user     User     @relation(fields: [userId], references: [id])
 
   @@unique([questionId, userId])
+}
+
+// =============================
+// Crypto Escrow Models
+// =============================
+
+model CryptoBounty {
+  id               String    @id @default(cuid())
+  questionId       String
+  askerId          String
+  amount           BigInt                              // USDC in 6-decimal native units
+  tokenMint        String                              // USDC mint address
+  verifierType     Int                                 // 0-4 pre-built, 255 custom
+  verifierConfig   String                              // JSON config (human-readable)
+  escrowPda        String    @unique                   // On-chain bounty PDA
+  vaultPda         String    @unique                   // On-chain vault PDA
+  status           String    @default("active")        // active | funded | awarded | refunded
+  answererId       String?
+  createTxHash     String?
+  fundTxHash       String?
+  awardTxHash      String?
+  refundTxHash     String?
+  platformFee      BigInt?
+  commitReveal     Boolean   @default(false)
+  deadline         DateTime
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  question  Question @relation(fields: [questionId], references: [id])
+  asker     User     @relation("CryptoBountyAsker", fields: [askerId], references: [id])
+  answerer  User?    @relation("CryptoBountyAnswerer", fields: [answererId], references: [id])
+
+  @@index([questionId])
+  @@index([status])
+  @@index([deadline])
+  @@index([askerId])
+}
+
+model UserWallet {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  publicKey       String   @unique
+  encryptedSecret String                               // AES-256-GCM encrypted
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model PaymentLog {
+  id             String   @id @default(cuid())
+  idempotencyKey String?  @unique
+  type           String                                // bounty_created | bounty_funded | bounty_awarded | bounty_refunded | withdrawal | deposit | fee_claimed
+  amount         BigInt
+  token          String                                // "USDC" | "SOL"
+  fromWallet     String
+  toWallet       String
+  txHash         String   @unique
+  status         String   @default("confirmed")        // pending | confirmed | failed
+  bountyId       String?
+  userId         String?
+  createdAt      DateTime @default(now())
+
+  @@index([bountyId])
+  @@index([userId])
+  @@index([type])
 }

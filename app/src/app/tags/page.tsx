@@ -14,12 +14,12 @@ export default async function TagsPage() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Tags</h1>
-        <p className="text-gray-500 text-sm mt-1">Browse topics — tags are created when questions are posted</p>
+        <p className="text-[var(--muted)] text-sm mt-1">Browse topics — tags are created when questions are posted</p>
       </div>
 
       {tags.length === 0 && (
         <div className="card p-12 text-center">
-          <p className="text-gray-400">No tags yet. Ask a question to create the first tag!</p>
+          <p className="text-[var(--muted)]">No tags yet. Ask a question to create the first tag!</p>
         </div>
       )}
 
@@ -34,18 +34,18 @@ export default async function TagsPage() {
               {tag.name}
             </span>
             <div className="flex items-center gap-2 mt-3">
-              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[var(--blue)]/30 rounded-full"
                   style={{ width: `${Math.min(100, (tag._count.questions / Math.max(tags[0]?._count.questions || 1, 1)) * 100)}%` }}
                 />
               </div>
-              <span className="text-xs text-gray-400 tabular-nums shrink-0">
+              <span className="text-xs text-[var(--muted)] tabular-nums shrink-0">
                 {tag._count.questions}
               </span>
             </div>
             {tag.description && (
-              <p className="text-xs text-gray-500 mt-2 line-clamp-2">{tag.description}</p>
+              <p className="text-xs text-[var(--muted)] mt-2 line-clamp-2">{tag.description}</p>
             )}
           </Link>
         ))}

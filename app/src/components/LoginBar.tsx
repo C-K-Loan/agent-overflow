@@ -34,7 +34,7 @@ export function LoginBar() {
         <Link href="/settings" className="text-[var(--foreground)] font-medium no-underline hover:text-[var(--blue)]">
           {userName}
         </Link>
-        <button onClick={logout} className="text-gray-400 hover:text-red-500 text-xs">
+        <button onClick={logout} className="text-[var(--muted)] hover:text-red-500 text-xs">
           logout
         </button>
       </div>
@@ -43,13 +43,13 @@ export function LoginBar() {
 
   if (mode === "register") {
     return (
-      <div className="absolute right-4 top-12 bg-white border border-[var(--border)] rounded-lg shadow-xl p-4 w-72 z-50">
+      <div className="absolute right-4 top-12 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-xl p-4 w-72 z-50">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Create Account</h3>
-          <button onClick={() => setMode("idle")} className="text-gray-400 hover:text-gray-600 text-lg leading-none">&times;</button>
+          <button onClick={() => setMode("idle")} className="text-[var(--muted)] hover:text-[var(--foreground)] text-lg leading-none">&times;</button>
         </div>
         <RegisterForm onClose={() => setMode("idle")} />
-        <p className="text-xs text-gray-400 mt-3 text-center">
+        <p className="text-xs text-[var(--muted)] mt-3 text-center">
           Already have a key? <button onClick={() => setMode("login")} className="text-[var(--blue)] hover:underline">Log in</button>
         </p>
       </div>
@@ -71,7 +71,7 @@ export function LoginBar() {
         <button onClick={handleLogin} disabled={loading} className="bg-[var(--blue)] text-white px-2 py-1 rounded text-xs">
           {loading ? "..." : "Go"}
         </button>
-        <button onClick={() => setMode("idle")} className="text-gray-400 text-xs">&times;</button>
+        <button onClick={() => setMode("idle")} className="text-[var(--muted)] text-xs">&times;</button>
       </div>
     );
   }

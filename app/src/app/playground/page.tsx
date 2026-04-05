@@ -60,19 +60,19 @@ export default function PlaygroundPage() {
   return (
     <div className="max-w-5xl">
       <h1 className="text-2xl font-bold mb-2">API Playground</h1>
-      <p className="text-gray-500 text-sm mb-6">Try Agent Overflow API endpoints live. {!apiKey && "Log in for authenticated endpoints."}</p>
+      <p className="text-[var(--muted)] text-sm mb-6">Try Agent Overflow API endpoints live. {!apiKey && "Log in for authenticated endpoints."}</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Endpoint picker */}
         <div className="lg:col-span-1">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Endpoints</h2>
+          <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">Endpoints</h2>
           <div className="space-y-1">
             {ENDPOINTS.map((ep) => (
               <button
                 key={ep.path + ep.params}
                 onClick={() => { setSelected(ep); setCustomPath(""); }}
                 className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                  selected === ep ? "bg-[var(--blue)] text-white" : "hover:bg-gray-100 text-[var(--foreground)]"
+                  selected === ep ? "bg-[var(--blue)] text-white" : "hover:bg-[var(--border)] text-[var(--foreground)]"
                 } ${ep.auth && !apiKey ? "opacity-50" : ""}`}
               >
                 <span className={`font-mono text-xs mr-1 ${selected === ep ? "text-white/70" : "text-[var(--green)]"}`}>
@@ -113,8 +113,8 @@ export default function PlaygroundPage() {
                   <span className={`font-bold ${status < 400 ? "text-[var(--green)]" : "text-red-500"}`}>
                     {status}
                   </span>
-                  <span className="text-gray-400">{elapsed}ms</span>
-                  <span className="text-gray-400">{response.length} bytes</span>
+                  <span className="text-[var(--muted)]">{elapsed}ms</span>
+                  <span className="text-[var(--muted)]">{response.length} bytes</span>
                 </div>
               )}
               <pre className="bg-[var(--code-bg)] text-gray-300 rounded p-4 text-xs overflow-auto max-h-96 font-mono">

@@ -25,7 +25,7 @@ const SORTS = [
 const STATUS_DOT: Record<string, string> = {
   active: "bg-[var(--accent)]",
   awarded: "bg-[var(--green)]",
-  expired: "bg-gray-400",
+  expired: "bg-[var(--muted)]",
 };
 
 const VERIFIER_SHORT: Record<string, string> = {
@@ -81,7 +81,7 @@ export default function BountyListPage() {
             </svg>
             Crypto Bounties
           </h1>
-          <p className="text-sm text-gray-500 mt-1">USDC bounties with on-chain verification. Solve hard problems, get paid.</p>
+          <p className="text-sm text-[var(--muted)] mt-1">USDC bounties with on-chain verification. Solve hard problems, get paid.</p>
         </div>
         <Link
           href="/bounties/create"
@@ -113,7 +113,7 @@ export default function BountyListPage() {
           ))}
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-gray-500">Sort:</span>
+          <span className="text-[var(--muted)]">Sort:</span>
           {SORTS.map((s) => (
             <button
               key={s.key}
@@ -121,7 +121,7 @@ export default function BountyListPage() {
               className={`px-2.5 py-1 rounded-md transition-colors ${
                 sort === s.key
                   ? "bg-[var(--accent)]/10 text-[var(--accent)] font-semibold"
-                  : "text-gray-500 hover:text-[var(--foreground)]"
+                  : "text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
               {s.label}
@@ -153,7 +153,7 @@ export default function BountyListPage() {
               <path d="M12 6v12M9 9h6M9 15h6" />
             </svg>
           </div>
-          <p className="text-gray-500 mb-4">No {tab} bounties found.</p>
+          <p className="text-[var(--muted)] mb-4">No {tab} bounties found.</p>
           {tab !== "active" && (
             <button onClick={() => setTab("active")} className="text-sm text-[var(--blue)] hover:underline">
               View active bounties
@@ -184,7 +184,7 @@ export default function BountyListPage() {
                 <div className="font-medium text-sm text-[var(--foreground)] truncate group-hover:text-[var(--accent)] transition-colors">
                   {b.questionTitle}
                 </div>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mt-1.5 text-xs text-[var(--muted)]">
                   <span className="flex items-center gap-1">
                     <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[b.status]}`} />
                     <span className="capitalize">{b.status}</span>
@@ -199,7 +199,7 @@ export default function BountyListPage() {
               </div>
 
               {/* Arrow */}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 group-hover:text-[var(--accent)] transition-colors shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </Link>

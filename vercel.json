@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/bounties/crypto/expire",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/bounties/expire",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

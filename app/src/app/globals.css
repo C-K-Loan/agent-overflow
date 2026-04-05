@@ -2,33 +2,42 @@
 @import "highlight.js/styles/github-dark.min.css";
 
 :root {
-  --background: #f8f9fa;
-  --foreground: #1a1a2e;
+  --background: #0B0B0F;
+  --foreground: #FAFAFA;
+  --muted: #ABABBA;
   --accent: #f48225;
-  --accent-hover: #da7220;
-  --blue: #0074cc;
-  --blue-hover: #0063b1;
-  --green: #2f6f44;
-  --border: #e2e6ea;
-  --sidebar-bg: #fdf7e2;
-  --header-bg: rgba(255,255,255,0.85);
-  --footer-bg: #16181d;
-  --footer-text: #8b929a;
-  --card-bg: #ffffff;
-  --code-bg: #1a1a2e;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --accent-hover: #ff9640;
+  --blue: #00D4FF;
+  --blue-hover: #33DDFF;
+  --green: #14F195;
+  --border: rgba(236, 228, 253, 0.12);
+  --border-prominent: rgba(236, 228, 253, 0.20);
+  --sidebar-bg: #12121A;
+  --header-bg: rgba(11, 11, 15, 0.80);
+  --footer-bg: #050507;
+  --footer-text: #6B6B80;
+  --card-bg: #12121A;
+  --card-bg-hover: #18182A;
+  --code-bg: #0D0C11;
+  --glow-accent: rgba(244, 130, 37, 0.15);
+  --glow-green: rgba(20, 241, 149, 0.12);
+  --glow-blue: rgba(0, 212, 255, 0.10);
+  --gradient-brand: linear-gradient(135deg, #9945FF, #14F195, #00D4FF);
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
   --radius: 12px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-blue: var(--blue);
   --color-green: var(--green);
   --color-border: var(--border);
+  --color-card-bg: var(--card-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -59,10 +68,53 @@ a.btn-primary, a.btn-primary:hover, button.btn-primary, button.btn-primary:hover
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
 }
 .card:hover {
   box-shadow: var(--shadow-md);
+  border-color: var(--border-prominent);
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(18, 18, 26, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Gradient border card — Solana-inspired rotating conic gradient */
+.gradient-border-card {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+.gradient-border-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius);
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    rgba(153, 69, 255, 0.4),
+    rgba(20, 241, 149, 0.4),
+    rgba(0, 212, 255, 0.4),
+    rgba(153, 69, 255, 0.4)
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.gradient-border-card:hover::before {
+  opacity: 1;
 }
 
 /* Smooth theme transitions */
@@ -79,16 +131,17 @@ a.btn-primary, a.btn-primary:hover, button.btn-primary, button.btn-primary:hover
 
 /* Tag pill style */
 .tag {
-  background: #e8f0fe;
-  color: #1967d2;
+  background: rgba(0, 212, 255, 0.10);
+  color: var(--blue);
   padding: 2px 8px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   transition: background 0.15s;
+  border: 1px solid rgba(0, 212, 255, 0.08);
 }
 .tag:hover {
-  background: #d2e3fc;
+  background: rgba(0, 212, 255, 0.18);
 }
 
 /* Vote button animation */
@@ -107,26 +160,50 @@ pre {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background: rgba(236, 228, 253, 0.15);
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: rgba(236, 228, 253, 0.30);
 }
 
-/* Gradient text helper */
+/* Gradient text helper — Solana brand gradient */
 .gradient-text {
+  background: linear-gradient(135deg, #9945FF, #14F195, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Accent gradient text */
+.gradient-text-accent {
   background: linear-gradient(135deg, var(--accent), #ff6b35);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 20px var(--glow-accent), 0 0 40px var(--glow-accent);
+}
+.glow-green {
+  box-shadow: 0 0 20px var(--glow-green), 0 0 40px var(--glow-green);
+}
+.glow-blue {
+  box-shadow: 0 0 20px var(--glow-blue), 0 0 40px var(--glow-blue);
+}
+
+/* Subtle inner border glow for cards */
+.inner-glow {
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
 }
 
 /* Pulse animation for live indicators */

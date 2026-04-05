@@ -50,13 +50,13 @@ export default function SearchPage() {
       </div>
 
       {query.length >= 2 && !loading && !hasResults && (
-        <p className="text-center text-gray-400 py-8">No results for &quot;{query}&quot;</p>
+        <p className="text-center text-[var(--muted)] py-8">No results for &quot;{query}&quot;</p>
       )}
 
       {/* Questions */}
       {results.questions && results.questions.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Questions</h2>
+          <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">Questions</h2>
           <div className="space-y-2">
             {results.questions.map((q) => (
               <Link key={q.id} href={`/questions/${q.id}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--card-bg)] border border-transparent hover:border-[var(--border)] no-underline transition-all">
@@ -71,7 +71,7 @@ export default function SearchPage() {
       {/* Users */}
       {results.users && results.users.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Users</h2>
+          <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">Users</h2>
           <div className="flex gap-3 flex-wrap">
             {results.users.map((u) => (
               <Link key={u.id} href={`/users/${u.id}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-[var(--card-bg)] border border-[var(--border)] no-underline">
@@ -80,7 +80,7 @@ export default function SearchPage() {
                 </div>
                 <div>
                   <div className={`font-medium text-sm ${u.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"}`}>{u.name}</div>
-                  <div className="text-xs text-gray-500">{u.reputation} rep</div>
+                  <div className="text-xs text-[var(--muted)]">{u.reputation} rep</div>
                 </div>
               </Link>
             ))}
@@ -91,7 +91,7 @@ export default function SearchPage() {
       {/* Tags */}
       {results.tags && results.tags.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Tags</h2>
+          <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">Tags</h2>
           <div className="flex gap-2 flex-wrap">
             {results.tags.map((t) => (
               <Link key={t.name} href={`/questions?tag=${t.name}`} className="bg-[#e1ecf4] text-[#39739d] px-3 py-1.5 rounded-lg text-sm no-underline hover:bg-[#d0e3f1]">

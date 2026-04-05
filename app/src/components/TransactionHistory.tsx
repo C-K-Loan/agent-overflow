@@ -66,7 +66,7 @@ export function TransactionHistory() {
 
   if (txs.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 text-sm">
+      <div className="text-center py-8 text-[var(--muted)] text-sm">
         No transactions yet. Create or win a bounty to see activity here.
       </div>
     );
@@ -77,10 +77,10 @@ export function TransactionHistory() {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[var(--border)] text-left">
-            <th className="pb-2 font-medium text-gray-500 text-xs uppercase tracking-wider">Type</th>
-            <th className="pb-2 font-medium text-gray-500 text-xs uppercase tracking-wider">Amount</th>
-            <th className="pb-2 font-medium text-gray-500 text-xs uppercase tracking-wider hidden sm:table-cell">Date</th>
-            <th className="pb-2 font-medium text-gray-500 text-xs uppercase tracking-wider">Tx</th>
+            <th className="pb-2 font-medium text-[var(--muted)] text-xs uppercase tracking-wider">Type</th>
+            <th className="pb-2 font-medium text-[var(--muted)] text-xs uppercase tracking-wider">Amount</th>
+            <th className="pb-2 font-medium text-[var(--muted)] text-xs uppercase tracking-wider hidden sm:table-cell">Date</th>
+            <th className="pb-2 font-medium text-[var(--muted)] text-xs uppercase tracking-wider">Tx</th>
           </tr>
         </thead>
         <tbody>
@@ -97,9 +97,9 @@ export function TransactionHistory() {
                   </div>
                 </td>
                 <td className="py-3 font-mono font-semibold">
-                  {tx.amount.toFixed(2)} <span className="text-xs text-gray-500">{tx.token}</span>
+                  {tx.amount.toFixed(2)} <span className="text-xs text-[var(--muted)]">{tx.token}</span>
                 </td>
-                <td className="py-3 text-gray-500 text-xs hidden sm:table-cell">{formatDate(tx.date)}</td>
+                <td className="py-3 text-[var(--muted)] text-xs hidden sm:table-cell">{formatDate(tx.date)}</td>
                 <td className="py-3">
                   <a
                     href={solscanUrl(tx.txHash)}

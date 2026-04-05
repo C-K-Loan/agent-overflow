@@ -61,7 +61,7 @@ export default function SettingsPage() {
     return (
       <div className="max-w-lg mx-auto mt-12 text-center">
         <h1 className="text-2xl font-bold mb-4">Settings</h1>
-        <p className="text-gray-500 mb-4">Log in to access your settings.</p>
+        <p className="text-[var(--muted)] mb-4">Log in to access your settings.</p>
         <Link href="/signup" className="btn-primary bg-[var(--accent)] text-white px-6 py-2 rounded-lg no-underline">
           Sign Up
         </Link>
@@ -72,9 +72,9 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="max-w-lg mx-auto mt-12 animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-32 mb-6" />
+        <div className="h-8 bg-[var(--border)] rounded w-32 mb-6" />
         <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="h-12 bg-gray-200 rounded" />)}
+          {[1, 2, 3, 4].map((i) => <div key={i} className="h-12 bg-[var(--border)] rounded" />)}
         </div>
       </div>
     );
@@ -102,7 +102,7 @@ export default function SettingsPage() {
             required
             minLength={2}
           />
-          <p className="text-xs text-gray-500 mt-1">Must be unique. Min 2 characters.</p>
+          <p className="text-xs text-[var(--muted)] mt-1">Must be unique. Min 2 characters.</p>
         </div>
 
         <div>
@@ -140,14 +140,14 @@ export default function SettingsPage() {
             <div className="mt-2 flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={avatarUrl} alt="Preview" className="w-10 h-10 rounded-lg object-cover border border-[var(--border)]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              <span className="text-xs text-gray-500">Preview</span>
+              <span className="text-xs text-[var(--muted)]">Preview</span>
             </div>
           )}
         </div>
 
         {message && (
           <div className={`px-4 py-2.5 rounded-lg text-sm ${
-            message.type === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700"
+            message.type === "success" ? "bg-[var(--glow-green)] border border-green-200 text-[var(--green)]" : "bg-[rgba(239,68,68,0.08)] border border-red-200 text-red-400"
           }`}>
             {message.text}
           </div>
@@ -164,7 +164,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="border border-[var(--border)] px-6 py-2.5 rounded-lg text-sm text-[var(--foreground)] hover:bg-gray-100 transition-colors"
+            className="border border-[var(--border)] px-6 py-2.5 rounded-lg text-sm text-[var(--foreground)] hover:bg-[var(--border)] transition-colors"
           >
             Cancel
           </button>
@@ -172,8 +172,8 @@ export default function SettingsPage() {
       </form>
 
       <div className="mt-10 pt-6 border-t border-[var(--border)]">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Wallet</h2>
-        <p className="text-xs text-gray-500 mb-3">Manage your Solana wallet for crypto bounties.</p>
+        <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">Wallet</h2>
+        <p className="text-xs text-[var(--muted)] mb-3">Manage your Solana wallet for crypto bounties.</p>
         <a
           href="/wallet"
           className="inline-flex items-center gap-2 border border-[var(--border)] hover:border-[var(--accent)] px-4 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline text-[var(--foreground)]"
@@ -187,9 +187,9 @@ export default function SettingsPage() {
       </div>
 
       <div className="mt-10 pt-6 border-t border-[var(--border)]">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">API Key</h2>
-        <p className="text-xs text-gray-500 mb-2">Your API key for programmatic access. Keep it secret.</p>
-        <code className="block bg-[var(--code-bg)] text-gray-400 px-4 py-2.5 rounded-lg text-sm font-mono">
+        <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">API Key</h2>
+        <p className="text-xs text-[var(--muted)] mb-2">Your API key for programmatic access. Keep it secret.</p>
+        <code className="block bg-[var(--code-bg)] text-[var(--muted)] px-4 py-2.5 rounded-lg text-sm font-mono">
           {apiKey?.startsWith("ey") ? "JWT token (log in with API key to see it)" : apiKey?.slice(0, 10) + "..." + apiKey?.slice(-4)}
         </code>
       </div>

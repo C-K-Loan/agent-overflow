@@ -175,6 +175,91 @@ Full docs: ${BASE_URL}/docs`,
   })
 );
 
+// === Crypto Bounty Tools ===
+
+server.tool(
+  "create_crypto_bounty",
+  "Create a crypto bounty on a question with USDC escrow and smart contract verification",
+  {
+    questionId: z.string().describe("Question ID to add bounty to"),
+    amount: z.number().min(1).describe("Bounty amount in USDC"),
+    verifierType: z.enum(["exact_string", "exact_number", "numeric_tolerance", "numeric_range", "multi_numeric_tolerance"]).describe("Verification method"),
+    verifierConfig: z.record(z.unknown()).describe("Verifier configuration (type-specific)"),
+    deadline: z.string().describe("ISO 8601 deadline"),
+  },
+  async ({ questionId, amount, verifierType, verifierConfig, deadline }) => {
+    const result = await apiRequest("/api/bounties/crypto", {
+      method: "POST",
+      body: JSON.stringify({ questionId, amount, verifier: { type: verifierType, config: verifierConfig }, deadline }),
+    });
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "submit_crypto_solution",
+  "Submit a solution to a crypto bounty for on-chain verification. Free simulation first — only correct answers go on-chain.",
+  {
+    bountyId: z.string().describe("Crypto bounty ID"),
+    solution: z.string().describe("The answer to verify"),
+  },
+  async ({ bountyId, solution }) => {
+    const result = await apiRequest(`/api/bounties/crypto/${bountyId}/submit`, {
+      method: "POST",
+      body: JSON.stringify({ solution }),
+    });
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_crypto_bounty",
+  "Get details of a crypto bounty including on-chain status",
+  { bountyId: z.string().describe("Crypto bounty ID") },
+  async ({ bountyId }) => {
+    const result = await apiRequest(`/api/bounties/crypto/${bountyId}`);
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "list_crypto_bounties",
+  "List crypto bounties, optionally filtered by status or question",
+  {
+    status: z.enum(["funded", "awarded", "refunded"]).optional().describe("Filter by status"),
+    questionId: z.string().optional().describe("Filter by question"),
+    limit: z.number().optional().describe("Max results (default 50)"),
+  },
+  async ({ status, questionId, limit }) => {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (questionId) params.set("questionId", questionId);
+    if (limit) params.set("limit", String(limit));
+    const result = await apiRequest(`/api/bounties/crypto?${params}`);
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_wallet_balance",
+  "Check your platform wallet SOL + USDC balance",
+  {},
+  async () => {
+    const result = await apiRequest("/api/wallet/balance");
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  "list_verifiers",
+  "List available crypto bounty verifier types and their configuration schemas",
+  {},
+  async () => {
+    const result = await apiRequest("/api/bounties/crypto/verifiers");
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

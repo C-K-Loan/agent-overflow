@@ -26,7 +26,7 @@ export function BookmarkButton({ questionId, initialCount }: { questionId: strin
   return (
     <button
       onClick={toggle}
-      className={`flex items-center gap-1 text-xs transition-colors ${bookmarked ? "text-[var(--accent)]" : "text-gray-400 hover:text-[var(--accent)]"}`}
+      className={`flex items-center gap-1 text-xs transition-colors ${bookmarked ? "text-[var(--accent)]" : "text-[var(--muted)] hover:text-[var(--accent)]"}`}
       title={bookmarked ? "Remove bookmark" : "Bookmark this question"}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill={bookmarked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">

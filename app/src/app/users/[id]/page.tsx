@@ -37,7 +37,7 @@ export default async function UserProfilePage({
 
   const tierColors: Record<string, string> = {
     gold: "bg-yellow-100 text-yellow-800 border-yellow-400",
-    silver: "bg-gray-100 text-gray-700 border-gray-400",
+    silver: "bg-[var(--border)] text-[var(--foreground)] border-gray-400",
     bronze: "bg-amber-50 text-amber-800 border-amber-600",
   };
   const tierDots: Record<string, string> = { gold: "bg-yellow-500", silver: "bg-gray-400", bronze: "bg-amber-600" };
@@ -59,14 +59,14 @@ export default async function UserProfilePage({
         </div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{user.name}</h1>
-          <div className="flex gap-4 text-sm text-gray-500 mt-1 flex-wrap">
+          <div className="flex gap-4 text-sm text-[var(--muted)] mt-1 flex-wrap">
             <span className="capitalize px-2 py-0.5 rounded-full text-xs font-medium border border-[var(--border)]">
               {user.type}
             </span>
             <span className="font-semibold text-[var(--foreground)]">{user.reputation} reputation</span>
             <span>Joined {timeAgo(user.createdAt)}</span>
           </div>
-          {user.bio && <p className="text-sm text-gray-600 mt-2">{user.bio}</p>}
+          {user.bio && <p className="text-sm text-[var(--muted)] mt-2">{user.bio}</p>}
 
           {/* Badge summary */}
           {user.userBadges.length > 0 && (
@@ -105,7 +105,7 @@ export default async function UserProfilePage({
         ].map((s) => (
           <div key={s.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-3 text-center">
             <div className="text-2xl font-bold">{s.value}</div>
-            <div className="text-xs text-gray-500">{s.label}</div>
+            <div className="text-xs text-[var(--muted)]">{s.label}</div>
           </div>
         ))}
       </div>
@@ -132,12 +132,12 @@ export default async function UserProfilePage({
         {/* Questions */}
         <div>
           <h2 className="text-lg font-semibold mb-3">Recent Questions</h2>
-          {user.questions.length === 0 && <p className="text-sm text-gray-500">No questions yet.</p>}
+          {user.questions.length === 0 && <p className="text-sm text-[var(--muted)]">No questions yet.</p>}
           <div className="space-y-2">
             {user.questions.map((q) => (
               <div key={q.id} className="flex items-start gap-3 text-sm">
                 <span className={`min-w-[36px] text-center rounded px-1.5 py-0.5 text-xs font-medium ${
-                  q.score > 0 ? "bg-[var(--green)] text-white" : "border border-[var(--border)] text-gray-500"
+                  q.score > 0 ? "bg-[var(--green)] text-white" : "border border-[var(--border)] text-[var(--muted)]"
                 }`}>
                   {q.score}
                 </span>
@@ -145,7 +145,7 @@ export default async function UserProfilePage({
                   <Link href={`/questions/${q.id}`} className="no-underline text-[var(--blue)] hover:underline line-clamp-1">
                     {q.title}
                   </Link>
-                  <div className="text-xs text-gray-400">{q._count.answers} answers &middot; {timeAgo(q.createdAt)}</div>
+                  <div className="text-xs text-[var(--muted)]">{q._count.answers} answers &middot; {timeAgo(q.createdAt)}</div>
                 </div>
               </div>
             ))}
@@ -155,12 +155,12 @@ export default async function UserProfilePage({
         {/* Answers */}
         <div>
           <h2 className="text-lg font-semibold mb-3">Recent Answers</h2>
-          {user.answers.length === 0 && <p className="text-sm text-gray-500">No answers yet.</p>}
+          {user.answers.length === 0 && <p className="text-sm text-[var(--muted)]">No answers yet.</p>}
           <div className="space-y-2">
             {user.answers.map((a) => (
               <div key={a.id} className="flex items-start gap-3 text-sm">
                 <span className={`min-w-[36px] text-center rounded px-1.5 py-0.5 text-xs font-medium ${
-                  a.isAccepted ? "bg-[var(--green)] text-white" : a.score > 0 ? "bg-gray-100 text-gray-700" : "border border-[var(--border)] text-gray-500"
+                  a.isAccepted ? "bg-[var(--green)] text-white" : a.score > 0 ? "bg-[var(--border)] text-[var(--foreground)]" : "border border-[var(--border)] text-[var(--muted)]"
                 }`}>
                   {a.isAccepted ? "\u2713" : a.score}
                 </span>
@@ -168,7 +168,7 @@ export default async function UserProfilePage({
                   <Link href={`/questions/${a.question.id}`} className="no-underline text-[var(--blue)] hover:underline line-clamp-1">
                     {a.question.title}
                   </Link>
-                  <div className="text-xs text-gray-400">{timeAgo(a.createdAt)}</div>
+                  <div className="text-xs text-[var(--muted)]">{timeAgo(a.createdAt)}</div>
                 </div>
               </div>
             ))}

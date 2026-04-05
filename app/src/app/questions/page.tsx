@@ -67,16 +67,16 @@ export default async function HomePage({
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-600">{total} questions</p>
-        <div className="flex border border-[var(--border)] rounded overflow-hidden text-sm">
+        <p className="text-sm text-[var(--muted)]">{total} questions</p>
+        <div className="flex border border-[var(--border)] rounded-lg overflow-hidden text-sm">
           {sorts.map((s) => (
             <Link
               key={s}
               href={`/questions?sort=${s}${tag ? `&tag=${tag}` : ""}${q ? `&q=${q}` : ""}`}
               className={`px-3 py-1.5 no-underline capitalize ${
                 sort === s
-                  ? "bg-[var(--foreground)] text-white"
-                  : "text-[var(--foreground)] hover:bg-gray-100"
+                  ? "bg-[var(--foreground)] text-[var(--background)]"
+                  : "text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)]"
               }`}
             >
               {s}
@@ -92,7 +92,7 @@ export default async function HomePage({
           name="q"
           defaultValue={q}
           placeholder="Search questions..."
-          className="w-full border border-[var(--border)] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)] focus:border-transparent"
+          className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--blue)] focus:border-transparent"
         />
       </form>
 
@@ -100,7 +100,7 @@ export default async function HomePage({
         {questions.length === 0 && (
           <div className="card p-12 text-center">
             <div className="text-4xl mb-3">?</div>
-            <p className="text-gray-500 mb-4">No questions yet. Be the first to ask!</p>
+            <p className="text-[var(--muted)] mb-4">No questions yet. Be the first to ask!</p>
             <Link href="/ask" className="btn-primary bg-[var(--blue)] text-white px-6 py-2 rounded-lg no-underline">Ask a Question</Link>
           </div>
         )}
@@ -111,7 +111,7 @@ export default async function HomePage({
           >
             {/* Stats */}
             <div className="flex flex-col items-center gap-1.5 min-w-[70px] pt-1">
-              <div className={`text-lg font-bold ${q.score > 0 ? "text-[var(--green)]" : q.score < 0 ? "text-red-500" : "text-gray-400"}`}>
+              <div className={`text-lg font-bold ${q.score > 0 ? "text-[var(--green)]" : q.score < 0 ? "text-red-500" : "text-[var(--muted)]"}`}>
                 {q.score}
               </div>
               <div
@@ -120,12 +120,12 @@ export default async function HomePage({
                     ? "bg-[var(--green)] text-white"
                     : q._count.answers > 0
                     ? "bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/30"
-                    : "bg-gray-100 text-gray-500"
+                    : "bg-[var(--border)] text-[var(--muted)]"
                 }`}
               >
                 {q.answers.length > 0 && "\u2713 "}{q._count.answers} ans
               </div>
-              <div className="text-gray-400 text-xs">{q.views} views</div>
+              <div className="text-[var(--muted)] text-xs">{q.views} views</div>
             </div>
 
             {/* Content */}
@@ -136,7 +136,7 @@ export default async function HomePage({
               >
                 {q.title}
               </Link>
-              <p className="text-sm text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+              <p className="text-sm text-[var(--muted)] mt-1.5 line-clamp-2 leading-relaxed">
                 {q.body.slice(0, 180)}
               </p>
               <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -149,7 +149,7 @@ export default async function HomePage({
                     {t.tag.name}
                   </Link>
                 ))}
-                <span className="text-xs text-gray-400 ml-auto">
+                <span className="text-xs text-[var(--muted)] ml-auto">
                   <span className={`font-medium ${q.author.type === "agent" ? "text-[var(--accent)]" : "text-[var(--blue)]"}`}>
                     {q.author.name}
                   </span>
@@ -171,7 +171,7 @@ export default async function HomePage({
               className={`px-3 py-1 rounded text-sm no-underline ${
                 p === page
                   ? "bg-[var(--accent)] text-white"
-                  : "border border-[var(--border)] text-[var(--foreground)] hover:bg-gray-100"
+                  : "border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)]"
               }`}
             >
               {p}

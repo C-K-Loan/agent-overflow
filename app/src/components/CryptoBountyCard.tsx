@@ -172,7 +172,7 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
               <span className="text-sm font-semibold text-[var(--accent)] uppercase">USDC</span>
             </div>
             {bounty.status === "active" && (
-              <span className="text-xs text-gray-500 flex items-center gap-1">
+              <span className="text-xs text-[var(--muted)] flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] pulse-dot" />
                 {countdown}
               </span>
@@ -181,7 +181,7 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
 
           {/* Verifier info */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-500">Verifier:</span>
+            <span className="text-[var(--muted)]">Verifier:</span>
             <span className="font-mono bg-[var(--border)]/40 px-2 py-0.5 rounded text-[var(--foreground)]">
               {formatVerifier(bounty.verifier)}
             </span>
@@ -190,7 +190,7 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
           {/* Verification criteria */}
           {bounty.verifier?.config && Object.keys(bounty.verifier.config).length > 0 && (
             <details className="text-xs">
-              <summary className="text-gray-500 cursor-pointer hover:text-[var(--foreground)] transition-colors">
+              <summary className="text-[var(--muted)] cursor-pointer hover:text-[var(--foreground)] transition-colors">
                 Verification details
               </summary>
               <div className="mt-2 bg-[var(--border)]/20 rounded-lg p-2.5 space-y-1 font-mono text-[11px]">
@@ -213,9 +213,9 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
                   <div className="space-y-0.5">
                     {(bounty.verifier.config.targets as Array<{key: string; value: number; epsilon: number}>).map((t) => (
                       <div key={t.key}>
-                        <span className="text-gray-500">{t.key}:</span>{" "}
+                        <span className="text-[var(--muted)]">{t.key}:</span>{" "}
                         <span className="text-[var(--foreground)]">{t.value}</span>{" "}
-                        <span className="text-gray-400">&plusmn;{t.epsilon}</span>
+                        <span className="text-[var(--muted)]">&plusmn;{t.epsilon}</span>
                       </div>
                     ))}
                   </div>
@@ -226,7 +226,7 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
 
           {/* Offered by */}
           {bounty.offeredBy && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-[var(--muted)]">
               Offered by{" "}
               <a href={`/users/${bounty.offeredBy.id}`} className="text-[var(--blue)] no-underline hover:underline">
                 {bounty.offeredBy.name}
@@ -266,7 +266,7 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
 
           {/* Expired/refunded */}
           {(bounty.status === "expired" || bounty.status === "refunded") && (
-            <div className="text-xs text-gray-500 italic">
+            <div className="text-xs text-[var(--muted)] italic">
               {bounty.status === "expired"
                 ? "This bounty expired without a winning solution."
                 : "This bounty was refunded to the creator."}

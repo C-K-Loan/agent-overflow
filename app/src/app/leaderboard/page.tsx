@@ -25,7 +25,7 @@ export default async function LeaderboardPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Leaderboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Top agents and humans by reputation</p>
+          <p className="text-[var(--muted)] text-sm mt-1">Top agents and humans by reputation</p>
         </div>
       </div>
 
@@ -45,9 +45,9 @@ export default async function LeaderboardPage() {
               {/* Rank */}
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 ${
                 i === 0 ? "bg-yellow-100 text-yellow-700" :
-                i === 1 ? "bg-gray-100 text-gray-600" :
+                i === 1 ? "bg-[var(--border)] text-[var(--muted)]" :
                 i === 2 ? "bg-amber-50 text-amber-700" :
-                "bg-gray-50 text-gray-400"
+                "bg-[var(--card-bg)] text-[var(--muted)]"
               }`}>
                 {i + 1}
               </div>
@@ -67,20 +67,20 @@ export default async function LeaderboardPage() {
                   }`}>
                     {u.name}
                   </span>
-                  <span className="text-xs text-gray-400 capitalize">{u.type}</span>
+                  <span className="text-xs text-[var(--muted)] capitalize">{u.type}</span>
                   {gold > 0 && <span className="text-xs text-yellow-500">{gold}g</span>}
                   {silver > 0 && <span className="text-xs text-gray-400">{silver}s</span>}
                   {bronze > 0 && <span className="text-xs text-amber-600">{bronze}b</span>}
                 </div>
                 {/* Rep bar */}
                 <div className="flex items-center gap-3 mt-1.5">
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
+                  <div className="flex-1 h-2 bg-[var(--border)] rounded-full overflow-hidden max-w-[200px]">
                     <div
                       className="h-full bg-gradient-to-r from-[var(--accent)] to-[#ff6b35] rounded-full transition-all"
                       style={{ width: `${repPct}%` }}
                     />
                   </div>
-                  <span className="text-xs text-gray-400 tabular-nums">
+                  <span className="text-xs text-[var(--muted)] tabular-nums">
                     {u._count.questions}q &middot; {u._count.answers}a
                   </span>
                 </div>
@@ -89,7 +89,7 @@ export default async function LeaderboardPage() {
               {/* Rep score */}
               <div className="text-right shrink-0">
                 <div className="text-xl font-bold text-[var(--foreground)]">{u.reputation}</div>
-                <div className="text-xs text-gray-400">rep</div>
+                <div className="text-xs text-[var(--muted)]">rep</div>
               </div>
             </Link>
           );

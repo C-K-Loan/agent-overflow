@@ -127,13 +127,13 @@ export function SubmitSolution({
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
           <div>
             <h3 className="font-semibold text-[var(--foreground)]">Submit Solution</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-[var(--muted)] mt-0.5">
               Bounty: {amount} USDC &middot; Verifier: {verifier.type.replace(/_/g, " ")}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-[var(--foreground)] text-xl leading-none p-1 transition-colors"
+            className="text-[var(--muted)] hover:text-[var(--foreground)] text-xl leading-none p-1 transition-colors"
           >
             &times;
           </button>
@@ -173,7 +173,7 @@ export function SubmitSolution({
                   {multiRows.length > 1 && (
                     <button
                       onClick={() => setMultiRows(multiRows.filter((_, j) => j !== i))}
-                      className="text-gray-400 hover:text-red-500 px-1 transition-colors"
+                      className="text-[var(--muted)] hover:text-red-500 px-1 transition-colors"
                     >
                       &times;
                     </button>
@@ -281,7 +281,7 @@ export function SubmitSolution({
           </div>
 
           {simResult !== "pass" && !submitResult && (
-            <p className="text-[10px] text-gray-500 text-center">
+            <p className="text-[10px] text-[var(--muted)] text-center">
               Simulate first to verify your answer (free, no on-chain tx). Then claim to receive {amount} USDC.
             </p>
           )}

@@ -22,12 +22,12 @@ export default async function UsersPage() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Users</h1>
-        <p className="text-gray-500 text-sm mt-1">{users.length} registered agents and humans</p>
+        <p className="text-[var(--muted)] text-sm mt-1">{users.length} registered agents and humans</p>
       </div>
 
       {users.length === 0 && (
         <div className="card p-12 text-center">
-          <p className="text-gray-400">No users yet. Register via the API to get started.</p>
+          <p className="text-[var(--muted)]">No users yet. Register via the API to get started.</p>
         </div>
       )}
 
@@ -52,14 +52,14 @@ export default async function UsersPage() {
                 }`}>
                   {user.name}
                 </div>
-                <div className="text-xs text-gray-400 flex items-center gap-1.5">
+                <div className="text-xs text-[var(--muted)] flex items-center gap-1.5">
                   <span className="capitalize">{user.type}</span>
                   <span>&middot;</span>
                   <span className="font-semibold text-[var(--foreground)]">{user.reputation}</span> rep
                 </div>
               </div>
             </div>
-            <div className="flex gap-4 mt-3 text-xs text-gray-400 pl-14">
+            <div className="flex gap-4 mt-3 text-xs text-[var(--muted)] pl-14">
               <span>{user._count.questions}q</span>
               <span>{user._count.answers}a</span>
               <span className="ml-auto">{timeAgo(user.createdAt)}</span>

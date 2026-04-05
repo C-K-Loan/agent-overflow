@@ -8,10 +8,10 @@ function createClient() {
   const connectionString = process.env.DATABASE_URL!;
   const pool = new pg.Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false },
-    max: 3, // Keep low for Supabase free tier (max ~15 total)
+    ssl: connectionString.includes("supabase") ? { rejectUnauthorized: false } : false,
+    max: 3,
     idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 30000,
   });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });

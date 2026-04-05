@@ -21,11 +21,11 @@ function WelcomeContent() {
     <div className="max-w-lg mx-auto mt-12 text-center">
       <div className="text-6xl mb-4">&#x1f389;</div>
       <h1 className="text-3xl font-bold mb-2">Welcome, {name}!</h1>
-      <p className="text-gray-500 mb-8">Your account is ready. You&apos;re logged in.</p>
+      <p className="text-[var(--muted)] mb-8">Your account is ready. You&apos;re logged in.</p>
 
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-6 text-left mb-6">
-        <h2 className="font-semibold mb-2 text-sm text-gray-500 uppercase tracking-wider">Your API Key</h2>
-        <p className="text-xs text-gray-500 mb-3">Save this — it&apos;s shown only once. Use it to authenticate programmatically.</p>
+        <h2 className="font-semibold mb-2 text-sm text-[var(--muted)] uppercase tracking-wider">Your API Key</h2>
+        <p className="text-xs text-[var(--muted)] mb-3">Save this — it&apos;s shown only once. Use it to authenticate programmatically.</p>
         <div className="flex items-center gap-2">
           <code className="flex-1 bg-[var(--code-bg)] text-[var(--green)] px-3 py-2 rounded font-mono text-sm break-all">
             {apiKey}
@@ -40,7 +40,7 @@ function WelcomeContent() {
       </div>
 
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-6 text-left mb-6">
-        <h2 className="font-semibold mb-3 text-sm text-gray-500 uppercase tracking-wider">Quick Start</h2>
+        <h2 className="font-semibold mb-3 text-sm text-[var(--muted)] uppercase tracking-wider">Quick Start</h2>
         <pre className="bg-[var(--code-bg)] text-gray-300 rounded-lg p-4 text-xs overflow-x-auto">
 {`# Get an identity token (1h expiry)
 curl -X POST ${typeof window !== "undefined" ? window.location.origin : ""}/api/auth/token \\
@@ -69,7 +69,7 @@ curl -X POST ${typeof window !== "undefined" ? window.location.origin : ""}/api/
         </Link>
         <Link
           href="/docs"
-          className="border border-[var(--border)] px-6 py-2.5 rounded-lg font-semibold no-underline text-[var(--foreground)] hover:bg-gray-100 transition-colors"
+          className="border border-[var(--border)] px-6 py-2.5 rounded-lg font-semibold no-underline text-[var(--foreground)] hover:bg-[var(--border)] transition-colors"
         >
           API Docs
         </Link>
@@ -80,7 +80,7 @@ curl -X POST ${typeof window !== "undefined" ? window.location.origin : ""}/api/
 
 export default function WelcomePage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-400">Loading...</div>}>
+    <Suspense fallback={<div className="text-center py-20 text-[var(--muted)]">Loading...</div>}>
       <WelcomeContent />
     </Suspense>
   );

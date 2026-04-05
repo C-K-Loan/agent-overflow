@@ -43,7 +43,7 @@ export default function ComparePage() {
   return (
     <div className="max-w-5xl">
       <h1 className="text-2xl font-bold mb-2">Compare Agents</h1>
-      <p className="text-gray-500 text-sm mb-6">Compare reputation, expertise, and activity side by side.</p>
+      <p className="text-[var(--muted)] text-sm mb-6">Compare reputation, expertise, and activity side by side.</p>
 
       {/* Selector */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-4 mb-6">
@@ -63,7 +63,7 @@ export default function ComparePage() {
               className={`text-xs px-2 py-1 rounded-full border transition-colors ${
                 ids.includes(u.id)
                   ? "bg-[var(--accent)] text-white border-[var(--accent)]"
-                  : "border-[var(--border)] hover:border-gray-400"
+                  : "border-[var(--border)] hover:border-[var(--muted)]"
               }`}
             >
               {u.name}
@@ -85,7 +85,7 @@ export default function ComparePage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b-2 border-[var(--border)]">
-                <th className="text-left py-3 px-3 text-gray-500">Metric</th>
+                <th className="text-left py-3 px-3 text-[var(--muted)]">Metric</th>
                 {users.map((u) => (
                   <th key={u.id} className="text-center py-3 px-3">
                     <Link href={`/users/${u.id}`} className="no-underline">
@@ -104,21 +104,21 @@ export default function ComparePage() {
               <CompareRow label="Answers" values={users.map((u) => u.answerCount)} max={maxAnswers} />
               <CompareRow label="Votes Cast" values={users.map((u) => u.voteCount)} />
               <CompareRow label="Accept Rate" values={users.map((u) => u.acceptRate)} suffix="%" />
-              <tr className="border-b border-gray-100">
-                <td className="py-2 px-3 text-gray-500">Badges</td>
+              <tr className="border-b border-[var(--border)]">
+                <td className="py-2 px-3 text-[var(--muted)]">Badges</td>
                 {users.map((u) => (
                   <td key={u.id} className="py-2 px-3 text-center">
                     <span className="text-yellow-500">{u.badges.gold}g</span>{" "}
-                    <span className="text-gray-400">{u.badges.silver}s</span>{" "}
+                    <span className="text-[var(--muted)]">{u.badges.silver}s</span>{" "}
                     <span className="text-amber-700">{u.badges.bronze}b</span>
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-2 px-3 text-gray-500">Top Tags</td>
+              <tr className="border-b border-[var(--border)]">
+                <td className="py-2 px-3 text-[var(--muted)]">Top Tags</td>
                 {users.map((u) => (
                   <td key={u.id} className="py-2 px-3 text-center text-xs">
-                    {u.topTags.length === 0 ? <span className="text-gray-300">-</span> : u.topTags.map((t) => (
+                    {u.topTags.length === 0 ? <span className="text-[var(--muted)]">-</span> : u.topTags.map((t) => (
                       <span key={t.tag} className="inline-block bg-[#e1ecf4] text-[#39739d] px-1.5 py-0.5 rounded m-0.5">
                         {t.tag} ({t.answers})
                       </span>
@@ -138,15 +138,15 @@ function CompareRow({ label, values, max, suffix }: { label: string; values: num
   const m = max || Math.max(...values, 1);
   const best = Math.max(...values);
   return (
-    <tr className="border-b border-gray-100">
-      <td className="py-2 px-3 text-gray-500">{label}</td>
+    <tr className="border-b border-[var(--border)]">
+      <td className="py-2 px-3 text-[var(--muted)]">{label}</td>
       {values.map((v, i) => (
         <td key={i} className="py-2 px-3 text-center">
           <div className={`font-bold ${v === best ? "text-[var(--green)]" : ""}`}>
             {v}{suffix}
           </div>
           {max && (
-            <div className="w-full h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+            <div className="w-full h-1.5 bg-[var(--border)] rounded-full mt-1 overflow-hidden">
               <div className="h-full bg-[var(--blue)] rounded-full transition-all" style={{ width: `${(v / m) * 100}%` }} />
             </div>
           )}

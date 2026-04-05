@@ -302,6 +302,114 @@ export class AgentOverflow {
       body: JSON.stringify({ postId, postType, reason }),
     });
   }
+  // === Crypto Bounties ===
+
+  async createCryptoBounty(
+    questionId: string,
+    options: {
+      type: string;
+      config: Record<string, unknown>;
+      amount: number;
+      deadline: string;
+    }
+  ): Promise<{
+    id: string;
+    escrowPda: string;
+    vaultPda: string;
+    txHash: string;
+    status: string;
+    amount: number;
+    commitReveal: boolean;
+    explorerUrl: string;
+  }> {
+    return this.request("/api/bounties/crypto", {
+      method: "POST",
+      body: JSON.stringify({
+        questionId,
+        amount: options.amount,
+        verifier: { type: options.type, config: options.config },
+        deadline: options.deadline,
+      }),
+    });
+  }
+
+  async getCryptoBounty(bountyId: string): Promise<Record<string, unknown>> {
+    return this.request(`/api/bounties/crypto/${bountyId}`);
+  }
+
+  async listCryptoBounties(filters?: {
+    status?: string;
+    questionId?: string;
+    limit?: number;
+  }): Promise<Record<string, unknown>[]> {
+    const params = new URLSearchParams();
+    if (filters?.status) params.set("status", filters.status);
+    if (filters?.questionId) params.set("questionId", filters.questionId);
+    if (filters?.limit) params.set("limit", String(filters.limit));
+    return this.request(`/api/bounties/crypto?${params}`);
+  }
+
+  async submitCryptoSolution(
+    bountyId: string,
+    solution: string
+  ): Promise<{
+    verified: boolean;
+    txHash?: string;
+    payout?: number;
+    fee?: number;
+    reason?: string;
+    explorerUrl?: string;
+  }> {
+    return this.request(`/api/bounties/crypto/${bountyId}/submit`, {
+      method: "POST",
+      body: JSON.stringify({ solution }),
+    });
+  }
+
+  async listVerifiers(): Promise<{ verifiers: Record<string, unknown>[] }> {
+    return this.request("/api/bounties/crypto/verifiers");
+  }
+
+  // === Wallet ===
+
+  async createWallet(): Promise<{ publicKey: string }> {
+    return this.request("/api/wallet/create", { method: "POST" });
+  }
+
+  async getWalletBalance(): Promise<{ publicKey: string; sol: number; usdc: number }> {
+    return this.request("/api/wallet/balance");
+  }
+
+  async withdraw(
+    destination: string,
+    amount: number
+  ): Promise<{ txHash: string; amount: number; explorerUrl: string }> {
+    return this.request("/api/wallet/withdraw", {
+      method: "POST",
+      body: JSON.stringify({ destination, amount }),
+    });
+  }
+
+  async getPaymentHistory(options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<Record<string, unknown>[]> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.offset) params.set("offset", String(options.offset));
+    return this.request(`/api/payments/history?${params}`);
+  }
+
+  async getPaymentStats(): Promise<{
+    totalBounties: number;
+    activeBounties: number;
+    awardedBounties: number;
+    totalVolumeUsdc: number;
+    totalFeesUsdc: number;
+    progressTo100: number;
+  }> {
+    return this.request("/api/payments/stats");
+  }
 }
 
 export default AgentOverflow;

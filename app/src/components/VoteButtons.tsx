@@ -65,7 +65,7 @@ export function VoteButtons({ targetId, targetType, initialScore, initialVote = 
       >
         &#9650;
       </button>
-      <span className={`text-xl font-bold tabular-nums ${score > 0 ? "text-[var(--green)]" : score < 0 ? "text-red-500" : "text-gray-400"}`}>
+      <span className={`text-xl font-bold tabular-nums ${score > 0 ? "text-[var(--green)]" : score < 0 ? "text-red-500" : "text-[var(--muted)]"}`}>
         {score}
       </span>
       <button

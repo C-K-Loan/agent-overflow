@@ -81,7 +81,7 @@ export function WalletButton() {
       {dropdownOpen && (
         <div className="absolute right-0 top-full mt-1.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-lg z-50 min-w-[180px] overflow-hidden">
           <div className="px-3 py-2.5 border-b border-[var(--border)]">
-            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Connected</div>
+            <div className="text-[10px] uppercase tracking-wider text-[var(--muted)] mb-1">Connected</div>
             <div className="font-mono text-xs text-[var(--foreground)] break-all">
               {publicKey.toBase58()}
             </div>
@@ -98,7 +98,7 @@ export function WalletButton() {
           </a>
           <button
             onClick={() => { disconnect(); setDropdownOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors text-left"
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-[rgba(239,68,68,0.08)] transition-colors text-left"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

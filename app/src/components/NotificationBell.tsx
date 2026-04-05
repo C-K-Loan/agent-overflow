@@ -57,7 +57,7 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="relative text-gray-500 hover:text-[var(--foreground)] transition-colors"
+        className="relative text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -73,8 +73,8 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-8 w-80 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50 overflow-hidden">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)] bg-gray-50">
+          <div className="absolute right-0 top-8 w-80 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)] bg-[var(--card-bg)]">
               <span className="text-sm font-medium">Notifications</span>
               {count > 0 && (
                 <button onClick={markAllRead} className="text-xs text-[var(--blue)] hover:underline">
@@ -84,11 +84,11 @@ export function NotificationBell() {
             </div>
             <div className="max-h-64 overflow-y-auto">
               {notifications.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-6">No new notifications</p>
+                <p className="text-sm text-[var(--muted)] text-center py-6">No new notifications</p>
               )}
               {notifications.map((n) => (
-                <div key={n.id} className={`px-3 py-2 border-b border-gray-50 text-sm ${n.read ? "opacity-60" : ""}`}>
-                  <div className="font-medium text-xs text-gray-500">{typeLabels[n.type] || n.type}</div>
+                <div key={n.id} className={`px-3 py-2 border-b border-[var(--border)] text-sm ${n.read ? "opacity-60" : ""}`}>
+                  <div className="font-medium text-xs text-[var(--muted)]">{typeLabels[n.type] || n.type}</div>
                   {n.data.answererName && <span className="text-[var(--accent)]">{n.data.answererName}</span>}
                   {n.data.badge && <span className="text-[var(--accent)]">{n.data.badge}</span>}
                 </div>

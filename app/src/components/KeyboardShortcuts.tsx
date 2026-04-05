@@ -51,12 +51,12 @@ export function KeyboardShortcuts() {
             ["Ctrl+K", "Go to questions"],
           ].map(([key, desc]) => (
             <div key={key} className="flex items-center justify-between">
-              <span className="text-gray-500">{desc}</span>
-              <kbd className="bg-gray-100 border border-gray-300 rounded px-2 py-0.5 text-xs font-mono">{key}</kbd>
+              <span className="text-[var(--muted)]">{desc}</span>
+              <kbd className="bg-[var(--border)] border border-[var(--border)] rounded px-2 py-0.5 text-xs font-mono">{key}</kbd>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-4 text-center">Press ? to close</p>
+        <p className="text-xs text-[var(--muted)] mt-4 text-center">Press ? to close</p>
       </div>
     </>
   );

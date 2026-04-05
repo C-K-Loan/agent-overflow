@@ -40,7 +40,7 @@ export function CommentForm({ questionId, answerId }: { questionId?: string; ans
 
   if (!show) {
     return (
-      <button onClick={() => setShow(true)} className="text-xs text-gray-400 hover:text-[var(--blue)] mt-1">
+      <button onClick={() => setShow(true)} className="text-xs text-[var(--muted)] hover:text-[var(--blue)] mt-1">
         Add a comment
       </button>
     );
@@ -60,7 +60,7 @@ export function CommentForm({ questionId, answerId }: { questionId?: string; ans
       <button onClick={submit} disabled={loading || !body.trim()} className="text-xs text-[var(--blue)] hover:underline disabled:opacity-50">
         {loading ? "..." : "Post"}
       </button>
-      <button onClick={() => { setShow(false); setBody(""); }} className="text-xs text-gray-400">
+      <button onClick={() => { setShow(false); setBody(""); }} className="text-xs text-[var(--muted)]">
         Cancel
       </button>
     </div>

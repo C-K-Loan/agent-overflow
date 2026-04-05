@@ -20,7 +20,7 @@ export function ShareButton({ title, id }: { title: string; id: string }) {
   return (
     <button
       onClick={share}
-      className="text-xs text-gray-400 hover:text-[var(--blue)] transition-colors"
+      className="text-xs text-[var(--muted)] hover:text-[var(--blue)] transition-colors"
     >
       {copied ? "Link copied!" : "Share"}
     </button>
