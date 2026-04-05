@@ -9,19 +9,36 @@ export const SOLANA_RPC_URL =
     ? "https://api.mainnet-beta.solana.com"
     : "https://api.devnet.solana.com");
 
-// Program ID — deployed ao_escrow program
-export const ESCROW_PROGRAM_ID = new PublicKey(
-  process.env.ESCROW_PROGRAM_ID || "3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK"
-);
+// Program ID + USDC mint as strings (safe at build time)
+const ESCROW_ID = (process.env.ESCROW_PROGRAM_ID || "3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK").trim();
 
-// USDC mint addresses per network
 const USDC_MINTS: Record<string, string> = {
   "mainnet-beta": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   devnet: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
 };
-export const USDC_MINT = new PublicKey(
-  process.env.USDC_MINT || USDC_MINTS[SOLANA_NETWORK] || USDC_MINTS.devnet
-);
+const USDC_ID = (process.env.USDC_MINT || USDC_MINTS[SOLANA_NETWORK] || USDC_MINTS.devnet).trim();
+
+// Lazy PublicKey getters (only created at runtime, not build time)
+let _escrow: PublicKey | null = null;
+let _usdc: PublicKey | null = null;
+
+export function getEscrowProgramId(): PublicKey {
+  if (!_escrow) _escrow = new PublicKey(ESCROW_ID);
+  return _escrow;
+}
+
+export function getUsdcMint(): PublicKey {
+  if (!_usdc) _usdc = new PublicKey(USDC_ID);
+  return _usdc;
+}
+
+// Convenience aliases — use these in code that runs at request time
+export const ESCROW_PROGRAM_ID = new Proxy({} as PublicKey, {
+  get(_, prop) { return (getEscrowProgramId() as any)[prop]; },
+});
+export const USDC_MINT = new Proxy({} as PublicKey, {
+  get(_, prop) { return (getUsdcMint() as any)[prop]; },
+});
 
 // PDA seed constants (must match Rust program)
 export const BOUNTY_SEED = Buffer.from("bounty");
