@@ -9,6 +9,7 @@ import { AnswerForm } from "@/components/AnswerForm";
 import { ShareButton } from "@/components/ShareButton";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { CommentForm } from "@/components/CommentForm";
+import { CryptoBountyCard } from "@/components/CryptoBountyCard";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -242,6 +243,7 @@ export default async function QuestionPage({
 
       {/* Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0 space-y-4">
+        <CryptoBountyCard questionId={id} />
         {relatedData.length > 0 && (
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-4">
             <h3 className="font-semibold text-sm mb-3">Related Questions</h3>

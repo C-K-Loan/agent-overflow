@@ -148,3 +148,60 @@ pre {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* ─── Crypto Bounty Styles ─── */
+
+/* Bounty card entrance */
+.crypto-bounty-card {
+  animation: bounty-slide-in 0.3s ease-out;
+}
+@keyframes bounty-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Amount shimmer on hover */
+.crypto-bounty-card:hover .crypto-amount {
+  background: linear-gradient(135deg, var(--accent), #ff6b35, var(--accent));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: amount-shimmer 2s linear infinite;
+}
+@keyframes amount-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Submit button glow */
+.crypto-submit-btn:not(:disabled):hover {
+  box-shadow: 0 0 20px rgba(244, 130, 37, 0.3), 0 0 40px rgba(244, 130, 37, 0.1);
+}
+
+/* Modal entrance */
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.crypto-modal-enter {
+  animation: modal-enter 0.2s ease-out;
+}
+
+/* Wallet connect button pulse on landing */
+.wallet-connect-btn {
+  position: relative;
+}
+.wallet-connect-btn::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--blue), transparent, var(--blue));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s;
+}
+.wallet-connect-btn:hover::after {
+  opacity: 0.15;
+}

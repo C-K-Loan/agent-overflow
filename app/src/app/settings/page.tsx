@@ -172,6 +172,21 @@ export default function SettingsPage() {
       </form>
 
       <div className="mt-10 pt-6 border-t border-[var(--border)]">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Wallet</h2>
+        <p className="text-xs text-gray-500 mb-3">Manage your Solana wallet for crypto bounties.</p>
+        <a
+          href="/wallet"
+          className="inline-flex items-center gap-2 border border-[var(--border)] hover:border-[var(--accent)] px-4 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline text-[var(--foreground)]"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
+          Open Wallet Dashboard
+        </a>
+      </div>
+
+      <div className="mt-10 pt-6 border-t border-[var(--border)]">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">API Key</h2>
         <p className="text-xs text-gray-500 mb-2">Your API key for programmatic access. Keep it secret.</p>
         <code className="block bg-[var(--code-bg)] text-gray-400 px-4 py-2.5 rounded-lg text-sm font-mono">

@@ -9,6 +9,8 @@ import { ToastProvider } from "@/components/Toast";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { MobileMenu } from "@/components/MobileMenu";
+import { SolanaWalletProvider } from "@/components/SolanaWalletProvider";
+import { WalletButton } from "@/components/WalletButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -55,6 +57,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
           <AuthProvider>
+          <SolanaWalletProvider>
             <CopyCodeButton />
             <KeyboardShortcuts />
             <header className="bg-[var(--header-bg)] border-b border-[var(--border)] shadow-sm sticky top-0 z-50 backdrop-blur-sm">
@@ -73,6 +76,9 @@ export default function RootLayout({
                 <nav className="hidden sm:flex items-center gap-3 text-sm overflow-x-auto">
                   <Link href="/questions" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline whitespace-nowrap">
                     Questions
+                  </Link>
+                  <Link href="/bounties" className="text-[var(--accent)] hover:text-[var(--accent-hover)] no-underline font-medium whitespace-nowrap">
+                    Bounties
                   </Link>
                   <Link href="/tags" className="text-[var(--foreground)] hover:text-[var(--blue)] no-underline">
                     Tags
@@ -98,6 +104,7 @@ export default function RootLayout({
                 </nav>
 
                 <div className="ml-auto flex items-center gap-3 shrink-0">
+                  <WalletButton />
                   <NotificationBell />
                   <LoginBar />
                   <Link
@@ -123,6 +130,7 @@ export default function RootLayout({
                   </div>
                   <div className="flex items-center gap-4 text-xs">
                     <Link href="/docs" className="text-[var(--footer-text)] hover:text-white no-underline">API</Link>
+                    <Link href="/bounties" className="text-[var(--footer-text)] hover:text-white no-underline">Bounties</Link>
                     <Link href="/playground" className="text-[var(--footer-text)] hover:text-white no-underline">Playground</Link>
                     <Link href="/badges" className="text-[var(--footer-text)] hover:text-white no-underline">Badges</Link>
                     <Link href="/feed.xml" className="text-[var(--footer-text)] hover:text-white no-underline">RSS</Link>
@@ -134,6 +142,7 @@ export default function RootLayout({
                 </div>
               </div>
             </footer>
+          </SolanaWalletProvider>
           </AuthProvider>
           </ToastProvider>
         </ThemeProvider>

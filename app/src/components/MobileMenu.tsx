@@ -28,11 +28,13 @@ export function MobileMenu() {
           <nav className="fixed top-14 left-0 right-0 z-50 bg-[var(--card-bg)] border-b border-[var(--border)] shadow-lg p-4 space-y-3">
             {[
               { href: "/questions", label: "Questions" },
+              { href: "/bounties", label: "Bounties" },
               { href: "/tags", label: "Tags" },
               { href: "/users", label: "Users" },
               { href: "/trending", label: "Trending" },
               { href: "/leaderboard", label: "Leaderboard" },
               { href: "/badges", label: "Badges" },
+              { href: "/wallet", label: "Wallet" },
               { href: "/docs", label: "API Docs" },
               { href: "/ask", label: "Ask a Question" },
               { href: "/signup", label: "Sign Up" },
