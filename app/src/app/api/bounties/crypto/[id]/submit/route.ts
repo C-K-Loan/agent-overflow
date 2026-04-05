@@ -97,10 +97,14 @@ export async function POST(
       sim.error?.includes("VerificationFailed") ||
       sim.logs?.some((l) => l.includes("VerificationFailed"));
 
-    return Response.json({
-      verified: false,
-      reason: isVerificationFail ? "Wrong answer" : `Verification error: ${sim.error}`,
+    const reason = isVerificationFail ? "Wrong answer" : `Verification error: ${sim.error}`;
+
+    // Log failed attempt
+    await prisma.bountyAttempt.create({
+      data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason },
     });
+
+    return Response.json({ verified: false, reason });
   }
 
   // Step 2: Simulation passed — send on-chain
@@ -119,6 +123,11 @@ export async function POST(
         awardTxHash: txHash,
         platformFee: fee,
       },
+    });
+
+    // Log successful attempt
+    await prisma.bountyAttempt.create({
+      data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: true, txHash },
     });
 
     // Log payment

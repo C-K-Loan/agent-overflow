@@ -14,6 +14,11 @@ export async function GET(
       asker: { select: { id: true, name: true } },
       answerer: { select: { id: true, name: true } },
       question: { select: { id: true, title: true } },
+      attempts: {
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: { id: true, verified: true, reason: true, solution: true, txHash: true, createdAt: true },
+      },
     },
   });
 

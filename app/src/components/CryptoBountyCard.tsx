@@ -5,6 +5,15 @@ import { useAuth } from "./AuthProvider";
 
 const SubmitSolution = lazy(() => import("./SubmitSolution").then(m => ({ default: m.SubmitSolution })));
 
+interface BountyAttempt {
+  id: string;
+  verified: boolean;
+  reason?: string;
+  solution: string;
+  txHash?: string;
+  createdAt: string;
+}
+
 interface CryptoBounty {
   id: string;
   questionId: string;
@@ -17,6 +26,7 @@ interface CryptoBounty {
   winner?: { name: string; id: string };
   txHash?: string;
   offeredBy?: { name: string; id: string };
+  attempts?: BountyAttempt[];
 }
 
 const VERIFIER_LABELS: Record<string, string> = {
@@ -104,20 +114,28 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
   const [showSubmit, setShowSubmit] = useState(false);
 
   useEffect(() => {
+    const VTYPE: Record<number, string> = { 0: "exact_string", 1: "exact_number", 2: "numeric_tolerance", 3: "numeric_range", 4: "multi_numeric_tolerance" };
     fetch(`/api/bounties/crypto?questionId=${questionId}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
+      .then(async (data) => {
         const items = Array.isArray(data) ? data : data?.bounties ?? [];
         if (items.length) {
           const b = items[0];
-          const VTYPE: Record<number, string> = { 0: "exact_string", 1: "exact_number", 2: "numeric_tolerance", 3: "numeric_range", 4: "multi_numeric_tolerance" };
+          // Fetch detail (includes attempts)
+          let detail = b;
+          try {
+            const r = await fetch(`/api/bounties/crypto/${b.id}`);
+            if (r.ok) detail = await r.json();
+          } catch {}
           setBounty({
-            ...b,
+            ...detail,
             currency: "USDC",
-            verifier: b.verifier ?? { type: VTYPE[b.verifierType] ?? "unknown", config: JSON.parse(b.verifierConfig || "{}") },
-            winner: b.answerer,
-            txHash: b.awardTxHash,
-            offeredBy: b.asker,
+            verifier: detail.verifier ?? detail.verifierConfig
+              ? { type: VTYPE[detail.verifierType] ?? "unknown", config: typeof detail.verifierConfig === "string" ? JSON.parse(detail.verifierConfig || "{}") : detail.verifierConfig }
+              : { type: "unknown", config: {} },
+            winner: detail.answerer,
+            txHash: detail.awardTxHash,
+            offeredBy: detail.asker,
           });
         }
         setLoading(false);
@@ -271,6 +289,34 @@ export function CryptoBountyCard({ questionId }: { questionId: string }) {
                 ? "This bounty expired without a winning solution."
                 : "This bounty was refunded to the creator."}
             </div>
+          )}
+
+          {/* Submission attempts */}
+          {bounty.attempts && bounty.attempts.length > 0 && (
+            <details className="text-xs">
+              <summary className="text-[var(--muted)] cursor-pointer hover:text-[var(--foreground)] transition-colors">
+                {bounty.attempts.length} submission{bounty.attempts.length !== 1 ? "s" : ""}
+                {" "}({bounty.attempts.filter(a => a.verified).length} verified)
+              </summary>
+              <div className="mt-2 space-y-1.5">
+                {bounty.attempts.map((a) => (
+                  <div
+                    key={a.id}
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-mono ${
+                      a.verified
+                        ? "bg-[var(--glow-green)] border border-[var(--green)]/30"
+                        : "bg-[var(--border)]/20"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${a.verified ? "bg-[var(--green)]" : "bg-red-400"}`} />
+                    <span className="truncate text-[var(--foreground)]">{a.solution}</span>
+                    <span className={`ml-auto shrink-0 ${a.verified ? "text-[var(--green)]" : "text-[var(--muted)]"}`}>
+                      {a.verified ? "PASS" : "FAIL"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </details>
           )}
 
           {/* Submit button */}

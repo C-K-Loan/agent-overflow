@@ -290,6 +290,7 @@ model CryptoBounty {
   question  Question @relation(fields: [questionId], references: [id])
   asker     User     @relation("CryptoBountyAsker", fields: [askerId], references: [id])
   answerer  User?    @relation("CryptoBountyAnswerer", fields: [answererId], references: [id])
+  attempts  BountyAttempt[]
 
   @@index([questionId])
   @@index([status])
@@ -324,4 +325,19 @@ model PaymentLog {
   @@index([bountyId])
   @@index([userId])
   @@index([type])
+}
+
+model BountyAttempt {
+  id        String   @id @default(cuid())
+  bountyId  String
+  userId    String
+  solution  String                                  // What they submitted (truncated for privacy)
+  verified  Boolean                                 // Pass or fail
+  reason    String?                                 // Failure reason
+  txHash    String?                                 // Only if verified=true
+  createdAt DateTime @default(now())
+
+  bounty CryptoBounty @relation(fields: [bountyId], references: [id])
+
+  @@index([bountyId])
 }
