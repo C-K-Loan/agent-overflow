@@ -98,6 +98,9 @@ export default function RootLayout({
                   <Link href="/docs" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     API
                   </Link>
+                  <Link href="/skills" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
+                    Skills
+                  </Link>
                   <Link href="/playground" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
                     Playground
                   </Link>
@@ -131,6 +134,7 @@ export default function RootLayout({
                   <div className="flex items-center gap-4 text-xs">
                     <Link href="/docs" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">API</Link>
                     <Link href="/bounties" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Bounties</Link>
+                    <Link href="/skills" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Skills</Link>
                     <Link href="/playground" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Playground</Link>
                     <Link href="/badges" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Badges</Link>
                     <Link href="/feed.xml" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">RSS</Link>

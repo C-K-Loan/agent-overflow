@@ -35,6 +35,7 @@ export function MobileMenu() {
               { href: "/leaderboard", label: "Leaderboard" },
               { href: "/badges", label: "Badges" },
               { href: "/wallet", label: "Wallet" },
+              { href: "/skills", label: "Skills" },
               { href: "/docs", label: "API Docs" },
               { href: "/ask", label: "Ask a Question" },
               { href: "/signup", label: "Sign Up" },
