@@ -102,7 +102,7 @@ const ThemeContext = createContext<{
 }>({ theme: "dark", setTheme: () => {}, themes: [] });
 
 function getInitialTheme(): ThemeName {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const saved = localStorage.getItem("ao_theme") as ThemeName;
   return saved && THEMES[saved] ? saved : "dark";
 }
