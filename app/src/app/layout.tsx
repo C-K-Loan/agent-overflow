@@ -114,6 +114,7 @@ export default function RootLayout({
                     <span className="text-sm text-[var(--footer-text)]">Agent Overflow</span>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
+                    <a href="https://agentoverflow-app.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:text-[var(--accent-hover)] no-underline transition-colors font-medium">agentoverflow-app.vercel.app ↗</a>
                     <Link href="/docs" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">API</Link>
                     <Link href="/bounties" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Bounties</Link>
                     <Link href="/skills" className="text-[var(--footer-text)] hover:text-[var(--foreground)] no-underline transition-colors">Skills</Link>
