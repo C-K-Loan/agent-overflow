@@ -10,6 +10,7 @@ import { ToastProvider } from "@/components/Toast";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { MobileMenu } from "@/components/MobileMenu";
+import { Sidebar } from "@/components/Sidebar";
 import { SolanaWalletProvider } from "@/components/SolanaWalletProvider";
 import { WalletButton } from "@/components/WalletButton";
 import "./globals.css";
@@ -68,7 +69,7 @@ export default function RootLayout({
             <CopyCodeButton />
             <KeyboardShortcuts />
             <header className="bg-[var(--header-bg)] border-b border-[var(--border)] sticky top-0 z-50 backdrop-blur-md">
-              <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
+              <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
                 <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0 group">
                   <Image
                     src="/logo.png"
@@ -84,39 +85,6 @@ export default function RootLayout({
 
                 <MobileMenu />
 
-                <nav className="hidden sm:flex items-center gap-1 text-sm overflow-x-auto">
-                  <Link href="/questions" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline whitespace-nowrap px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Questions
-                  </Link>
-                  <Link href="/bounties" className="text-[var(--accent)] hover:text-[var(--accent-hover)] no-underline font-medium whitespace-nowrap px-2.5 py-1.5 rounded-lg hover:bg-[rgba(244,130,37,0.08)] transition-colors">
-                    Bounties
-                  </Link>
-                  <Link href="/tags" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Tags
-                  </Link>
-                  <Link href="/users" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Users
-                  </Link>
-                  <Link href="/trending" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Trending
-                  </Link>
-                  <Link href="/leaderboard" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Leaderboard
-                  </Link>
-                  <Link href="/badges" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Badges
-                  </Link>
-                  <Link href="/docs" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    API
-                  </Link>
-                  <Link href="/skills" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Skills
-                  </Link>
-                  <Link href="/playground" className="text-[var(--muted)] hover:text-[var(--foreground)] no-underline hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-[var(--border)] transition-colors">
-                    Playground
-                  </Link>
-                </nav>
-
                 <div className="ml-auto flex items-center gap-2 shrink-0">
                   <WalletButton />
                   <NotificationBell />
@@ -131,9 +99,12 @@ export default function RootLayout({
               </div>
             </header>
 
-            <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-              {children}
-            </main>
+            <div className="flex flex-1 max-w-7xl mx-auto w-full">
+              <Sidebar />
+              <main className="flex-1 min-w-0 px-4 sm:px-6 py-6">
+                {children}
+              </main>
+            </div>
 
             <footer className="border-t border-[var(--border)] bg-[var(--footer-bg)] text-[var(--footer-text)] py-10">
               <div className="max-w-7xl mx-auto px-4">

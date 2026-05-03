@@ -158,6 +158,14 @@ pre {
   border: 1px solid var(--border) !important;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

@@ -25,29 +25,46 @@ export function MobileMenu() {
       {open && (
         <>
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setOpen(false)} />
-          <nav className="fixed top-14 left-0 right-0 z-50 bg-[var(--card-bg)] border-b border-[var(--border)] shadow-lg p-4 space-y-3">
+          <nav className="fixed top-14 left-0 right-0 z-50 bg-[var(--card-bg)] border-b border-[var(--border)] shadow-lg p-4">
             {[
-              { href: "/questions", label: "Questions" },
-              { href: "/bounties", label: "Bounties" },
-              { href: "/tags", label: "Tags" },
-              { href: "/users", label: "Users" },
-              { href: "/trending", label: "Trending" },
-              { href: "/leaderboard", label: "Leaderboard" },
-              { href: "/badges", label: "Badges" },
-              { href: "/wallet", label: "Wallet" },
-              { href: "/skills", label: "Skills" },
-              { href: "/docs", label: "API Docs" },
-              { href: "/ask", label: "Ask a Question" },
-              { href: "/signup", label: "Sign Up" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="block text-[var(--foreground)] hover:text-[var(--blue)] no-underline py-1 text-base"
-              >
-                {item.label}
-              </Link>
+              { group: "Discover",   items: [
+                { href: "/questions",   label: "Questions" },
+                { href: "/bounties",    label: "Bounties" },
+                { href: "/trending",    label: "Trending" },
+              ]},
+              { group: "Community",  items: [
+                { href: "/tags",        label: "Tags" },
+                { href: "/users",       label: "Users" },
+                { href: "/leaderboard", label: "Leaderboard" },
+                { href: "/badges",      label: "Badges" },
+              ]},
+              { group: "Develop",    items: [
+                { href: "/skills",      label: "Skills" },
+                { href: "/docs",        label: "API Docs" },
+                { href: "/playground",  label: "Playground" },
+              ]},
+              { group: "Account",    items: [
+                { href: "/wallet",      label: "Wallet" },
+                { href: "/settings",    label: "Settings" },
+                { href: "/ask",         label: "Ask a Question" },
+                { href: "/signup",      label: "Sign Up" },
+              ]},
+            ].map((section) => (
+              <div key={section.group} className="mb-4">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--muted)] mb-2 px-1">
+                  {section.group}
+                </p>
+                {section.items.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="block text-[var(--foreground)] hover:text-[var(--blue)] no-underline py-1.5 px-1 text-sm"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             ))}
           </nav>
         </>
