@@ -14,7 +14,7 @@ const ESCROW_ID = (process.env.ESCROW_PROGRAM_ID || "3Cr9smqeF12BhzG3fWJVJ21V4Ww
 
 const USDC_MINTS: Record<string, string> = {
   "mainnet-beta": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  devnet: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+  devnet: "GKFJwYjcV5pDhSCsRZeuSSVgpbRSPo2HMRVGRH5KzzEu",
 };
 const USDC_ID = (process.env.USDC_MINT || USDC_MINTS[SOLANA_NETWORK] || USDC_MINTS.devnet).trim();
 
