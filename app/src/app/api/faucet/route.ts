@@ -54,20 +54,48 @@ export async function POST(request: NextRequest) {
   const recipientPubkey = new PublicKey(wallet.publicKey);
 
   try {
-    // 1. Airdrop SOL
+    const faucetKeyJson = process.env.FAUCET_KEYPAIR;
+
+    // 1. Send SOL from faucet wallet (more reliable than devnet airdrop which rate-limits)
     let solTxHash = "";
-    try {
-      const sig = await connection.requestAirdrop(recipientPubkey, SOL_DRIP);
-      await connection.confirmTransaction(sig);
-      solTxHash = sig;
-    } catch {
-      // Airdrop may fail on some RPCs — that's ok, USDC is more important
-      solTxHash = "airdrop_unavailable";
+    if (faucetKeyJson) {
+      try {
+        const { Keypair, SystemProgram, Transaction } = await import("@solana/web3.js");
+        const faucetKp = Keypair.fromSecretKey(Uint8Array.from(JSON.parse(faucetKeyJson)));
+        const tx = new Transaction().add(SystemProgram.transfer({
+          fromPubkey: faucetKp.publicKey,
+          toPubkey: recipientPubkey,
+          lamports: SOL_DRIP,
+        }));
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+        tx.recentBlockhash = blockhash;
+        tx.feePayer = faucetKp.publicKey;
+        tx.sign(faucetKp);
+        const sig = await connection.sendRawTransaction(tx.serialize());
+        await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+        solTxHash = sig;
+      } catch {
+        // Fallback to public airdrop if faucet wallet is dry
+        try {
+          const sig = await connection.requestAirdrop(recipientPubkey, SOL_DRIP);
+          await connection.confirmTransaction(sig);
+          solTxHash = sig;
+        } catch {
+          solTxHash = "airdrop_unavailable";
+        }
+      }
+    } else {
+      try {
+        const sig = await connection.requestAirdrop(recipientPubkey, SOL_DRIP);
+        await connection.confirmTransaction(sig);
+        solTxHash = sig;
+      } catch {
+        solTxHash = "airdrop_unavailable";
+      }
     }
 
     // 2. Mint USDC (we're the mint authority on devnet)
     let usdcTxHash = "";
-    const faucetKeyJson = process.env.FAUCET_KEYPAIR;
     if (faucetKeyJson) {
       try {
         const { Keypair } = await import("@solana/web3.js");
