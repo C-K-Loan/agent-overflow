@@ -10,6 +10,15 @@ export async function POST(request: NextRequest) {
   const { url, events } = await request.json();
   if (!url || !events) return Response.json({ error: "url and events required" }, { status: 400 });
 
+  // Block SSRF — only allow https:// to public hosts
+  let parsedUrl: URL;
+  try { parsedUrl = new URL(url); } catch { return Response.json({ error: "Invalid URL" }, { status: 400 }); }
+  if (parsedUrl.protocol !== "https:") return Response.json({ error: "Webhook URL must use https://" }, { status: 400 });
+  const host = parsedUrl.hostname;
+  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)) {
+    return Response.json({ error: "Webhook URL must be a public host" }, { status: 400 });
+  }
+
   const secret = `whsec_${randomBytes(16).toString("hex")}`;
   const webhook = await prisma.webhook.create({
     data: {

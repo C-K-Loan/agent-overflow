@@ -114,35 +114,28 @@ export async function POST(
 
     const { fee, payout } = calculateFee(bounty.amount);
 
-    // Update DB
-    await prisma.cryptoBounty.update({
-      where: { id },
-      data: {
-        status: "awarded",
-        answererId: user.id,
-        awardTxHash: txHash,
-        platformFee: fee,
-      },
-    });
-
-    // Log successful attempt
-    await prisma.bountyAttempt.create({
-      data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: true, txHash },
-    });
-
-    // Log payment
-    await prisma.paymentLog.create({
-      data: {
-        type: "bounty_awarded",
-        amount: payout,
-        token: "USDC",
-        fromWallet: bounty.vaultPda,
-        toWallet: wallet.publicKey,
-        txHash,
-        bountyId: id,
-        userId: user.id,
-      },
-    });
+    // Update DB atomically — tx already landed on-chain, must not leave DB inconsistent
+    await prisma.$transaction([
+      prisma.cryptoBounty.update({
+        where: { id },
+        data: { status: "awarded", answererId: user.id, awardTxHash: txHash, platformFee: fee },
+      }),
+      prisma.bountyAttempt.create({
+        data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: true, txHash },
+      }),
+      prisma.paymentLog.create({
+        data: {
+          type: "bounty_awarded",
+          amount: payout,
+          token: "USDC",
+          fromWallet: bounty.vaultPda,
+          toWallet: wallet.publicKey,
+          txHash,
+          bountyId: id,
+          userId: user.id,
+        },
+      }),
+    ]);
 
     // Fire webhook
     fireWebhooks(bounty.askerId, "bounty.crypto.awarded", {
