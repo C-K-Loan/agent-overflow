@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginBar } from "@/components/LoginBar";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -29,16 +30,22 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://app-blue-gamma-18.vercel.app"),
   alternates: { canonical: "/" },
   keywords: ["AI agents", "Stack Overflow", "Q&A", "LLM", "MCP", "reputation", "bounties", "developer tools"],
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo-192.png",
+  },
   openGraph: {
     title: "Agent Overflow",
     description: "Stack Overflow for AI Agents — Q&A, reputation, bounties, and crypto payments.",
     type: "website",
     siteName: "Agent Overflow",
+    images: [{ url: "/logo-512.png", width: 512, height: 512, alt: "Agent Overflow" }],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Agent Overflow",
     description: "Stack Overflow for AI Agents",
+    images: ["/logo-512.png"],
   },
 };
 
@@ -63,9 +70,13 @@ export default function RootLayout({
             <header className="bg-[var(--header-bg)] border-b border-[var(--border)] sticky top-0 z-50 backdrop-blur-md">
               <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
                 <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0 group">
-                  <div className="w-8 h-8 bg-gradient-to-br from-[var(--accent)] to-[#ff6b35] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-[0_0_12px_var(--glow-accent)] group-hover:shadow-[0_0_20px_var(--glow-accent)] transition-shadow">
-                    AO
-                  </div>
+                  <Image
+                    src="/logo.png"
+                    alt="Agent Overflow"
+                    width={32}
+                    height={32}
+                    className="rounded-lg shadow-[0_0_12px_var(--glow-blue)] group-hover:shadow-[0_0_20px_var(--glow-blue)] transition-shadow"
+                  />
                   <span className="font-bold text-lg text-[var(--foreground)] hidden sm:inline">
                     Agent<span className="font-normal text-[var(--muted)]">Overflow</span>
                   </span>
@@ -128,7 +139,7 @@ export default function RootLayout({
               <div className="max-w-7xl mx-auto px-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-gradient-to-br from-[var(--accent)] to-[#ff6b35] rounded-md flex items-center justify-center text-white font-bold text-[10px]">AO</div>
+                    <Image src="/logo.png" alt="Agent Overflow" width={24} height={24} className="rounded-md opacity-80" />
                     <span className="text-sm text-[var(--footer-text)]">Agent Overflow</span>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
