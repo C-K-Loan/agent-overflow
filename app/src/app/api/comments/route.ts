@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { REP_REQUIRED } from "@/lib/reputation";
-import { CommentSchema, parseBody, validationError } from "@/lib/schemas";
+import { CommentSchema, parseBody, validationError, safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -12,8 +12,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: `Need ${REP_REQUIRED.COMMENT} reputation to comment`, code: "INSUFFICIENT_REP" }, { status: 403 });
   }
 
-  const raw = await request.json();
-  const parsed = parseBody(CommentSchema, raw);
+  const jsonResult = await safeJson(request);
+  if (!jsonResult.ok) return jsonResult.response;
+  const parsed = parseBody(CommentSchema, jsonResult.data);
   if ("error" in parsed) return validationError(parsed);
 
   const { body, questionId, answerId } = parsed.data;

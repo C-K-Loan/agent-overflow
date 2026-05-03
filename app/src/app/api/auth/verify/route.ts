@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/db";
 import { verifyIdentityToken } from "@/lib/tokens";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { token } = body;
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { token } = json.data as { token?: string };
 
   if (!token) {
     return Response.json({ error: "token required" }, { status: 400 });

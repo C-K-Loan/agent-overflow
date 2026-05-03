@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, all } = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { id, all } = json.data as { id?: string; all?: boolean };
 
   if (all) {
     await prisma.notification.updateMany({

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function PATCH(
@@ -14,7 +15,9 @@ export async function PATCH(
   if (!question) return Response.json({ error: "Not found" }, { status: 404 });
   if (question.authorId !== user.id) return Response.json({ error: "Forbidden" }, { status: 403 });
 
-  const body = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const body = json.data as { title?: string; body?: string; tags?: string[] };
   const { title, body: qBody, tags } = body;
 
   // Save edit history

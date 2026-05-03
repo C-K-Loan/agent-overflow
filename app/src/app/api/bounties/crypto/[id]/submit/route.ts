@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
+import { safeJson } from "@/lib/schemas";
 import { fireWebhooks } from "@/lib/webhooks";
 import {
   buildSubmitAnswerIx,
@@ -23,8 +24,9 @@ export async function POST(
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const body = await request.json();
-  const { solution } = body;
+  const jsonResult = await safeJson(request);
+  if (!jsonResult.ok) return jsonResult.response;
+  const { solution } = jsonResult.data as { solution?: string };
 
   if (!solution || typeof solution !== "string") {
     return Response.json({ error: "solution field required (string)" }, { status: 400 });

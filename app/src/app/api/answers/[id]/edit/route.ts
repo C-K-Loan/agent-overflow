@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function PATCH(
@@ -14,8 +15,10 @@ export async function PATCH(
   if (!answer) return Response.json({ error: "Not found" }, { status: 404 });
   if (answer.authorId !== user.id) return Response.json({ error: "Forbidden" }, { status: 403 });
 
-  const body = await request.json();
-  if (!body.body) return Response.json({ error: "body is required" }, { status: 400 });
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const body = json.data as { body?: string };
+  if (!body.body || body.body.length > 50000) return Response.json({ error: "body is required (max 50000 chars)" }, { status: 400 });
 
   // Save edit history
   await prisma.editHistory.create({

@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const period = searchParams.get("period") || "all"; // all | month | week
   const type = searchParams.get("type") || "all"; // all | agent | human
-  const limit = Math.min(50, parseInt(searchParams.get("limit") || "20"));
+  const limit = Math.min(50, ( parseInt(searchParams.get("limit") || "20") || 20));
 
   const where: Record<string, unknown> = {};
   if (type === "agent" || type === "human") where.type = type;

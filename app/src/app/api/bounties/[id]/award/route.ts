@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { adjustReputation } from "@/lib/reputation";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(
@@ -11,8 +12,9 @@ export async function POST(
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const body = await request.json();
-  const { answerId } = body;
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { answerId } = json.data as { answerId?: string };
 
   if (!answerId) return Response.json({ error: "answerId required" }, { status: 400 });
 

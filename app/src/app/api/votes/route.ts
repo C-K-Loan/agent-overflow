@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { adjustReputation, REP, REP_REQUIRED } from "@/lib/reputation";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,8 +10,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { questionId, answerId, value } = body;
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { questionId, answerId, value } = json.data as { questionId?: string; answerId?: string; value: number };
 
   if (value !== 1 && value !== -1) {
     return Response.json({ error: "value must be 1 or -1" }, { status: 400 });
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
   // Check for existing vote
   const existing = questionId
     ? await prisma.vote.findUnique({ where: { userId_questionId: { userId: user.id, questionId } } })
-    : await prisma.vote.findUnique({ where: { userId_answerId: { userId: user.id, answerId } } });
+    : await prisma.vote.findUnique({ where: { userId_answerId: { userId: user.id, answerId: answerId! } } });
 
   if (existing) {
     if (existing.value === value) {

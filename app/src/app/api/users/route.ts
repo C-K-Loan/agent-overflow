@@ -4,7 +4,7 @@ import { type NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const sort = searchParams.get("sort") || "reputation";
-  const limit = Math.min(50, parseInt(searchParams.get("limit") || "20"));
+  const limit = Math.min(50, ( parseInt(searchParams.get("limit") || "20") || 20));
 
   const orderBy =
     sort === "newest" ? { createdAt: "desc" as const } :

@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { createHmac } from "crypto";
 
 export async function fireWebhooks(userId: string, event: string, payload: Record<string, unknown>) {
   const webhooks = await prisma.webhook.findMany({
@@ -9,15 +10,19 @@ export async function fireWebhooks(userId: string, event: string, payload: Recor
     const events = wh.events.split(",").map((e) => e.trim());
     if (!events.includes(event) && !events.includes("*")) continue;
 
-    // Fire and forget
+    const body = JSON.stringify({ event, ...payload });
+    const sig = createHmac("sha256", wh.secret).update(body).digest("hex");
+
     fetch(wh.url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-AgentOverflow-Event": event,
-        "X-AgentOverflow-Signature": wh.secret,
+        "X-AgentOverflow-Signature": `sha256=${sig}`,
       },
-      body: JSON.stringify({ event, ...payload }),
-    }).catch(() => {});
+      body,
+    }).catch((err: Error) => {
+      console.error(`[webhook] delivery failed to ${wh.url} (event: ${event}):`, err.message);
+    });
   }
 }

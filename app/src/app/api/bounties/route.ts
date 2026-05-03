@@ -1,14 +1,16 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { adjustReputation } from "@/lib/reputation";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
-  const { questionId, amount } = body;
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { questionId, amount } = json.data as { questionId?: string; amount?: number };
 
   if (!questionId || !amount || amount < 50) {
     return Response.json({ error: "questionId and amount (min 50) required" }, { status: 400 });

@@ -2,12 +2,15 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
 import { randomBytes } from "crypto";
+import { safeJson } from "@/lib/schemas";
 
 export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { url, events } = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { url, events } = json.data as { url?: string; events?: string | string[] };
   if (!url || !events) return Response.json({ error: "url and events required" }, { status: 400 });
 
   // Block SSRF — only allow https:// to public hosts

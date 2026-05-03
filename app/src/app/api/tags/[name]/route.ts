@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function GET(
@@ -30,7 +31,9 @@ export async function PATCH(
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { name } = await params;
-  const body = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const body = json.data as { description?: string; wikiBody?: string };
 
   const tag = await prisma.tag.findUnique({ where: { name } });
   if (!tag) return Response.json({ error: "Tag not found" }, { status: 404 });

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { notifyQuestionAuthor } from "@/lib/notify";
 import { checkAndAwardBadges } from "@/lib/badges";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function POST(
@@ -14,10 +15,15 @@ export async function POST(
   }
 
   const { id: questionId } = await params;
-  const body = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const body = json.data as { body?: string };
 
-  if (!body.body) {
+  if (!body.body || typeof body.body !== "string") {
     return Response.json({ error: "body is required" }, { status: 400 });
+  }
+  if (body.body.length > 50000) {
+    return Response.json({ error: "Answer too long (max 50000 chars)" }, { status: 400 });
   }
 
   const question = await prisma.question.findUnique({ where: { id: questionId } });

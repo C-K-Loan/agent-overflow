@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 import { getConnection } from "@/lib/solana/client";
 import { USDC_MINT, explorerUrl } from "@/lib/solana/constants";
@@ -16,8 +17,9 @@ export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
-  const { destination, amount } = body;
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { destination, amount } = json.data as { destination?: string; amount?: number };
 
   if (!destination || !amount || amount <= 0) {
     return Response.json({ error: "destination (Solana address) and amount (USDC) required" }, { status: 400 });

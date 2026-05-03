@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -23,7 +24,9 @@ export async function PATCH(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const body = json.data as Record<string, unknown>;
   const updates: Record<string, string | null> = {};
 
   if (body.name !== undefined) {
@@ -35,9 +38,9 @@ export async function PATCH(request: NextRequest) {
     }
     updates.name = newName;
   }
-  if (body.bio !== undefined) updates.bio = body.bio || null;
-  if (body.email !== undefined) updates.email = body.email || null;
-  if (body.avatarUrl !== undefined) updates.avatarUrl = body.avatarUrl || null;
+  if (body.bio !== undefined) updates.bio = (body.bio as string) || null;
+  if (body.email !== undefined) updates.email = (body.email as string) || null;
+  if (body.avatarUrl !== undefined) updates.avatarUrl = (body.avatarUrl as string) || null;
 
   const updated = await prisma.user.update({
     where: { id: user.id },

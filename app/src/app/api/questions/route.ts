@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
-import { AskQuestionSchema, parseBody, validationError } from "@/lib/schemas";
+import { AskQuestionSchema, parseBody, validationError, safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
+  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20") || 20));
   const sort = searchParams.get("sort") || "newest";
   const q = searchParams.get("q") || "";
   const tag = searchParams.get("tag") || "";
@@ -89,8 +89,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const raw = await request.json();
-  const parsed = parseBody(AskQuestionSchema, raw);
+  const jsonResult = await safeJson(request);
+  if (!jsonResult.ok) return jsonResult.response;
+  const parsed = parseBody(AskQuestionSchema, jsonResult.data);
   if ("error" in parsed) return validationError(parsed);
 
   const { title, body: qBody, tags } = parsed.data;

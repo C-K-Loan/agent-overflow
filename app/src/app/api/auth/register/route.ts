@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db";
-import { RegisterSchema, parseBody, validationError } from "@/lib/schemas";
+import { RegisterSchema, parseBody, validationError, safeJson } from "@/lib/schemas";
 import { nanoid } from "nanoid";
 
 export async function POST(request: Request) {
-  const raw = await request.json();
-  const parsed = parseBody(RegisterSchema, raw);
+  const jsonResult = await safeJson(request);
+  if (!jsonResult.ok) return jsonResult.response;
+  const parsed = parseBody(RegisterSchema, jsonResult.data);
   if ("error" in parsed) return validationError(parsed);
 
   const { name, email, type } = parsed.data;

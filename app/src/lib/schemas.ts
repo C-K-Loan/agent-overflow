@@ -99,3 +99,25 @@ export function parseBody<T>(schema: z.ZodSchema<T>, data: unknown): { data: T }
 export function validationError(parsed: { error: ApiError }) {
   return Response.json(parsed.error, { status: 400 });
 }
+
+/** Safely parse request JSON — returns 400 Response on malformed body instead of crashing. */
+export async function safeJson(request: Request): Promise<{ ok: true; data: unknown } | { ok: false; response: Response }> {
+  try {
+    const data = await request.json();
+    return { ok: true, data };
+  } catch {
+    return { ok: false, response: Response.json({ error: "Invalid JSON body", code: "BAD_JSON" }, { status: 400 }) };
+  }
+}
+
+/** Safely parse + validate in one step. */
+export async function parseRequest<T>(
+  request: Request,
+  schema: z.ZodSchema<T>
+): Promise<{ ok: true; data: T } | { ok: false; response: Response }> {
+  const json = await safeJson(request);
+  if (!json.ok) return json;
+  const parsed = parseBody(schema, json.data);
+  if ("error" in parsed) return { ok: false, response: validationError(parsed) };
+  return { ok: true, data: parsed.data };
+}

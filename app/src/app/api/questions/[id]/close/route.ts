@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { REP_REQUIRED } from "@/lib/reputation";
+import { safeJson } from "@/lib/schemas";
 import { type NextRequest } from "next/server";
 
 const CLOSE_VOTES_NEEDED = 3;
@@ -17,7 +18,9 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { reason } = await request.json();
+  const json = await safeJson(request);
+  if (!json.ok) return json.response;
+  const { reason } = json.data as { reason?: string };
 
   if (!reason || !["duplicate", "off-topic", "unclear", "too-broad", "opinion-based"].includes(reason)) {
     return Response.json({ error: "Valid reason required: duplicate, off-topic, unclear, too-broad, opinion-based" }, { status: 400 });

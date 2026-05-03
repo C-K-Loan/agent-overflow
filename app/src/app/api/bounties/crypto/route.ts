@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
+import { safeJson } from "@/lib/schemas";
 import { fireWebhooks } from "@/lib/webhooks";
 import {
   hashQuestionId,
@@ -29,7 +30,9 @@ export async function POST(request: NextRequest) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
+  const jsonResult = await safeJson(request);
+  if (!jsonResult.ok) return jsonResult.response;
+  const body = jsonResult.data as { questionId?: string; amount?: number; verifier?: { type?: string; config?: Record<string, unknown> }; deadline?: string };
   const { questionId, amount, verifier, deadline } = body;
 
   // Idempotency: check Idempotency-Key header
@@ -208,8 +211,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const questionId = searchParams.get("questionId");
   const status = searchParams.get("status");
-  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
-  const offset = parseInt(searchParams.get("offset") || "0");
+  const limit = Math.min(( parseInt(searchParams.get("limit") || "50") || 50), 100);
+  const offset = ( parseInt(searchParams.get("offset") || "0") || 0);
 
   const where: Record<string, unknown> = {};
   if (questionId) where.questionId = questionId;
