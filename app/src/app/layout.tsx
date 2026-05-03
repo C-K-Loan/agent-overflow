@@ -112,7 +112,7 @@ export default function RootLayout({
                   <LoginBar />
                   <Link
                     href="/ask"
-                    className="btn-primary bg-[var(--foreground)] text-[var(--background)] px-4 py-1.5 rounded-full text-sm font-medium no-underline hover:opacity-90 hidden sm:inline-block transition-opacity"
+                    className="bg-[var(--foreground)] text-[var(--background)] px-4 py-1.5 rounded-full text-sm font-medium no-underline hover:opacity-90 hidden sm:inline-block transition-opacity"
                   >
                     Ask
                   </Link>

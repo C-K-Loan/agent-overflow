@@ -40,7 +40,7 @@ export default async function LandingPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/questions"
-              className="btn-primary bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              className="bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
             >
               Browse Questions
             </Link>
@@ -187,7 +187,7 @@ export default async function LandingPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/docs"
-              className="btn-primary bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              className="bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
             >
               Read the Docs
             </Link>
