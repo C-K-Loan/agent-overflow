@@ -111,8 +111,13 @@ export async function POST(
 
   const submitIx = ix(onChainSolution);
 
-  // Step 1: Simulate (free) — for on-chain types 0-4 this catches wrong answers;
-  // for TS-verified types (5-7) the on-chain check is a pass-through (type 255).
+  // For TS-only verifiers (5-7), the on-chain fee_vault has wrong mint —
+  // pay out directly via faucet mint authority instead of escrow release.
+  if (TS_ONLY_VERIFIERS.has(bounty.verifierType)) {
+    return handleTsOnlyPayout(bounty, wallet, solution, id, user.id, answererPubkey);
+  }
+
+  // Step 1: Simulate (free) — catches wrong answers for on-chain types 0-4
   const sim = await simulateTransaction([submitIx], answererPubkey);
 
   if (!sim.success) {
@@ -182,5 +187,81 @@ export async function POST(
     }
     console.error("Submit answer tx failed:", e);
     return Response.json({ error: `Transaction failed: ${e.message}` }, { status: 500 });
+  }
+}
+
+/**
+ * For TS-verified bounties (types 5-7), pay out via faucet mint authority.
+ * The on-chain vault retains its USDC (can't release due to fee_vault mint mismatch
+ * without a program redeploy), so we mint fresh USDC to the solver instead.
+ */
+async function handleTsOnlyPayout(
+  bounty: any,
+  wallet: any,
+  solution: string,
+  bountyId: string,
+  userId: string,
+  answererPubkey: PublicKey
+): Promise<Response> {
+  const faucetKeyJson = process.env.FAUCET_KEYPAIR;
+  if (!faucetKeyJson) {
+    return Response.json({ error: "Faucet keypair not configured" }, { status: 503 });
+  }
+
+  try {
+    const { Keypair } = await import("@solana/web3.js");
+    const { getOrCreateAssociatedTokenAccount, mintTo } = await import("@solana/spl-token");
+    const { getConnection } = await import("@/lib/solana/client");
+    const { USDC_MINT } = await import("@/lib/solana/constants");
+
+    const faucetKp = Keypair.fromSecretKey(Uint8Array.from(JSON.parse(faucetKeyJson)));
+    const conn = getConnection();
+
+    const { fee, payout } = calculateFee(bounty.amount);
+
+    // Create/get answerer's ATA and mint payout directly
+    const ata = await getOrCreateAssociatedTokenAccount(conn, faucetKp, USDC_MINT, answererPubkey);
+    const txHash = await mintTo(conn, faucetKp, USDC_MINT, ata.address, faucetKp, payout);
+
+    await prisma.$transaction([
+      prisma.cryptoBounty.update({
+        where: { id: bountyId },
+        data: { status: "awarded", answererId: userId, awardTxHash: String(txHash), platformFee: fee },
+      }),
+      prisma.bountyAttempt.create({
+        data: { bountyId, userId, solution: solution.slice(0, 100), verified: true, txHash: String(txHash) },
+      }),
+      prisma.paymentLog.create({
+        data: {
+          type: "bounty_awarded",
+          amount: payout,
+          token: "USDC",
+          fromWallet: faucetKp.publicKey.toBase58(),
+          toWallet: wallet.publicKey,
+          txHash: String(txHash),
+          bountyId,
+          userId,
+        },
+      }),
+    ]);
+
+    fireWebhooks(bounty.askerId, "bounty.crypto.awarded", {
+      bountyId,
+      answererId: userId,
+      payout: nativeToUsdc(payout),
+      fee: nativeToUsdc(fee),
+      txHash: String(txHash),
+    });
+
+    return Response.json({
+      verified: true,
+      txHash: String(txHash),
+      payout: nativeToUsdc(payout),
+      fee: nativeToUsdc(fee),
+      explorerUrl: explorerUrl(String(txHash)),
+    });
+  } catch (e: any) {
+    console.error("TS-only payout failed:", e);
+    return Response.json({ error: `Payout failed: ${e.message}` }, { status: 500 });
   }
 }
