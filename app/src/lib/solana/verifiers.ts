@@ -14,10 +14,11 @@ export const VERIFIER_TYPES = {
   hash_preimage: 5,
   sat: 6,
   graph_coloring: 7,
+  wasm_exec: 8,
 } as const;
 
 /** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through) */
-export const TS_ONLY_VERIFIERS = new Set([5, 6, 7]);
+export const TS_ONLY_VERIFIERS = new Set([5, 6, 7, 8]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
 
@@ -125,6 +126,17 @@ export function serializeVerifierConfig(
       return Buffer.from(buf);
     }
 
+    case "wasm_exec": {
+      // Config: { wasmBase64: string, description: string }
+      // On-chain we store a 32-byte SHA256 of the WASM binary as commitment
+      const wasmBase64 = config.wasmBase64 as string;
+      if (!wasmBase64) throw new Error("wasmBase64 required");
+      const wasmBytes = Buffer.from(wasmBase64, "base64");
+      if (wasmBytes.length > 500_000) throw new Error("WASM binary too large (max 500KB)");
+      // Store SHA256 of binary as 32-byte on-chain commitment
+      return createHash("sha256").update(wasmBytes).digest();
+    }
+
     default:
       throw new Error(`Unknown verifier type: ${type}`);
   }
@@ -136,20 +148,22 @@ export function hashAnswer(answer: string): string {
 }
 
 /**
- * TypeScript-side verification for types 5-7.
+ * TypeScript-side verification for types 5-8.
  * These mirror the Rust logic exactly so the behaviour is identical.
  * Returns null if correct, error string if wrong.
  */
-export function verifyInTypeScript(
+export async function verifyInTypeScript(
   verifierType: number,
   configBuf: Buffer,
-  solution: string
-): string | null {
+  solution: string,
+  fullConfig?: Record<string, unknown>
+): Promise<string | null> {
   try {
     switch (verifierType) {
       case 5: return verifyHashPreimage(configBuf, solution);
       case 6: return verifySat(configBuf, solution);
       case 7: return verifyGraphColoring(configBuf, solution);
+      case 8: return verifyWasmExec(configBuf, solution, fullConfig);
       default: return null; // on-chain handles it
     }
   } catch (e: any) {
@@ -226,6 +240,32 @@ function verifyGraphColoring(config: Buffer, solution: string): string | null {
     if (coloring[u] === coloring[v]) return `Adjacent vertices ${u} and ${v} share color ${coloring[u]}`;
   }
   return null;
+}
+
+function verifyWasmExec(config: Buffer, solution: string, fullConfig?: Record<string, unknown>): Promise<string | null> {
+  if (!fullConfig) return Promise.resolve("Missing fullConfig for wasm_exec verifier");
+  return verifyWasmExecAsync(fullConfig, solution);
+}
+
+async function verifyWasmExecAsync(fullConfig: Record<string, unknown>, solution: string): Promise<string | null> {
+  const wasmBase64 = fullConfig.wasmBase64 as string;
+  if (!wasmBase64) return "Missing wasmBase64 in config";
+  try {
+    const wasmBytes = Buffer.from(wasmBase64, "base64");
+    const mod = await WebAssembly.compile(wasmBytes);
+    const inst = await WebAssembly.instantiate(mod, {});
+    const exports = inst.exports as { verify?: (ptr: number, len: number) => number; memory?: WebAssembly.Memory };
+    if (typeof exports.verify !== "function") return "WASM must export verify(ptr, len) -> i32";
+    if (!exports.memory) return "WASM must export memory";
+    const solBytes = Buffer.from(solution, "utf8");
+    if (solBytes.length > 1024) return "Solution too long (max 1024 bytes)";
+    const view = new Uint8Array(exports.memory.buffer);
+    view.set(solBytes, 0);
+    const result = exports.verify(0, solBytes.length);
+    return result !== 0 ? null : "Wrong answer";
+  } catch (e: any) {
+    return `WASM execution error: ${e.message}`;
+  }
 }
 
 /** Convert float to fixed-point i64 (6 decimal places) */
@@ -414,6 +454,25 @@ export const VERIFIER_REGISTRY = [
     example: {
       config: { numVertices: 4, numColors: 2, edges: [[0,1],[1,2],[2,3]] },
       correctAnswer: "0,1,0,1",
+    },
+  },
+  {
+    type: "wasm_exec",
+    name: "WASM Execution",
+    description: "Upload a compiled WASM binary. Your checker receives the solution string via linear memory and returns 1 for correct, 0 for wrong. Enables any problem with a deterministic verifier.",
+    configSchema: {
+      type: "object",
+      required: ["wasmBase64", "description"],
+      properties: {
+        wasmBase64: { type: "string", description: "Base64-encoded .wasm binary. Must export verify(ptr: i32, len: i32) -> i32 and memory." },
+        description: { type: "string", description: "Human-readable description of what the checker verifies." },
+      },
+    },
+    answerFormat: "Plain string passed to WASM as UTF-8 bytes at memory offset 0.",
+    limits: "Max 500KB WASM binary, max 1024-byte solution string.",
+    example: {
+      config: { wasmBase64: "AGFzbQ...", description: "Checks if input is the string '97'" },
+      correctAnswer: "97",
     },
   },
 ];

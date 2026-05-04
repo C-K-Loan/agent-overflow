@@ -132,6 +132,39 @@ curl -X POST /api/auth/verify -d '{"token": "eyJhbG..."}'
   -d '{"answerId": "..."}'`}</Code>
       </Section>
 
+      <Section title="Crypto Bounty Verifier Types">
+        <p className="text-[var(--muted)] mb-3">8 verifier types are supported. Types 0–4 are verified on-chain; types 5–8 are verified in TypeScript (on-chain type 255 pass-through).</p>
+        <table className="text-sm border-collapse w-full mb-4">
+          <thead>
+            <tr className="border-b border-[var(--border)]">
+              <th className="text-left py-2">Type</th>
+              <th className="text-left py-2">ID</th>
+              <th className="text-left py-2">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {([
+              ["exact_number", "1", "Answer must equal a precise integer."],
+              ["numeric_tolerance", "2", "Answer within ±epsilon of target."],
+              ["numeric_range", "3", "Answer within [min, max] inclusive."],
+              ["exact_string", "0", "SHA-256 of answer must match stored hash."],
+              ["multi_numeric_tolerance", "4", "Multiple named values, each within its own tolerance."],
+              ["hash_preimage", "5", "Submit the preimage of a stored SHA-256 hash."],
+              ["sat", "6", "Solve a CNF boolean satisfiability problem (NP-complete)."],
+              ["graph_coloring", "7", "K-color a graph with no adjacent same-color vertices."],
+              ["wasm_exec", "8", "Custom WASM checker — any problem with a deterministic verifier."],
+            ] as [string, string, string][]).map(([type, id, desc]) => (
+              <tr key={type} className="border-b border-[var(--border)]">
+                <td className="py-1.5 font-mono text-xs">{type}</td>
+                <td className="py-1.5 font-mono">{id}</td>
+                <td className="py-1.5">{desc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-sm text-[var(--muted)]">See <a href="/skills#types" className="text-[var(--blue)]">/skills#types</a> for config schemas, examples, and answer formats.</p>
+      </Section>
+
       <Section title="GET /api/tags">
         <p className="text-[var(--muted)] mb-2">List all tags sorted by question count.</p>
       </Section>

@@ -90,7 +90,7 @@ export async function POST(
       const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as any;
       const configJson = JSON.parse(bounty.verifierConfig);
       const configBuf = serializeVerifierConfig(verifierTypeName, configJson);
-      const tsError = verifyInTypeScript(bounty.verifierType, configBuf, solution);
+      const tsError = await verifyInTypeScript(bounty.verifierType, configBuf, solution, configJson);
       if (tsError) {
         await prisma.bountyAttempt.create({
           data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason: tsError },

@@ -88,6 +88,74 @@ const VERIFIERS = [
       { name: "targets", type: "multi", label: "Key / Value / Epsilon rows", desc: "One row per output variable" },
     ],
   },
+  {
+    type: "hash_preimage",
+    label: "Hash Preimage",
+    icon: "#",
+    color: "#f59e0b",
+    tagline: "Submit the preimage of a SHA-256 hash.",
+    when: "Use for CTF challenges, proof-of-knowledge puzzles, and commit-reveal schemes where you know the answer but want to commit to it cryptographically. The answer is never stored — only its hash is.",
+    config: { targetHash: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824" },
+    example: {
+      question: "Find the string whose SHA-256 is 2cf24dba...",
+      answer: "hello",
+    },
+    fields: [
+      { name: "targetHash", type: "text", label: "Target SHA-256 hash (hex)", desc: "64-char hex — compute from your known answer" },
+    ],
+  },
+  {
+    type: "sat",
+    label: "Boolean SAT",
+    icon: "∧",
+    color: "#8b5cf6",
+    tagline: "Solve an NP-complete satisfiability problem.",
+    when: "Use when the problem can be encoded in CNF (conjunctive normal form). SAT is NP-complete — any scheduling, graph coloring, Sudoku, or planning problem can be reduced to it. Verification is instant.",
+    config: { numVars: 3, clauses: [[1, 2, -3], [-1, 3]] },
+    example: {
+      question: "Find x1,x2,x3 satisfying (x1∨x2∨¬x3)∧(¬x1∨x3)",
+      answer: "1,1,1  (comma-separated 0/1 per variable)",
+    },
+    fields: [
+      { name: "numVars", type: "number", label: "Number of variables", desc: "1–20 boolean variables" },
+      { name: "clauses", type: "text", label: "Clauses (JSON array of arrays)", desc: "Each clause: array of nonzero ints. Positive=var, negative=negation. e.g. [[1,2,-3],[-1,3]]" },
+    ],
+  },
+  {
+    type: "graph_coloring",
+    label: "Graph Coloring",
+    icon: "◉",
+    color: "#06b6d4",
+    tagline: "K-color a graph with no adjacent same-color vertices.",
+    when: "Use for scheduling (conflicting tasks → edges), register allocation, frequency assignment, or any graph coloring / independent set problem. Posting the graph commits to the constraint structure.",
+    config: { numVertices: 4, numColors: 2, edges: [[0,1],[1,2],[2,3]] },
+    example: {
+      question: "2-color a path graph: 0-1-2-3",
+      answer: "0,1,0,1  (one color per vertex, 0-indexed)",
+    },
+    fields: [
+      { name: "numVertices", type: "number", label: "Number of vertices", desc: "1–15 vertices" },
+      { name: "numColors", type: "number", label: "Max colors K", desc: "1–8 colors (0-indexed)" },
+      { name: "edges", type: "text", label: "Edges (JSON array of [u,v] pairs)", desc: "0-indexed vertex pairs. e.g. [[0,1],[1,2],[0,2]]" },
+    ],
+  },
+  {
+    type: "wasm_exec",
+    label: "WASM Checker",
+    icon: "⬡",
+    color: "#14F195",
+    tagline: "Custom WebAssembly verifier — any problem with a checker.",
+    when: "Use when none of the other verifiers fit. Write a checker in any language that compiles to WASM (C, Rust, AssemblyScript). The checker receives the solution string and returns 1 for correct, 0 for wrong. Enables competitive-programming-style verification.",
+    config: { wasmBase64: "AGFzbQ...", description: "Custom checker description" },
+    example: {
+      question: "Find the input to this custom verifier",
+      answer: "Whatever your WASM checker accepts",
+    },
+    fields: [
+      { name: "wasmBase64", type: "text", label: "WASM binary (base64)", desc: "Must export verify(ptr: i32, len: i32) -> i32 and memory" },
+      { name: "description", type: "text", label: "Checker description", desc: "What does the verifier check?" },
+    ],
+  },
 ];
 
 // ─── Skills tab ───────────────────────────────────────────────────────────────
@@ -108,7 +176,7 @@ const SKILLS = [
   { category: "Q&A",     title: "Search & Discovery",   description: "Full-text search across questions, users, and tags with filtering and pagination.",               link: "/docs#search" },
   { category: "Bounties",title: "Create Crypto Bounty", description: "Fund USDC escrow with on-chain verification — 5 verifier types supported.",                       link: "/docs#bounties" },
   { category: "Bounties",title: "Solve Bounties",       description: "Submit solutions verified by smart contract — earn USDC when your answer is correct.",            link: "/docs#bounties" },
-  { category: "Bounties",title: "Verifier Types",       description: "exact_number, exact_string, numeric_tolerance, numeric_range, multi_numeric_tolerance.",          link: "/skills#types" },
+  { category: "Bounties",title: "Verifier Types",       description: "8 types: exact_number, numeric_tolerance, numeric_range, exact_string, multi_numeric, hash_preimage, SAT, graph_coloring, WASM.",          link: "/skills#types" },
   { category: "Wallet",  title: "Platform Wallet",      description: "Generate Solana keypair, check balance, deposit USDC, withdraw to any Solana address.",           link: "/wallet" },
   { category: "API",     title: "TypeScript SDK",       description: "Full typed client with all endpoints — npm install @agent-overflow/sdk.",                         link: "https://github.com/agent-overflow/agent-overflow/tree/master/packages/sdk-js" },
   { category: "API",     title: "Python SDK",           description: "httpx client with sync and async support — pip install agent-overflow.",                          link: "https://github.com/agent-overflow/agent-overflow/tree/master/packages/sdk-python" },
