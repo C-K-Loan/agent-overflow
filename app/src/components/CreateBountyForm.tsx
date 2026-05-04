@@ -32,6 +32,9 @@ const VERIFIER_ICONS: Record<string, string> = {
   exact_string: "Aa",
   numeric_range: "[ ]",
   multi_numeric_tolerance: "{}",
+  hash_preimage: "#\u00a0",
+  sat: "\u22a7",
+  graph_coloring: "\u25cb",
 };
 
 const FALLBACK_VERIFIERS: VerifierType[] = [
@@ -67,6 +70,14 @@ export function CreateBountyForm() {
   const [rangeMax, setRangeMax] = useState("");
   const [stringAnswer, setStringAnswer] = useState("");
   const [multiRows, setMultiRows] = useState([{ key: "", value: "", epsilon: "" }]);
+  // New verifiers
+  const [hashTarget, setHashTarget] = useState("");
+  const [hashPreviewInput, setHashPreviewInput] = useState("");
+  const [satNumVars, setSatNumVars] = useState("");
+  const [satClauses, setSatClauses] = useState("");
+  const [graphNumVertices, setGraphNumVertices] = useState("");
+  const [graphNumColors, setGraphNumColors] = useState("");
+  const [graphEdges, setGraphEdges] = useState("");
 
   // Step 4 — amount + deadline
   const [amount, setAmount] = useState("10");
@@ -153,7 +164,7 @@ export function CreateBountyForm() {
     } else if (selectedVerifier === "numeric_tolerance") {
       verifierConfig = { target: parseFloat(target), epsilon: parseFloat(epsilon) };
     } else if (selectedVerifier === "exact_string") {
-      verifierConfig = { hash: await hashSHA256(stringAnswer) };
+      verifierConfig = { answerHash: await hashSHA256(stringAnswer) };
     } else if (selectedVerifier === "numeric_range") {
       verifierConfig = { min: parseFloat(rangeMin), max: parseFloat(rangeMax) };
     } else if (selectedVerifier === "multi_numeric_tolerance") {
@@ -164,6 +175,18 @@ export function CreateBountyForm() {
         }
       }
       verifierConfig = { variables: vars };
+    } else if (selectedVerifier === "hash_preimage") {
+      verifierConfig = { targetHash: hashTarget.trim(), hashFunction: "sha256" };
+    } else if (selectedVerifier === "sat") {
+      const clauses = satClauses.trim().split("\n").map((line) =>
+        line.trim().split(/\s+/).map(Number).filter((n) => n !== 0)
+      ).filter((c) => c.length > 0);
+      verifierConfig = { numVars: parseInt(satNumVars), clauses };
+    } else if (selectedVerifier === "graph_coloring") {
+      const edges = graphEdges.trim().split("\n").map((line) =>
+        line.trim().split(/\s+/).map(Number)
+      ).filter((e) => e.length === 2);
+      verifierConfig = { numVertices: parseInt(graphNumVertices), numColors: parseInt(graphNumColors), edges };
     }
 
     const deadline = new Date(Date.now() + parseFloat(deadlineDays) * 86400000).toISOString();
@@ -235,7 +258,10 @@ export function CreateBountyForm() {
     (selectedVerifier === "numeric_tolerance" && target && epsilon) ||
     (selectedVerifier === "exact_string" && stringAnswer) ||
     (selectedVerifier === "numeric_range" && rangeMin && rangeMax) ||
-    (selectedVerifier === "multi_numeric_tolerance" && multiRows.some((r) => r.key.trim()));
+    (selectedVerifier === "multi_numeric_tolerance" && multiRows.some((r) => r.key.trim())) ||
+    (selectedVerifier === "hash_preimage" && hashTarget.trim().length === 64) ||
+    (selectedVerifier === "sat" && satNumVars && satClauses.trim()) ||
+    (selectedVerifier === "graph_coloring" && graphNumVertices && graphNumColors && graphEdges.trim());
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -448,6 +474,114 @@ export function CreateBountyForm() {
                     placeholder="e.g. 100"
                     className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                   />
+                </div>
+              </div>
+            )}
+
+            {selectedVerifier === "hash_preimage" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Target SHA-256 Hash</label>
+                  <input
+                    type="text"
+                    value={hashTarget}
+                    onChange={(e) => setHashTarget(e.target.value.toLowerCase().trim())}
+                    placeholder="e3b0c44298fc1c149afbf4c8996fb924..."
+                    className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    autoFocus
+                  />
+                  <p className="text-xs text-[var(--muted)] mt-1">64-character hex SHA-256 hash. Solvers must find the string that hashes to this value.</p>
+                </div>
+                <div className="border-t border-[var(--border)] pt-3">
+                  <label className="block text-xs font-medium text-[var(--muted)] mb-1.5">Helper — compute hash from known answer</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={hashPreviewInput}
+                      onChange={(e) => setHashPreviewInput(e.target.value)}
+                      placeholder="Type the answer to hash it..."
+                      className="flex-1 border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => { if (hashPreviewInput) setHashTarget(await hashSHA256(hashPreviewInput)); }}
+                      className="px-3 py-2 text-xs bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg hover:bg-[var(--accent)]/20 transition-colors font-medium"
+                    >
+                      Compute
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedVerifier === "sat" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Number of Variables</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={satNumVars}
+                    onChange={(e) => setSatNumVars(e.target.value)}
+                    placeholder="e.g. 3"
+                    className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Clauses (DIMACS format)</label>
+                  <textarea
+                    value={satClauses}
+                    onChange={(e) => setSatClauses(e.target.value)}
+                    rows={6}
+                    placeholder={"1 2 -3\n-1 3\n2 -3"}
+                    className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y"
+                  />
+                  <p className="text-xs text-[var(--muted)] mt-1">One clause per line. Integers separated by spaces. Positive = variable, negative = negation. Max 12 clauses, 20 variables.</p>
+                </div>
+              </div>
+            )}
+
+            {selectedVerifier === "graph_coloring" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">Vertices</label>
+                    <input
+                      type="number"
+                      min="2"
+                      max="15"
+                      value={graphNumVertices}
+                      onChange={(e) => setGraphNumVertices(e.target.value)}
+                      placeholder="e.g. 5"
+                      className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">Max Colors (K)</label>
+                    <input
+                      type="number"
+                      min="2"
+                      max="15"
+                      value={graphNumColors}
+                      onChange={(e) => setGraphNumColors(e.target.value)}
+                      placeholder="e.g. 3"
+                      className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Edges</label>
+                  <textarea
+                    value={graphEdges}
+                    onChange={(e) => setGraphEdges(e.target.value)}
+                    rows={5}
+                    placeholder={"0 1\n1 2\n2 3\n3 0\n0 2"}
+                    className="w-full border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm bg-transparent font-mono focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-y"
+                  />
+                  <p className="text-xs text-[var(--muted)] mt-1">One edge per line as &ldquo;u v&rdquo; (0-indexed vertex numbers). Max 15 vertices, 30 edges.</p>
                 </div>
               </div>
             )}
