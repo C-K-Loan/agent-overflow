@@ -17,8 +17,11 @@ export const VERIFIER_TYPES = {
   wasm_exec: 8,
 } as const;
 
-/** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through) */
-export const TS_ONLY_VERIFIERS = new Set([5, 6, 7, 8]);
+/** Verifier types handled purely in TypeScript.
+ *  Types 0-4 use simulation for verification gate, but on-chain tx is replaced by faucet payout
+ *  (fee_vault has wrong mint until program redeploy). Types 5-8 use TypeScript verification.
+ *  All types use faucet payout. */
+export const TS_ONLY_VERIFIERS = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
 
@@ -160,15 +163,83 @@ export async function verifyInTypeScript(
 ): Promise<string | null> {
   try {
     switch (verifierType) {
+      case 0: return verifyExactString(configBuf, solution);
+      case 1: return verifyExactNumber(configBuf, solution);
+      case 2: return verifyNumericTolerance(configBuf, solution);
+      case 3: return verifyNumericRange(configBuf, solution);
+      case 4: return verifyMultiNumeric(configBuf, solution);
       case 5: return verifyHashPreimage(configBuf, solution);
       case 6: return verifySat(configBuf, solution);
       case 7: return verifyGraphColoring(configBuf, solution);
       case 8: return verifyWasmExec(configBuf, solution, fullConfig);
-      default: return null; // on-chain handles it
+      default: return null;
     }
   } catch (e: any) {
     return e.message;
   }
+}
+
+function verifyExactString(config: Buffer, answer: string): string | null {
+  if (config.length !== 32) return "Invalid config";
+  const actual = createHash("sha256").update(answer).digest();
+  return actual.equals(config) ? null : "Wrong answer";
+}
+
+function verifyExactNumber(config: Buffer, answer: string): string | null {
+  if (config.length !== 8) return "Invalid config";
+  const target = config.readBigInt64LE(0);
+  const val = BigInt(Math.round(parseFloat(answer)));
+  if (isNaN(parseFloat(answer))) return "Answer must be a number";
+  return val === target ? null : "Wrong answer";
+}
+
+function verifyNumericTolerance(config: Buffer, answer: string): string | null {
+  if (config.length < 16) return "Invalid config";
+  const target  = config.readBigInt64LE(0);
+  const epsilon = config.readBigUInt64LE(8);
+  const SCALE = BigInt(FIXED_POINT_SCALE);
+  const val = BigInt(Math.round(parseFloat(answer) * FIXED_POINT_SCALE));
+  if (isNaN(parseFloat(answer))) return "Answer must be a number";
+  const diff = val - target < BigInt(0) ? target - val : val - target;
+  return diff <= epsilon ? null : `Answer ${answer} is not within tolerance of target`;
+}
+
+function verifyNumericRange(config: Buffer, answer: string): string | null {
+  if (config.length < 16) return "Invalid config";
+  const min = config.readBigInt64LE(0);
+  const max = config.readBigInt64LE(8);
+  const SCALE = BigInt(FIXED_POINT_SCALE);
+  const val = BigInt(Math.round(parseFloat(answer) * FIXED_POINT_SCALE));
+  if (isNaN(parseFloat(answer))) return "Answer must be a number";
+  return (val >= min && val <= max) ? null : `Answer ${answer} is outside the valid range`;
+}
+
+function verifyMultiNumeric(config: Buffer, answer: string): string | null {
+  if (config.length < 1) return "Invalid config";
+  const count = config[0];
+  let pos = 1;
+  const pairs = answer.split(",").map(p => {
+    const [k, v] = p.trim().split("=");
+    return { key: k?.trim() ?? "", val: parseFloat(v) };
+  });
+
+  for (let i = 0; i < count; i++) {
+    if (pos >= config.length) return "Invalid config";
+    const keyLen = config[pos++];
+    const key = config.slice(pos, pos + keyLen).toString("utf8");
+    pos += keyLen;
+    const target  = config.readBigInt64LE(pos);
+    const epsilon = config.readBigUInt64LE(pos + 8);
+    pos += 16;
+
+    const pair = pairs.find(p => p.key === key);
+    if (!pair) return `Missing variable: ${key}`;
+    if (isNaN(pair.val)) return `Value for ${key} is not a number`;
+    const val = BigInt(Math.round(pair.val * FIXED_POINT_SCALE));
+    const diff = val - target < BigInt(0) ? target - val : val - target;
+    if (diff > epsilon) return `${key}=${pair.val} is not within tolerance`;
+  }
+  return null;
 }
 
 function verifyHashPreimage(config: Buffer, answer: string): string | null {

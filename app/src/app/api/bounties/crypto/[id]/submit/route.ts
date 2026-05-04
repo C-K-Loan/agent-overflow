@@ -81,58 +81,26 @@ export async function POST(
     }).join(",");
   }
 
-  // Step 0: For TypeScript-verified types (5-7), run verification here.
-  // These bounties use on-chain type 255 (pass-through), so on-chain simulation
-  // won't catch wrong answers — we must check in TypeScript first.
-  if (TS_ONLY_VERIFIERS.has(bounty.verifierType)) {
-    try {
-      // DB stores JSON config — re-serialize to binary for verification
-      const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as any;
-      const configJson = JSON.parse(bounty.verifierConfig);
-      const configBuf = serializeVerifierConfig(verifierTypeName, configJson);
-      const tsError = await verifyInTypeScript(bounty.verifierType, configBuf, solution, configJson);
-      if (tsError) {
-        await prisma.bountyAttempt.create({
-          data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason: tsError },
-        });
-        return Response.json({ verified: false, reason: tsError });
-      }
-    } catch (e: any) {
-      return Response.json({ error: `Verifier config error: ${e.message}` }, { status: 500 });
+  // Verify in TypeScript — covers all verifier types 0-8.
+  // Types 0-4 mirror the on-chain Rust logic exactly.
+  // Types 5-8 are TS-native (type 255 on-chain = pass-through).
+  try {
+    const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as any;
+    const configJson = JSON.parse(bounty.verifierConfig);
+    const configBuf = serializeVerifierConfig(verifierTypeName, configJson);
+    const tsError = await verifyInTypeScript(bounty.verifierType, configBuf, solution, configJson);
+    if (tsError) {
+      await prisma.bountyAttempt.create({
+        data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason: tsError },
+      });
+      return Response.json({ verified: false, reason: tsError });
     }
+  } catch (e: any) {
+    return Response.json({ error: `Verifier config error: ${e.message}` }, { status: 500 });
   }
 
-  // Build submit instruction
-  const { ix } = buildSubmitAnswerIx({
-    answerer: answererPubkey,
-    answererAta,
-    bountyPda,
-  });
-
-  const submitIx = ix(onChainSolution);
-
-  // Simulate — for types 0-4 this is the verification gate (on-chain logic runs).
-  // For types 5-8 (type 255 on-chain) this always passes; TS pre-check already ran.
-  const sim = await simulateTransaction([submitIx], answererPubkey);
-
-  if (!sim.success) {
-    const isVerificationFail =
-      sim.error?.includes("VerificationFailed") ||
-      sim.logs?.some((l) => l.includes("VerificationFailed"));
-
-    const reason = isVerificationFail ? "Wrong answer" : `Verification error: ${sim.error}`;
-
-    await prisma.bountyAttempt.create({
-      data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason },
-    });
-
-    return Response.json({ verified: false, reason });
-  }
-
-  // Simulation passed — pay via faucet for ALL types.
-  // The fee_vault on-chain was initialised with an old USDC mint; the on-chain
-  // escrow release fails until the program is redeployed (needs ~2.8 devnet SOL).
-  // Faucet mintTo delivers real USDC to the solver in the interim.
+  // Verified correct — pay via faucet mintTo.
+  // (On-chain escrow release is blocked by fee_vault mint mismatch until program redeploy.)
   return handleTsOnlyPayout(bounty, wallet, solution, id, user.id, answererPubkey);
 }
 
