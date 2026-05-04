@@ -111,13 +111,8 @@ export async function POST(
 
   const submitIx = ix(onChainSolution);
 
-  // For TS-only verifiers (5-7), the on-chain fee_vault has wrong mint —
-  // pay out directly via faucet mint authority instead of escrow release.
-  if (TS_ONLY_VERIFIERS.has(bounty.verifierType)) {
-    return handleTsOnlyPayout(bounty, wallet, solution, id, user.id, answererPubkey);
-  }
-
-  // Step 1: Simulate (free) — catches wrong answers for on-chain types 0-4
+  // Simulate — for types 0-4 this is the verification gate (on-chain logic runs).
+  // For types 5-8 (type 255 on-chain) this always passes; TS pre-check already ran.
   const sim = await simulateTransaction([submitIx], answererPubkey);
 
   if (!sim.success) {
@@ -134,60 +129,11 @@ export async function POST(
     return Response.json({ verified: false, reason });
   }
 
-  // Step 2: Simulation passed — send on-chain
-  try {
-    const keypair = restoreKeypair(wallet.encryptedSecret);
-    const txHash = await sendAndConfirm([submitIx], keypair);
-
-    const { fee, payout } = calculateFee(bounty.amount);
-
-    // Update DB atomically — tx already landed on-chain, must not leave DB inconsistent
-    await prisma.$transaction([
-      prisma.cryptoBounty.update({
-        where: { id },
-        data: { status: "awarded", answererId: user.id, awardTxHash: txHash, platformFee: fee },
-      }),
-      prisma.bountyAttempt.create({
-        data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: true, txHash },
-      }),
-      prisma.paymentLog.create({
-        data: {
-          type: "bounty_awarded",
-          amount: payout,
-          token: "USDC",
-          fromWallet: bounty.vaultPda,
-          toWallet: wallet.publicKey,
-          txHash,
-          bountyId: id,
-          userId: user.id,
-        },
-      }),
-    ]);
-
-    // Fire webhook
-    fireWebhooks(bounty.askerId, "bounty.crypto.awarded", {
-      bountyId: id,
-      answererId: user.id,
-      payout: nativeToUsdc(payout),
-      fee: nativeToUsdc(fee),
-      txHash,
-    });
-
-    return Response.json({
-      verified: true,
-      txHash,
-      payout: nativeToUsdc(payout),
-      fee: nativeToUsdc(fee),
-      explorerUrl: explorerUrl(txHash),
-    });
-  } catch (e: any) {
-    // Check if someone else won (race condition)
-    if (e.message?.includes("BountyNotActive")) {
-      return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
-    }
-    console.error("Submit answer tx failed:", e);
-    return Response.json({ error: `Transaction failed: ${e.message}` }, { status: 500 });
-  }
+  // Simulation passed — pay via faucet for ALL types.
+  // The fee_vault on-chain was initialised with an old USDC mint; the on-chain
+  // escrow release fails until the program is redeployed (needs ~2.8 devnet SOL).
+  // Faucet mintTo delivers real USDC to the solver in the interim.
+  return handleTsOnlyPayout(bounty, wallet, solution, id, user.id, answererPubkey);
 }
 
 /**
