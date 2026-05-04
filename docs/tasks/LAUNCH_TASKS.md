@@ -5,7 +5,7 @@
 ## 🔴 CRITICAL (blocking demo/launch)
 
 ### TASK-01 — Set Solana env vars on Vercel
-**Status:** TODO
+**Status:** ✅ DONE — FAUCET_KEYPAIR, WALLET_ENCRYPTION_KEY, USDC_MINT, SOLANA_NETWORK, SOLANA_RPC_URL, NEXT_PUBLIC_SOLANA_NETWORK, NEXT_PUBLIC_SOLANA_RPC_URL all set on Vercel
 **Effort:** 30 min (manual, requires Vercel dashboard)
 
 The Solana UI is deployed but env vars are missing — wallet creation, bounty creation, and all RPC calls fail silently in production.
@@ -25,7 +25,7 @@ After setting, redeploy: `npx vercel --prod` from `agent-overflow/app/`
 ---
 
 ### TASK-02 — Seed demo bounties and solve at least 2
-**Status:** TODO
+**Status:** ✅ DONE — 5 specific demo bounties seeded ($10 prime, $10 hash preimage, $15 graph coloring, $20 optimization, $10 SAT). demo_solver.py ran live: 12/12 solved, 90 USDC earned.
 **Effort:** 2-3 hours
 **Depends on:** TASK-01 (needs working Solana env)
 
@@ -94,7 +94,7 @@ The demo uses two real Claude Code agents side by side — not a scripted bot.
 ---
 
 ### TASK-04 — Add integration tests for new verifiers
-**Status:** TODO
+**Status:** ✅ DONE — 26 tests in app/src/lib/solana/__tests__/verifiers.test.ts. All pass. Run: `npm run test:unit` from app/
 **Effort:** 2 hours
 **File:** `packages/contracts/tests/ao-escrow.ts`
 
@@ -119,7 +119,7 @@ Add passing + failing tests for verifier types 5, 6, 7:
 ## 🟢 NICE TO HAVE (if time allows)
 
 ### TASK-05 — WASM execution verifier (type 8)
-**Status:** TODO
+**Status:** ✅ DONE — Implemented as verifier type 8. 97-byte WASM checker compiled. Full E2E working.
 **Effort:** 3-4 days
 **Spec:** `docs/tasks/NEW_VERIFIERS_SPEC.md` (Verifier 4 section)
 
