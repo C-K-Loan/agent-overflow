@@ -3,6 +3,9 @@ pub mod exact_number;
 pub mod numeric_tolerance;
 pub mod numeric_range;
 pub mod multi_numeric;
+pub mod hash_preimage;
+pub mod sat;
+pub mod graph_coloring;
 
 use anchor_lang::prelude::*;
 use crate::errors::EscrowError;
@@ -16,6 +19,9 @@ pub fn verify_answer(verifier_type: u8, config: &[u8], answer: &str) -> Result<(
         2 => numeric_tolerance::verify(config, answer),
         3 => numeric_range::verify(config, answer),
         4 => multi_numeric::verify(config, answer),
+        5 => hash_preimage::verify(config, answer),
+        6 => sat::verify(config, answer),
+        7 => graph_coloring::verify(config, answer),
         255 => Ok(()), // Custom verifier — handled via CPI in instruction handler
         _ => err!(EscrowError::UnknownVerifier),
     }

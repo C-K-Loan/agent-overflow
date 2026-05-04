@@ -1,14 +1,23 @@
 import { createHash } from "crypto";
 import { FIXED_POINT_SCALE } from "./constants";
 
-/** Verifier type IDs (must match Rust program) */
+/** Verifier type IDs (must match Rust program).
+ *  Types 5-7 are verified in TypeScript; on-chain they use type 255 (pass-through).
+ *  This allows new verifiers without a program redeploy.
+ */
 export const VERIFIER_TYPES = {
   exact_string: 0,
   exact_number: 1,
   numeric_tolerance: 2,
   numeric_range: 3,
   multi_numeric_tolerance: 4,
+  hash_preimage: 5,
+  sat: 6,
+  graph_coloring: 7,
 } as const;
+
+/** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through) */
+export const TS_ONLY_VERIFIERS = new Set([5, 6, 7]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
 
@@ -73,14 +82,150 @@ export function serializeVerifierConfig(
       return Buffer.concat(parts);
     }
 
+    case "hash_preimage": {
+      // Config: { targetHash: "hex" } — store 32-byte hash
+      const hex = config.targetHash as string;
+      if (!hex || hex.length !== 64) throw new Error("targetHash must be 64-char hex SHA256");
+      return Buffer.from(hex, "hex");
+    }
+
+    case "sat": {
+      // Config: { numVars, clauses: number[][] } — compact binary
+      const numVars = config.numVars as number;
+      const clauses = config.clauses as number[][];
+      if (!numVars || numVars < 1 || numVars > 20) throw new Error("numVars must be 1-20");
+      if (!clauses || clauses.length < 1 || clauses.length > 12) throw new Error("clauses must have 1-12 entries");
+      const buf: number[] = [numVars, clauses.length];
+      for (const clause of clauses) {
+        if (clause.length < 1 || clause.length > 5) throw new Error("each clause must have 1-5 literals");
+        buf.push(clause.length);
+        for (const lit of clause) {
+          if (lit === 0 || Math.abs(lit) > numVars) throw new Error(`literal ${lit} out of range`);
+          buf.push(lit < 0 ? 256 + lit : lit); // i8 as u8
+        }
+      }
+      if (buf.length > 64) throw new Error(`SAT config too large: ${buf.length} bytes (max 64)`);
+      return Buffer.from(buf);
+    }
+
+    case "graph_coloring": {
+      // Config: { numVertices, numColors, edges: [u,v][] } — compact binary
+      const numVertices = config.numVertices as number;
+      const numColors   = config.numColors as number;
+      const edges       = config.edges as [number, number][];
+      if (!numVertices || numVertices < 1 || numVertices > 15) throw new Error("numVertices must be 1-15");
+      if (!numColors   || numColors < 1   || numColors > 8)   throw new Error("numColors must be 1-8");
+      if (!edges || edges.length > 30) throw new Error("edges must have ≤30 entries");
+      const buf: number[] = [numVertices, numColors, edges.length];
+      for (const [u, v] of edges) {
+        if (u >= numVertices || v >= numVertices) throw new Error(`edge [${u},${v}] out of range`);
+        buf.push(u, v);
+      }
+      if (buf.length > 64) throw new Error(`graph_coloring config too large: ${buf.length} bytes (max 64)`);
+      return Buffer.from(buf);
+    }
+
     default:
       throw new Error(`Unknown verifier type: ${type}`);
   }
 }
 
-/** Compute SHA256 hash of an answer (for exact_string config) */
+/** Compute SHA256 hash of an answer (for exact_string / hash_preimage config) */
 export function hashAnswer(answer: string): string {
   return createHash("sha256").update(answer).digest("hex");
+}
+
+/**
+ * TypeScript-side verification for types 5-7.
+ * These mirror the Rust logic exactly so the behaviour is identical.
+ * Returns null if correct, error string if wrong.
+ */
+export function verifyInTypeScript(
+  verifierType: number,
+  configBuf: Buffer,
+  solution: string
+): string | null {
+  try {
+    switch (verifierType) {
+      case 5: return verifyHashPreimage(configBuf, solution);
+      case 6: return verifySat(configBuf, solution);
+      case 7: return verifyGraphColoring(configBuf, solution);
+      default: return null; // on-chain handles it
+    }
+  } catch (e: any) {
+    return e.message;
+  }
+}
+
+function verifyHashPreimage(config: Buffer, answer: string): string | null {
+  if (config.length !== 32) return "Invalid config: expected 32-byte hash";
+  const actual = createHash("sha256").update(answer).digest();
+  if (!actual.equals(config)) return "Wrong answer";
+  return null;
+}
+
+function verifySat(config: Buffer, solution: string): string | null {
+  if (config.length < 2) return "Invalid SAT config";
+  const numVars    = config[0];
+  const numClauses = config[1];
+  if (numVars < 1 || numVars > 20)    return "Invalid config: numVars out of range";
+  if (numClauses < 1 || numClauses > 12) return "Invalid config: numClauses out of range";
+
+  const parts = solution.split(",");
+  if (parts.length !== numVars) return `Expected ${numVars} comma-separated values, got ${parts.length}`;
+
+  const assignment: boolean[] = [false]; // 1-indexed
+  for (const p of parts) {
+    const v = p.trim();
+    if (v !== "0" && v !== "1") return `Invalid value '${v}': must be 0 or 1`;
+    assignment.push(v === "1");
+  }
+
+  let pos = 2;
+  for (let c = 0; c < numClauses; c++) {
+    if (pos >= config.length) return "Config too short";
+    const numLits = config[pos++];
+    if (numLits < 1 || numLits > 5) return "Invalid config: clause size out of range";
+    let satisfied = false;
+    for (let l = 0; l < numLits; l++) {
+      if (pos >= config.length) return "Config too short";
+      const raw = config[pos++];
+      const lit = raw > 127 ? raw - 256 : raw; // u8 → i8
+      if (lit === 0) return "Invalid config: zero literal";
+      const varIdx = Math.abs(lit);
+      if (varIdx > numVars) return "Invalid config: variable index out of range";
+      const val = lit > 0 ? assignment[varIdx] : !assignment[varIdx];
+      if (val) satisfied = true;
+    }
+    if (!satisfied) return `Clause ${c + 1} is not satisfied`;
+  }
+  return null;
+}
+
+function verifyGraphColoring(config: Buffer, solution: string): string | null {
+  if (config.length < 3) return "Invalid graph_coloring config";
+  const numVertices = config[0];
+  const numColors   = config[1];
+  const numEdges    = config[2];
+  if (config.length < 3 + numEdges * 2) return "Config too short for edges";
+
+  const parts = solution.split(",");
+  if (parts.length !== numVertices) return `Expected ${numVertices} colors, got ${parts.length}`;
+
+  const coloring: number[] = [];
+  for (const p of parts) {
+    const c = parseInt(p.trim(), 10);
+    if (isNaN(c) || c < 0 || c >= numColors) return `Color ${p.trim()} out of range [0,${numColors - 1}]`;
+    coloring.push(c);
+  }
+
+  for (let i = 0; i < numEdges; i++) {
+    const u = config[3 + i * 2];
+    const v = config[3 + i * 2 + 1];
+    if (u >= numVertices || v >= numVertices) return "Invalid config: edge vertex out of range";
+    if (coloring[u] === coloring[v]) return `Adjacent vertices ${u} and ${v} share color ${coloring[u]}`;
+  }
+  return null;
 }
 
 /** Convert float to fixed-point i64 (6 decimal places) */
@@ -202,6 +347,73 @@ export const VERIFIER_REGISTRY = [
         ],
       },
       correctAnswer: "u_0=1000200,u_1=499000",
+    },
+  },
+  {
+    type: "hash_preimage",
+    name: "Hash Preimage",
+    description:
+      "Submit a string whose SHA-256 hash matches the stored target. Perfect for proof-of-knowledge puzzles, CTF challenges, and commit-reveal schemes.",
+    configSchema: {
+      type: "object",
+      required: ["targetHash"],
+      properties: {
+        targetHash: { type: "string", description: "64-char hex SHA-256 of the correct answer." },
+      },
+    },
+    answerFormat: "Plaintext string (hashed on-chain, compared to targetHash)",
+    example: {
+      config: { targetHash: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824" },
+      correctAnswer: "hello",
+    },
+  },
+  {
+    type: "sat",
+    name: "Boolean SAT (CNF)",
+    description:
+      "Submit a variable assignment that satisfies all clauses of a CNF boolean formula. SAT is NP-complete — encodes scheduling, graph coloring, Sudoku, and any NP decision problem.",
+    configSchema: {
+      type: "object",
+      required: ["numVars", "clauses"],
+      properties: {
+        numVars: { type: "number", description: "Number of boolean variables (1–20)" },
+        clauses: {
+          type: "array",
+          description: "Clauses in CNF. Each clause is an array of nonzero integers (positive=var, negative=negation, 1-indexed).",
+          items: { type: "array", items: { type: "number" } },
+        },
+      },
+    },
+    answerFormat: "Comma-separated 0/1 values, one per variable (1-indexed). e.g. \"1,0,1\" → x1=true, x2=false, x3=true.",
+    limits: "Max 20 variables, 12 clauses, 5 literals per clause.",
+    example: {
+      config: { numVars: 3, clauses: [[1, 2, -3], [-1, 3], [2, -3]] },
+      correctAnswer: "1,1,1",
+    },
+  },
+  {
+    type: "graph_coloring",
+    name: "Graph K-Coloring",
+    description:
+      "Submit a vertex color assignment where no two adjacent vertices share a color. Encodes scheduling, register allocation, and frequency assignment problems.",
+    configSchema: {
+      type: "object",
+      required: ["numVertices", "numColors", "edges"],
+      properties: {
+        numVertices: { type: "number", description: "Number of vertices (1–15)" },
+        numColors:   { type: "number", description: "Max colors K (1–8)" },
+        edges: {
+          type: "array",
+          description: "[u, v] pairs (0-indexed vertex numbers)",
+          items: { type: "array", items: { type: "number" }, minItems: 2, maxItems: 2 },
+        },
+      },
+    },
+    answerFormat: "Comma-separated color integers (0-indexed), one per vertex. e.g. \"0,1,2,0,1\".",
+    limits: "Max 15 vertices, 8 colors, 30 edges.",
+    example: {
+      config: { numVertices: 4, numColors: 2, edges: [[0,1],[1,2],[2,3]] },
+      correctAnswer: "0,1,0,1",
     },
   },
 ];

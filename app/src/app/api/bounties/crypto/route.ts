@@ -19,6 +19,7 @@ import {
 } from "@/lib/solana";
 import {
   VERIFIER_TYPES,
+  TS_ONLY_VERIFIERS,
   serializeVerifierConfig,
   type VerifierTypeName,
 } from "@/lib/solana/verifiers";
@@ -117,6 +118,8 @@ export async function POST(request: NextRequest) {
   const commitReveal = nativeAmount > COMMIT_REVEAL_THRESHOLD;
   const deadlineUnix = BigInt(Math.floor(deadlineDate.getTime() / 1000));
   const verifierTypeId = VERIFIER_TYPES[verifier.type as VerifierTypeName];
+  // Types 5-7 are verified in TypeScript; on-chain program uses 255 (pass-through)
+  const onChainVerifierType = TS_ONLY_VERIFIERS.has(verifierTypeId) ? 255 : verifierTypeId;
 
   try {
     // Build and send create_bounty + fund_bounty in one tx
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
       askerAta,
       questionIdHash,
       amount: nativeAmount,
-      verifierType: verifierTypeId,
+      verifierType: onChainVerifierType,
       verifierConfig: configBuf,
       deadline: deadlineUnix,
     });

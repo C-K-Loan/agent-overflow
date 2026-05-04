@@ -56,9 +56,9 @@ pub fn handler(
     require!(amount >= MIN_BOUNTY_AMOUNT, EscrowError::AmountBelowMinimum);
     require!(amount <= MAX_BOUNTY_AMOUNT, EscrowError::AmountExceedsMaximum);
 
-    // Validate verifier type
+    // Validate verifier type (0-7 built-in, 255 custom CPI)
     require!(
-        verifier_type <= 4 || verifier_type == 255,
+        verifier_type <= 7 || verifier_type == 255,
         EscrowError::UnknownVerifier
     );
 

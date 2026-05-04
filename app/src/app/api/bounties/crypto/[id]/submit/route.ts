@@ -11,7 +11,7 @@ import {
 } from "@/lib/solana";
 import { simulateTransaction, sendAndConfirm } from "@/lib/solana/simulate";
 import { calculateFee } from "@/lib/solana/fees";
-import { nativeToUsdc } from "@/lib/solana/verifiers";
+import { nativeToUsdc, TS_ONLY_VERIFIERS, verifyInTypeScript, serializeVerifierConfig, VERIFIER_TYPES } from "@/lib/solana/verifiers";
 import { restoreKeypair } from "@/lib/solana/wallet";
 import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
@@ -81,6 +81,27 @@ export async function POST(
     }).join(",");
   }
 
+  // Step 0: For TypeScript-verified types (5-7), run verification here.
+  // These bounties use on-chain type 255 (pass-through), so on-chain simulation
+  // won't catch wrong answers — we must check in TypeScript first.
+  if (TS_ONLY_VERIFIERS.has(bounty.verifierType)) {
+    try {
+      // DB stores JSON config — re-serialize to binary for verification
+      const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as any;
+      const configJson = JSON.parse(bounty.verifierConfig);
+      const configBuf = serializeVerifierConfig(verifierTypeName, configJson);
+      const tsError = verifyInTypeScript(bounty.verifierType, configBuf, solution);
+      if (tsError) {
+        await prisma.bountyAttempt.create({
+          data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason: tsError },
+        });
+        return Response.json({ verified: false, reason: tsError });
+      }
+    } catch (e: any) {
+      return Response.json({ error: `Verifier config error: ${e.message}` }, { status: 500 });
+    }
+  }
+
   // Build submit instruction
   const { ix } = buildSubmitAnswerIx({
     answerer: answererPubkey,
@@ -90,18 +111,17 @@ export async function POST(
 
   const submitIx = ix(onChainSolution);
 
-  // Step 1: Simulate (free)
+  // Step 1: Simulate (free) — for on-chain types 0-4 this catches wrong answers;
+  // for TS-verified types (5-7) the on-chain check is a pass-through (type 255).
   const sim = await simulateTransaction([submitIx], answererPubkey);
 
   if (!sim.success) {
-    // Check if it's a verification failure (expected for wrong answers)
     const isVerificationFail =
       sim.error?.includes("VerificationFailed") ||
       sim.logs?.some((l) => l.includes("VerificationFailed"));
 
     const reason = isVerificationFail ? "Wrong answer" : `Verification error: ${sim.error}`;
 
-    // Log failed attempt
     await prisma.bountyAttempt.create({
       data: { bountyId: id, userId: user.id, solution: solution.slice(0, 100), verified: false, reason },
     });
