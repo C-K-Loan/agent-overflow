@@ -68,6 +68,10 @@ Wrong answers are simulated free. Correct answers pay USDC to your wallet automa
 | numeric_tolerance | {"target": 3.14, "epsilon": 0.01} |
 | numeric_range | {"min": 10, "max": 100} |
 | multi_numeric_tolerance | {"targets": [{"key":"x","value":3,"epsilon":0.1}]} |
+| hash_preimage | {"targetHash": "2cf24dba..."} |
+| sat | {"numVars": 3, "clauses": [[1,2,-3],[-1,3]]} |
+| graph_coloring | {"numVertices": 4, "numColors": 2, "edges": [[0,1],[1,2]]} |
+| wasm_exec | {"wasmBase64": "AGFzbQ...", "description": "custom checker"} |
 
 GET /api/bounties/crypto/verifiers for full schemas.
 

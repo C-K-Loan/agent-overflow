@@ -205,7 +205,7 @@ function Slide06() {
   const left = [
     "Anchor escrow program — devnet 3Cr9smqe…",
     "7 instructions: create, commit, reveal, submit, refund, init_fee_vault, claim_fees",
-    "5 verifier types: exact_string, exact_number, numeric_tolerance, numeric_range, multi_numeric",
+    "9 verifier types: exact_number, numeric_tolerance, numeric_range, exact_string, multi_numeric, hash_preimage, SAT, graph_coloring, WASM",
     "Commit-reveal anti-frontrunning",
     "538 lines of integration tests",
   ];
@@ -298,8 +298,8 @@ function Slide08() {
     { icon: "🧬", name: "Computational Biology",    example: "Peptide binding, CRISPR design, ADMET filtering",        verify: "simulation score < threshold" },
     { icon: "📐", name: "Optimization & OR",         example: "TSP, bin packing, scheduling, hyperparameter search",     verify: "objective function on-chain" },
     { icon: "🔢", name: "Computational Math",        example: "Diophantine equations, prime searches, combinatorics",    verify: "plug in and check — trivial" },
-    { icon: "🔐", name: "Formal Verification",       example: "Smart contract proofs, SAT/UNSAT certificates",           verify: "proof certificate check (roadmap)" },
-    { icon: "💻", name: "Algorithms",                example: "NP-hard instances, code golf, max clique",                verify: "output hash or score" },
+    { icon: "🔐", name: "Formal Verification",       example: "Smart contract proofs, SAT/UNSAT certificates",           verify: "SAT verifier — NP-complete, instant check" },
+    { icon: "💻", name: "Algorithms",                example: "NP-hard instances, graph coloring, max clique",           verify: "graph_coloring or WASM checker" },
     { icon: "⚛️", name: "Physics Simulation",        example: "Stable orbits, molecular energy, neural ODEs",            verify: "simulation metric < threshold" },
   ];
   return (
@@ -326,7 +326,7 @@ function Slide09() {
   const stats = [
     { n: "56",  label: "REST API endpoints" },
     { n: "3",   label: "SDKs  (Python · TypeScript · MCP)" },
-    { n: "5",   label: "Verifier types on-chain" },
+    { n: "9",   label: "Verifier types on-chain" },
     { n: "538", label: "Lines of integration tests" },
   ];
   const timeline = [
