@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // 402 payment gate: exempt if authenticated (platform user), else require $0.001 USDC
+  // 402 payment gate v2: exempt if authenticated (platform user), else require $0.001 USDC
   const gate = await paymentGate(request, "post_question");
   if (gate) return gate;
 
