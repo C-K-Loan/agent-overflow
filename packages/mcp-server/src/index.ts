@@ -6,13 +6,77 @@ import { z } from "zod";
 const BASE_URL = process.env.AGENT_OVERFLOW_URL || "https://app-blue-gamma-18.vercel.app";
 const API_KEY = process.env.AGENT_OVERFLOW_API_KEY || "";
 
-async function apiRequest(path: string, options: RequestInit = {}) {
+// Optional: Solana keypair (JSON array) for auto-paying 402 challenges.
+// If not set, 402 routes require authentication via AGENT_OVERFLOW_API_KEY.
+const WALLET_KEYPAIR_JSON = process.env.AGENT_OVERFLOW_WALLET || "";
+
+/**
+ * Make an API request. If the server responds with 402 (Payment Required):
+ * 1. Parse payment instructions from the response
+ * 2. Send USDC from the configured wallet to the platform address
+ * 3. Retry the original request with X-Payment-Tx header
+ *
+ * This makes the MCP server a native pay.sh/x402 client — agents using
+ * Claude Code / Cursor can call gated endpoints without any manual setup.
+ */
+async function apiRequest(path: string, options: RequestInit = {}, _retrying = false): Promise<any> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`;
   Object.assign(headers, options.headers || {});
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+
+  // Handle 402 Payment Required
+  if (res.status === 402 && !_retrying && WALLET_KEYPAIR_JSON) {
+    const body = await res.json() as any;
+    const payment = body?.payment;
+    if (!payment) return body;
+
+    try {
+      const txHash = await payFor402(payment);
+      if (txHash) {
+        // Retry with payment proof
+        const retryHeaders = { ...headers, "X-Payment-Tx": txHash };
+        const retry = await fetch(`${BASE_URL}${path}`, {
+          ...options,
+          headers: retryHeaders,
+        });
+        return retry.json();
+      }
+    } catch (e: any) {
+      return { error: `402 payment failed: ${e.message}`, payment };
+    }
+  }
+
   return res.json();
+}
+
+/** Pay a 402 challenge by sending USDC from our wallet. Returns tx hash. */
+async function payFor402(payment: {
+  amount: number;
+  tokenMint: string;
+  recipient: string;
+  network: string;
+}): Promise<string> {
+  // Dynamic import to keep startup fast when wallet not configured
+  const { Keypair, Connection, PublicKey } = await import("@solana/web3.js");
+  const { getOrCreateAssociatedTokenAccount, transfer } = await import("@solana/spl-token");
+
+  const keypair = Keypair.fromSecretKey(Uint8Array.from(JSON.parse(WALLET_KEYPAIR_JSON)));
+  const rpc = payment.network === "mainnet-beta"
+    ? "https://api.mainnet-beta.solana.com"
+    : "https://api.devnet.solana.com";
+  const conn = new Connection(rpc, "confirmed");
+
+  const mint = new PublicKey(payment.tokenMint);
+  const recipient = new PublicKey(payment.recipient);
+  const amount = BigInt(Math.round(payment.amount * 1_000_000));
+
+  const sourceAta = await getOrCreateAssociatedTokenAccount(conn, keypair, mint, keypair.publicKey);
+  const destAta   = await getOrCreateAssociatedTokenAccount(conn, keypair, mint, recipient);
+
+  const sig = await transfer(conn, keypair, sourceAta.address, destAta.address, keypair, amount);
+  return String(sig);
 }
 
 const server = new McpServer({

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { AskQuestionSchema, parseBody, validationError, safeJson } from "@/lib/schemas";
+import { paymentGate } from "@/lib/solana/payment-gate";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -84,6 +85,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // 402 payment gate: exempt if authenticated (platform user), else require $0.001 USDC
+  const gate = await paymentGate(request, "post_question");
+  if (gate) return gate;
+
   const user = await getUser(request);
   if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
