@@ -33,13 +33,14 @@ pub struct SubmitAnswer<'info> {
     )]
     pub answerer_token_account: Account<'info, TokenAccount>,
 
-    /// Fee vault (receives 1% platform fee)
+    /// Platform fee account — any token account with matching mint.
+    /// Not a PDA so it works with any USDC mint (devnet or mainnet).
+    /// The backend always passes the platform wallet's ATA for the bounty's mint.
     #[account(
         mut,
-        seeds = [FEE_VAULT_SEED],
-        bump,
+        constraint = platform_fee_account.mint == bounty.token_mint @ EscrowError::InvalidMint,
     )]
-    pub fee_vault: Account<'info, TokenAccount>,
+    pub platform_fee_account: Account<'info, TokenAccount>,
 
     pub token_program: Program<'info, Token>,
 }
@@ -66,7 +67,7 @@ pub fn handler(ctx: Context<SubmitAnswer>, answer: String) -> Result<()> {
     let fee = bounty.amount * PLATFORM_FEE_BPS / BPS_DENOMINATOR;
     let payout = bounty.amount - fee;
 
-    // Transfer payout: vault → answerer
+    // Sign transfers using vault PDA seeds
     let bounty_key = ctx.accounts.bounty.key();
     let vault_seeds: &[&[u8]] = &[
         VAULT_SEED,
@@ -75,31 +76,30 @@ pub fn handler(ctx: Context<SubmitAnswer>, answer: String) -> Result<()> {
     ];
     let signer_seeds = &[vault_seeds];
 
-    let cpi_payout = Transfer {
-        from: ctx.accounts.vault.to_account_info(),
-        to: ctx.accounts.answerer_token_account.to_account_info(),
-        authority: ctx.accounts.vault.to_account_info(),
-    };
+    // Transfer payout: vault → answerer (99%)
     token::transfer(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
-            cpi_payout,
+            Transfer {
+                from:      ctx.accounts.vault.to_account_info(),
+                to:        ctx.accounts.answerer_token_account.to_account_info(),
+                authority: ctx.accounts.vault.to_account_info(),
+            },
             signer_seeds,
         ),
         payout,
     )?;
 
-    // Transfer fee: vault → fee_vault
+    // Transfer fee: vault → platform_fee_account (1%)
     if fee > 0 {
-        let cpi_fee = Transfer {
-            from: ctx.accounts.vault.to_account_info(),
-            to: ctx.accounts.fee_vault.to_account_info(),
-            authority: ctx.accounts.vault.to_account_info(),
-        };
         token::transfer(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
-                cpi_fee,
+                Transfer {
+                    from:      ctx.accounts.vault.to_account_info(),
+                    to:        ctx.accounts.platform_fee_account.to_account_info(),
+                    authority: ctx.accounts.vault.to_account_info(),
+                },
                 signer_seeds,
             ),
             fee,
@@ -112,7 +112,7 @@ pub fn handler(ctx: Context<SubmitAnswer>, answer: String) -> Result<()> {
     bounty.answerer = ctx.accounts.answerer.key();
 
     emit!(BountyAwardedEvent {
-        bounty: ctx.accounts.bounty.key(),
+        bounty:   ctx.accounts.bounty.key(),
         answerer: ctx.accounts.answerer.key(),
         payout,
         fee,
@@ -123,8 +123,8 @@ pub fn handler(ctx: Context<SubmitAnswer>, answer: String) -> Result<()> {
 
 #[event]
 pub struct BountyAwardedEvent {
-    pub bounty: Pubkey,
+    pub bounty:   Pubkey,
     pub answerer: Pubkey,
-    pub payout: u64,
-    pub fee: u64,
+    pub payout:   u64,
+    pub fee:      u64,
 }

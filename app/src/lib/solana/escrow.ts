@@ -163,9 +163,9 @@ export function buildSubmitAnswerIx(params: {
   answerer: PublicKey;
   answererAta: PublicKey;
   bountyPda: PublicKey;
+  platformFeeAccount: PublicKey;  // platform wallet's ATA for the bounty's USDC mint
 }): { ix: (answer: string) => TransactionInstruction } {
   const [vaultPda] = findVaultPda(params.bountyPda);
-  const [feeVaultPda] = findFeeVaultPda();
 
   return {
     ix: (answer: string) => {
@@ -173,12 +173,12 @@ export function buildSubmitAnswerIx(params: {
       return new TransactionInstruction({
         programId: ESCROW_PROGRAM_ID,
         keys: [
-          { pubkey: params.answerer, isSigner: true, isWritable: true },
-          { pubkey: params.bountyPda, isSigner: false, isWritable: true },
-          { pubkey: vaultPda, isSigner: false, isWritable: true },
-          { pubkey: params.answererAta, isSigner: false, isWritable: true },
-          { pubkey: feeVaultPda, isSigner: false, isWritable: true },
-          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: params.answerer,           isSigner: true,  isWritable: true  },
+          { pubkey: params.bountyPda,          isSigner: false, isWritable: true  },
+          { pubkey: vaultPda,                  isSigner: false, isWritable: true  },
+          { pubkey: params.answererAta,        isSigner: false, isWritable: true  },
+          { pubkey: params.platformFeeAccount, isSigner: false, isWritable: true  },
+          { pubkey: TOKEN_PROGRAM_ID,          isSigner: false, isWritable: false },
         ],
         data,
       });
