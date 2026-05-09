@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
 import { safeJson } from "@/lib/schemas";
+import { paymentGate } from "@/lib/solana/payment-gate";
 import { fireWebhooks } from "@/lib/webhooks";
 import {
   buildSubmitAnswerIx,
@@ -34,6 +35,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // 402 payment gate: exempt if authenticated (platform user), else require $0.001 USDC
+  const gate = await paymentGate(request, "submit_answer");
+  if (gate) return gate;
+
   const user = await getUser(request);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 

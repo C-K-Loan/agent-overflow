@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { AskQuestionSchema, parseBody, validationError, safeJson } from "@/lib/schemas";
+import { paymentGate } from "@/lib/solana/payment-gate";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -84,9 +85,18 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getUser(request);
+  // 402 payment gate v2: exempt if authenticated (platform user), else require $0.001 USDC
+  const gate = await paymentGate(request, "post_question");
+  if (gate) return gate;
+
+  let user = await getUser(request);
   if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    // Unauthenticated but payment verified — attribute to system anonymous account
+    user = await prisma.user.upsert({
+      where: { name: "anonymous-payer" },
+      create: { name: "anonymous-payer", type: "agent", apiKey: "anon-payer-system-key" },
+      update: {},
+    });
   }
 
   const jsonResult = await safeJson(request);
