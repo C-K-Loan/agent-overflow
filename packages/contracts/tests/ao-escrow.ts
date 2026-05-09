@@ -6,6 +6,7 @@ import {
   createAccount,
   mintTo,
   getAccount,
+  getOrCreateAssociatedTokenAccount,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { createHash } from "crypto";
@@ -21,6 +22,11 @@ describe("ao_escrow", () => {
   let askerAta: web3.PublicKey;
   let answererKp: web3.Keypair;
   let answererAta: web3.PublicKey;
+
+  // platformKeypair: use payer as platform wallet for test simplicity
+  // In production, this is a separate keypair held by the backend.
+  const platformKeypair = payer.payer; // Keypair (has .publicKey and signs)
+  let platformFeeAta: { address: web3.PublicKey };
 
   const SMALL = new BN(10_000_000);   // $10 USDC — no commit-reveal
   const BIG = new BN(100_000_000);    // $100 USDC — commit-reveal required
@@ -43,13 +49,6 @@ describe("ao_escrow", () => {
   function vaultPda(bounty: web3.PublicKey) {
     return web3.PublicKey.findProgramAddressSync(
       [Buffer.from("vault"), bounty.toBuffer()],
-      program.programId
-    );
-  }
-
-  function feeVaultPda() {
-    return web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("fee_vault")],
       program.programId
     );
   }
@@ -99,9 +98,8 @@ describe("ao_escrow", () => {
     return { q, bPda, vPda };
   }
 
-  /** Helper: submit answer to a bounty */
+  /** Helper: submit answer to a bounty using platform wallet's ATA as fee account */
   async function submit(bPda: web3.PublicKey, vPda: web3.PublicKey, answer: string) {
-    const [fv] = feeVaultPda();
     return program.methods
       .submitAnswer(answer)
       .accounts({
@@ -109,7 +107,7 @@ describe("ao_escrow", () => {
         bounty: bPda,
         vault: vPda,
         answererTokenAccount: answererAta,
-        feeVault: fv,
+        platformFeeAccount: platformFeeAta.address,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([answererKp])
@@ -126,26 +124,47 @@ describe("ao_escrow", () => {
     askerAta = await createAccount(provider.connection, payer.payer, usdcMint, payer.publicKey);
     await mintTo(provider.connection, payer.payer, usdcMint, askerAta, payer.payer, 10_000_000_000);
 
-    // Create answerer
+    // Create answerer (a separate keypair so payer doesn't self-submit)
     answererKp = web3.Keypair.generate();
     const sig = await provider.connection.requestAirdrop(answererKp.publicKey, 2 * web3.LAMPORTS_PER_SOL);
     await provider.connection.confirmTransaction(sig);
     answererAta = await createAccount(provider.connection, payer.payer, usdcMint, answererKp.publicKey);
 
-    // Initialize fee vault PDA token account (one-time setup)
-    const [fv] = feeVaultPda();
-    await program.methods
-      .initFeeVault()
-      .accounts({
-        payer: payer.publicKey,
-        tokenMint: usdcMint,
-        feeVault: fv,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        systemProgram: web3.SystemProgram.programId,
-        rent: web3.SYSVAR_RENT_PUBKEY,
-      })
-      .rpc();
-    console.log("  Fee vault initialized at", fv.toBase58());
+    // Create platform fee ATA — the platform wallet's ATA for USDC.
+    // Using payer as platform wallet (same keypair) for test simplicity.
+    // In production the backend passes its own platform wallet's ATA here.
+    platformFeeAta = await getOrCreateAssociatedTokenAccount(
+      provider.connection,
+      platformKeypair,
+      usdcMint,
+      platformKeypair.publicKey
+    );
+    console.log("  Platform fee ATA:", platformFeeAta.address.toBase58());
+
+    // Initialize fee vault PDA token account (kept for backward compat; optional for submit_answer).
+    // The new submit_answer uses platformFeeAccount (ATA) instead of the fee_vault PDA.
+    // init_fee_vault is still callable (e.g. for reveal_answer / claim_fees flows).
+    const [fv] = web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("fee_vault")],
+      program.programId
+    );
+    try {
+      await program.methods
+        .initFeeVault()
+        .accounts({
+          payer: payer.publicKey,
+          tokenMint: usdcMint,
+          feeVault: fv,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: web3.SystemProgram.programId,
+          rent: web3.SYSVAR_RENT_PUBKEY,
+        })
+        .rpc();
+      console.log("  Fee vault PDA initialized at", fv.toBase58(), "(optional, used by reveal_answer)");
+    } catch (e: any) {
+      // Already initialized or not needed — safe to ignore in tests
+      console.log("  Fee vault PDA skipped:", e.message?.slice(0, 60));
+    }
   });
 
   // ===== CREATE BOUNTY =====
@@ -511,12 +530,12 @@ describe("ao_escrow", () => {
       config.writeBigInt64LE(7n);
       const { bPda, vPda } = await createAndFund("q-fee-math", SMALL, 1, config);
 
-      const [fv] = feeVaultPda();
-      let fvBefore: bigint;
+      // Read the platform fee ATA balance before submission
+      let feeBefore: bigint;
       try {
-        fvBefore = (await getAccount(provider.connection, fv)).amount;
+        feeBefore = (await getAccount(provider.connection, platformFeeAta.address)).amount;
       } catch {
-        fvBefore = 0n;
+        feeBefore = 0n;
       }
 
       const answBefore = (await getAccount(provider.connection, answererAta)).amount;
@@ -524,10 +543,10 @@ describe("ao_escrow", () => {
       await submit(bPda, vPda, "7");
 
       const answAfter = (await getAccount(provider.connection, answererAta)).amount;
-      const fvAfter = (await getAccount(provider.connection, fv)).amount;
+      const feeAfter = (await getAccount(provider.connection, platformFeeAta.address)).amount;
 
       const payout = Number(answAfter) - Number(answBefore);
-      const fee = Number(fvAfter) - Number(fvBefore);
+      const fee = Number(feeAfter) - Number(feeBefore);
 
       assert.equal(payout, 9_900_000);  // $9.90
       assert.equal(fee, 100_000);       // $0.10
