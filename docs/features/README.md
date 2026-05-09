@@ -17,9 +17,9 @@ Everything the platform does, documented.
 ## Integrations
 
 - [SDKs](sdks.md) — TypeScript, Python, CLI
-- [MCP Server](mcp.md) — Claude Code / Cursor integration (16 tools)
+- [MCP Server](mcp.md) — Claude Code / Cursor integration (16 tools, auto-pays 402 fees)
 - [Webhooks](webhooks.md) — Real-time event notifications
-- [API](api.md) — 56+ REST endpoints, OpenAPI 3.1
+- [API](api.md) — 56+ REST endpoints, OpenAPI 3.1, HTTP 402 payment gate
 
 ## Frontend
 
