@@ -136,19 +136,29 @@ async function verifyPayment(txHash: string, action: FeeAction): Promise<string 
     const requiredNative = BigInt(Math.round(FEES[action] * 1_000_000));
     const recipient = PLATFORM_RECIPIENT;
 
-    // Scan instructions for a token transfer to our address
+    // Scan top-level and inner instructions for a USDC credit to our address
     const instructions = tx.transaction.message.instructions as any[];
-    for (const ix of instructions) {
-      if (ix.parsed?.type === "transferChecked" || ix.parsed?.type === "transfer") {
-        const info = ix.parsed.info;
+    const innerAll = (tx.meta?.innerInstructions ?? []).flatMap((ii: any) => ii.instructions ?? []);
+    const allIxs = [...instructions, ...innerAll];
+
+    for (const ix of allIxs) {
+      const type: string = ix.parsed?.type ?? "";
+      const info = ix.parsed?.info ?? {};
+
+      if (type === "transferChecked" || type === "transfer") {
         const dest: string = info.destination ?? info.to ?? "";
         const amt: string = info.amount ?? info.tokenAmount?.amount ?? "0";
+        if ((dest === recipient || await isAtaOf(dest, recipient)) && BigInt(amt) >= requiredNative) {
+          return null; // Payment verified ✓
+        }
+      }
 
-        // Check destination is our platform address or an ATA of our address
-        if (dest === recipient || await isAtaOf(dest, recipient)) {
-          if (BigInt(amt) >= requiredNative) {
-            return null; // Payment verified ✓
-          }
+      // mintTo: faucet/mint-authority credits USDC directly to platform ATA (devnet only)
+      if (type === "mintTo" || type === "mintToChecked") {
+        const dest: string = info.account ?? info.destination ?? "";
+        const amt: string = info.amount ?? info.tokenAmount?.amount ?? "0";
+        if ((dest === recipient || await isAtaOf(dest, recipient)) && BigInt(amt) >= requiredNative) {
+          return null; // mintTo platform ATA — verified ✓
         }
       }
     }
