@@ -9,7 +9,14 @@ const LIMITS = {
 
 function getKey(request: NextRequest): string {
   const auth = request.headers.get("authorization");
-  if (auth?.startsWith("Bearer ")) return `key:${auth.slice(7, 20)}`;
+  if (auth?.startsWith("Bearer ")) {
+    // JWT tokens share the same 36-char header (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9)
+    // so take chars from the payload section (after position 40) for uniqueness.
+    // API keys (ao_XXXXX) are short and unique from position 7.
+    const token = auth.slice(7);
+    const key = token.startsWith("eyJ") ? token.slice(37, 57) : token.slice(0, 20);
+    return `key:${key}`;
+  }
   return `ip:${request.headers.get("x-forwarded-for") || "unknown"}`;
 }
 

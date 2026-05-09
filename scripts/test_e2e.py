@@ -255,6 +255,63 @@ class TestSuite:
         self.check("Wallet balance accessible", ok, f"sol={sol}, usdc={usdc}")
         return data if ok else None
 
+    def step_402_gate(self) -> None:
+        """Test HTTP 402 payment gate on POST /api/questions."""
+        self.section("5b. HTTP 402 payment gate")
+
+        # Case 1: No auth, no payment → must get 402
+        resp = self._session.post(
+            f"{self.base_url}/api/questions",
+            headers={"Content-Type": "application/json"},
+            json={"title": "402 test", "body": "402 test", "tags": []},
+            timeout=30,
+        )
+        self.check(
+            "Unauthenticated POST /questions → 402",
+            resp.status_code == 402,
+            f"status={resp.status_code}",
+        )
+        if resp.status_code == 402:
+            body = resp.json()
+            has_payment = "payment" in body
+            has_www = "www-authenticate" in {k.lower(): v for k, v in resp.headers.items()}
+            has_mpp = "MPP" in resp.headers.get("WWW-Authenticate", "")
+            self.check("402 body contains payment object", has_payment,
+                       f"keys={list(body.keys())}")
+            self.check("402 WWW-Authenticate: MPP header present", has_www and has_mpp,
+                       resp.headers.get("WWW-Authenticate", "")[:60])
+
+        # Case 2: Authenticated user → bypasses 402 (returns 201 or 400 not 402)
+        resp2 = self._post("/api/questions", {
+            "title": f"402 gate bypass test [{int(time.time())}]",
+            "body": "Authenticated users skip the 402 gate.",
+            "tags": ["test"],
+        })
+        self.check(
+            "Authenticated POST /questions → not 402 (gate bypassed)",
+            resp2.status_code != 402,
+            f"status={resp2.status_code}",
+        )
+
+        # Case 3: Fake tx hash → 402 PAYMENT_INVALID
+        resp3 = self._session.post(
+            f"{self.base_url}/api/questions",
+            headers={
+                "Content-Type": "application/json",
+                "X-Payment-Tx": "fakehash1111111111111111111111111111111111111111111111111111111111111111111111111111",
+            },
+            json={"title": "402 test fake tx", "body": "test", "tags": []},
+            timeout=30,
+        )
+        self.check(
+            "Fake X-Payment-Tx → 402 PAYMENT_INVALID",
+            resp3.status_code == 402,
+            f"status={resp3.status_code} code={resp3.json().get('code', '?')}",
+        )
+        if resp3.status_code == 402:
+            code = resp3.json().get("code", "")
+            self.check("Error code is PAYMENT_INVALID", code == "PAYMENT_INVALID", f"code={code}")
+
     def step_post_question(self) -> Optional[str]:
         """Post a test question."""
         self.section("6. Post a question")
@@ -506,7 +563,7 @@ class TestSuite:
             tx_hash = correct_data.get("txHash", "")
             payout = correct_data.get("payout")
             reason_c = correct_data.get("reason") or correct_data.get("error") or ""
-            self.vlog(f"Correct answer '{spec['correct']}': verified={correct_verified} tx={tx_hash[:16]} payout={payout}")
+            self.vlog(f"Correct answer '{spec['correct']}': status={correct_resp.status_code} verified={correct_verified} tx={tx_hash[:16]} payout={payout} reason={reason_c[:60]} body={correct_resp.text[:120] if correct_resp.status_code not in (200,201) else ''}")
             self.check(
                 f"[{name}] Correct answer accepted",
                 correct_verified,
@@ -588,6 +645,9 @@ class TestSuite:
         if usdc < 12:
             print(yellow(f"\n  [!] USDC balance is {usdc} (need ~$12 for 6 bounties at $2 each)"))
             print(yellow("  Continuing — bounty creation may fail if balance is insufficient"))
+
+        # ── 5b. 402 payment gate ──────────────────────────────────────────────
+        self.step_402_gate()
 
         # ── 6. Post question ─────────────────────────────────────────────────
         question_id = self.step_post_question()

@@ -8,7 +8,7 @@ import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import { restoreKeypair } from "@/lib/solana/wallet";
 
 // Faucet config
-const SOL_DRIP = 0.005 * LAMPORTS_PER_SOL; // 0.005 SOL (enough for ~100 txs, 10× cheaper)
+const SOL_DRIP = 0.05 * LAMPORTS_PER_SOL;  // 0.05 SOL (covers 6+ bounty escrows + all txs)
 const USDC_DRIP = 50_000_000;               // $50 USDC (enough for several bounties)
 const COOLDOWN_MS = 24 * 60 * 60 * 1000;  // 1 drip per 24h per user
 
