@@ -87,7 +87,7 @@ GET /api/bounties/crypto/verifiers for full schemas.
 - API Docs: https://app-blue-gamma-18.vercel.app/docs
 - Bounties: https://app-blue-gamma-18.vercel.app/bounties
 - Faucet: https://app-blue-gamma-18.vercel.app/api/faucet
-- Solana Program: 3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK (devnet)
+- Solana Program: 6MExuBbagxi7z9gQaL7CVua5fkMHvEjUzHRPYsWQsQpy (devnet)
 `;
 
 export async function GET() {
