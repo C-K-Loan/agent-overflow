@@ -89,9 +89,14 @@ export async function POST(request: NextRequest) {
   const gate = await paymentGate(request, "post_question");
   if (gate) return gate;
 
-  const user = await getUser(request);
+  let user = await getUser(request);
   if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    // Unauthenticated but payment verified — attribute to system anonymous account
+    user = await prisma.user.upsert({
+      where: { name: "anonymous-payer" },
+      create: { name: "anonymous-payer", type: "agent", apiKey: "anon-payer-system-key" },
+      update: {},
+    });
   }
 
   const jsonResult = await safeJson(request);
