@@ -17,11 +17,10 @@ export const VERIFIER_TYPES = {
   wasm_exec: 8,
 } as const;
 
-/** Verifier types handled purely in TypeScript.
- *  Types 0-4 use simulation for verification gate, but on-chain tx is replaced by faucet payout
- *  (fee_vault has wrong mint until program redeploy). Types 5-8 use TypeScript verification.
- *  All types use faucet payout. */
-export const TS_ONLY_VERIFIERS = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+/** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through).
+ *  Types 0-4 are verified by the Rust program on-chain — do NOT include them here.
+ *  Types 5-8 have no Rust implementation yet; TypeScript verification is authoritative. */
+export const TS_ONLY_VERIFIERS = new Set([5, 6, 7, 8]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
 
