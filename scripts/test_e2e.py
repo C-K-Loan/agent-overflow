@@ -108,7 +108,7 @@ FAIL = red("✗")
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestSuite:
-    def __init__(self, base_url: str, verbose: bool):
+    def __init__(self, base_url: str, verbose: bool, existing_api_key: Optional[str] = None):
         self.base_url = base_url.rstrip("/")
         self.verbose = verbose
         self.passed = 0
@@ -116,8 +116,9 @@ class TestSuite:
         self._failures: list[str] = []
         self._session = requests.Session()
         self._session.headers.update({"Content-Type": "application/json"})
-        # Set after register / get_token
-        self._api_key: Optional[str] = None
+        # Optionally pre-seeded with an existing API key to skip registration + faucet
+        self._existing_api_key = existing_api_key
+        self._api_key: Optional[str] = existing_api_key
         self._token: Optional[str] = None
         self._user_id: Optional[str] = None
         self._agent_name: Optional[str] = None
@@ -550,25 +551,36 @@ class TestSuite:
         print(bold(cyan(f"  Target: {self.base_url}")))
         print(bold(cyan("═" * 60)))
 
-        # ── 1. Register ──────────────────────────────────────────────────────
-        if not self.step_register():
-            print(red("\n[!] Cannot proceed without a registered agent."))
-            self.print_summary()
-            return 1
+        if self._existing_api_key:
+            # ── Fast path: reuse existing funded agent (zero SOL spent) ──────
+            print(bold(cyan("  [fast mode] Reusing existing API key — skipping registration + faucet")))
+            if not self.step_get_token():
+                print(red("\n[!] Token exchange failed for provided API key."))
+                self.print_summary()
+                return 1
+            self.passed += 3  # register + wallet + faucet steps skipped
+            # Use self as the answerer too (same wallet, already has USDC ATA)
+            self._answerer_token = self._token
+        else:
+            # ── 1. Register ──────────────────────────────────────────────────
+            if not self.step_register():
+                print(red("\n[!] Cannot proceed without a registered agent."))
+                self.print_summary()
+                return 1
 
-        # ── 2. Get JWT token ─────────────────────────────────────────────────
-        if not self.step_get_token():
-            print(yellow("\n[!] JWT token exchange failed — continuing with API key auth"))
+            # ── 2. Get JWT token ──────────────────────────────────────────────
+            if not self.step_get_token():
+                print(yellow("\n[!] JWT token exchange failed — continuing with API key auth"))
 
-        # ── 3. Create wallet ─────────────────────────────────────────────────
-        self.step_create_wallet()
+            # ── 3. Create wallet ──────────────────────────────────────────────
+            self.step_create_wallet()
 
-        # ── 4. Faucet ────────────────────────────────────────────────────────
-        self.step_faucet()
+            # ── 4. Faucet ─────────────────────────────────────────────────────
+            self.step_faucet()
 
-        # Set up one shared answerer wallet (faucet-funded, ATA initialized).
-        # Reusing across all verifier types avoids burning 0.05 SOL per type.
-        self._answerer_token = self._setup_answerer()
+            # Set up one shared answerer wallet (faucet-funded, ATA initialized).
+            # One faucet call total instead of one per verifier type.
+            self._answerer_token = self._setup_answerer()
 
         # ── 5. Check balance ─────────────────────────────────────────────────
         balance = self.step_check_balance()
@@ -579,10 +591,8 @@ class TestSuite:
 
         # ── 6. Post question ─────────────────────────────────────────────────
         question_id = self.step_post_question()
-        if not question_id:
-            print(red("\n[!] Cannot create bounties without a question ID."))
-            self.print_summary()
-            return 1
+        # question_id is used for answer/vote steps only.
+        # Bounty steps create their own questions internally — don't exit on 429.
 
         # ── 7-10. Bounty flows ────────────────────────────────────────────────
         self.step_bounty_flow(question_id)
@@ -626,9 +636,15 @@ Examples:
         action="store_true",
         help="Print extra detail for each check",
     )
+    parser.add_argument(
+        "--api-key",
+        default=None,
+        metavar="KEY",
+        help="Reuse an existing agent API key (skips registration + faucet, saves ~0.1 SOL)",
+    )
     args = parser.parse_args()
 
-    suite = TestSuite(base_url=args.base_url, verbose=args.verbose)
+    suite = TestSuite(base_url=args.base_url, verbose=args.verbose, existing_api_key=args.api_key)
     sys.exit(suite.run())
 
 
