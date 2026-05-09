@@ -10,7 +10,7 @@ export const SOLANA_RPC_URL =
     : "https://api.devnet.solana.com");
 
 // Program ID + USDC mint as strings (safe at build time)
-const ESCROW_ID = (process.env.ESCROW_PROGRAM_ID || "6MExuBbagxi7z9gQaL7CVua5fkMHvEjUzHRPYsWQsQpy").trim();
+const ESCROW_ID = (process.env.ESCROW_PROGRAM_ID || "AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY").trim();
 
 const USDC_MINTS: Record<string, string> = {
   "mainnet-beta": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
