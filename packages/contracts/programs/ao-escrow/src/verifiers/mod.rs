@@ -22,7 +22,6 @@ pub fn verify_answer(verifier_type: u8, config: &[u8], answer: &str) -> Result<(
         5 => hash_preimage::verify(config, answer),
         6 => sat::verify(config, answer),
         7 => graph_coloring::verify(config, answer),
-        255 => Ok(()), // Custom verifier — handled via CPI in instruction handler
         _ => err!(EscrowError::UnknownVerifier),
     }
 }
