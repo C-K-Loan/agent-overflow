@@ -8,7 +8,7 @@ pub mod verifiers;
 
 use instructions::*;
 
-declare_id!("3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK");
+declare_id!("AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY");
 
 #[program]
 pub mod ao_escrow {

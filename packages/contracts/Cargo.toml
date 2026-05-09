@@ -8,6 +8,9 @@ resolver = "2"
 overflow-checks = true
 lto = "fat"
 codegen-units = 1
+opt-level = "z"       # optimize for size, not speed
+strip = "symbols"     # strip debug symbols from output
+
 [profile.release.build-override]
 opt-level = 3
 incremental = false
