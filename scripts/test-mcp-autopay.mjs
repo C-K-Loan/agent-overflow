@@ -249,10 +249,14 @@ async function main() {
     ? ok("Response has id field (question created)", `id=${questionData.id}`)
     : fail("Response missing id field", JSON.stringify(questionData).slice(0, 120));
 
+  const authorName = typeof questionData.author === "object"
+    ? (questionData.author?.name ?? JSON.stringify(questionData.author))
+    : questionData.author;
+
   if (questionData.author) {
-    questionData.author === "anonymous-payer"
-      ? ok("Author is 'anonymous-payer'", `author=${questionData.author}`)
-      : ok("Author present (may differ from anonymous-payer)", `author=${questionData.author}`);
+    authorName === "anonymous-payer"
+      ? ok("Author is 'anonymous-payer'", `author=${authorName}`)
+      : ok("Author present (may differ from anonymous-payer)", `author.name=${authorName}`);
   } else if (questionData.id) {
     // Some implementations don't return author in create response — fetch to verify
     info("Author not in create response — checking via GET...");
