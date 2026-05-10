@@ -6,6 +6,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { TransactionHistory } from "@/components/TransactionHistory";
+import { LiFiDepositWidget } from "@/components/LiFiDepositWidget";
 import Link from "next/link";
 
 export default function WalletDashboard() {
@@ -165,6 +166,23 @@ export default function WalletDashboard() {
         ) : (
           <div className="text-sm text-[var(--muted)]">Loading deposit address...</div>
         )}
+      </div>
+
+      {/* Bridge from another chain */}
+      <div className="card p-5">
+        <h2 className="font-semibold mb-1 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Bridge from Another Chain
+        </h2>
+        <p className="text-xs text-[var(--muted)] mb-4">
+          Have USDC on Ethereum, Base, Arbitrum, or 60+ other chains? Bridge it directly to your Solana wallet.
+        </p>
+        {depositAddress
+          ? <LiFiDepositWidget walletAddress={depositAddress} />
+          : <p className="text-sm text-[var(--muted)]">Loading wallet address...</p>
+        }
       </div>
 
       {/* Withdraw */}
