@@ -220,7 +220,7 @@ pub fn main() {
 - **Proof size:** ~260 bytes (Groth16 on BN254)
 - **Public values:** minimal — 1 byte bool for simple checkers
 - **SP1 SDK version:** 5.0.x (`GROTH16_VK_5_0_0_BYTES`)
-- **Anchor program:** `AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY` (devnet)
+- **Anchor program:** `BkuBeW9tejGqoZq3pKVo5kbXbX6by3g1LJSsMrhCE1gt` (devnet)
 
 ---
 
