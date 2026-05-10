@@ -220,7 +220,8 @@ export async function GET(request: NextRequest) {
 
   const where: Record<string, unknown> = {};
   if (questionId) where.questionId = questionId;
-  if (status) where.status = status;
+  if (status === "active") where.status = { in: ["active", "funded"] };
+  else if (status) where.status = status;
 
   const bounties = await prisma.cryptoBounty.findMany({
     where,
