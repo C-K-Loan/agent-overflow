@@ -71,6 +71,22 @@ export async function POST(
   const wallet = await prisma.userWallet.findUnique({ where: { userId: user.id } });
   if (!wallet) return Response.json({ error: "No wallet found. Create one first." }, { status: 400 });
 
+  // ── zk_rust (type 9): proof-based submission ──────────────────────────────
+  // These bounties don't take a text solution — they take a pre-generated ZK proof.
+  // The proof + public_values are passed as separate fields.
+  if (bounty.verifierType === VERIFIER_TYPES.zk_rust) {
+    const body = (jsonResult.data as any);
+    const proofB64: string = body.proof;
+    const publicValuesB64: string = body.publicValues;
+    if (!proofB64 || !publicValuesB64) {
+      return Response.json({
+        error: "zk_rust bounties require 'proof' and 'publicValues' fields (base64), not 'solution'.",
+        hint: "Generate a proof with: aof-zk prove <checker.elf> <your_answer>",
+      }, { status: 400 });
+    }
+    return handleZkRustPayout(bounty, wallet, proofB64, publicValuesB64, id, user.id);
+  }
+
   // ── Step 1: TypeScript pre-verification (fast, free, good UX) ──────────────
   // For types 0-4 this mirrors the Rust on-chain logic exactly.
   // For types 5-8 (type 255 on-chain) this IS the authoritative check.
@@ -257,5 +273,101 @@ async function handleTsOnlyPayout(
   } catch (e: any) {
     console.error("TS-only payout failed:", e);
     return Response.json({ error: `Payout failed: ${e.message}` }, { status: 500 });
+  }
+}
+
+// ── ZK Rust payout (type 9) ──────────────────────────────────────────────────
+// Proof is verified ON-CHAIN by the Anchor program's submit_zk_proof instruction.
+// No trust in server — the chain verifies the SP1 Groth16 proof atomically with payout.
+async function handleZkRustPayout(
+  bounty: any,
+  wallet: any,
+  proofB64: string,
+  publicValuesB64: string,
+  bountyId: string,
+  userId: string
+): Promise<Response> {
+  try {
+    const proof = Buffer.from(proofB64, "base64");
+    const publicValues = Buffer.from(publicValuesB64, "base64");
+
+    if (proof.length < 200 || proof.length > 400) {
+      return Response.json({ error: "Invalid proof size (expected ~260 bytes Groth16 proof)" }, { status: 400 });
+    }
+
+    const answererPubkey = new PublicKey(wallet.publicKey);
+    const bountyPda      = new PublicKey(bounty.escrowPda);
+    const platformKp     = getPlatformFeeKeypair();
+
+    const answererAta    = await getAssociatedTokenAddress(USDC_MINT, answererPubkey);
+    const platformFeeAta = await getOrCreateAssociatedTokenAccount(
+      getConnection(), platformKp, USDC_MINT, platformKp.publicKey
+    );
+
+    // Build the submit_zk_proof instruction
+    const { buildSubmitZkProofIx } = await import("@/lib/solana");
+    const ix = buildSubmitZkProofIx({
+      answerer: answererPubkey,
+      answererAta,
+      bountyPda,
+      platformFeeAccount: platformFeeAta.address,
+      proof: Array.from(proof),
+      publicValues: Array.from(publicValues),
+    });
+
+    // submit_zk_proof needs 400K CU (SP1 Groth16 BN254 pairing = ~280K CU)
+    const { ComputeBudgetProgram } = await import("@solana/web3.js");
+    const budgetIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 });
+
+    // Simulate first — if proof is wrong, catch it cheaply
+    const sim = await simulateTransaction([budgetIx, ix], answererPubkey);
+    if (!sim.success) {
+      const isWrong = sim.error?.includes("VerificationFailed") || sim.logs?.some(l => l.includes("VerificationFailed"));
+      const reason = isWrong ? "ZK proof verification failed — wrong answer" : `Simulation failed: ${sim.error}`;
+      await prisma.bountyAttempt.create({
+        data: { bountyId, userId, solution: "zk_proof", verified: false, reason },
+      });
+      return Response.json({ verified: false, reason });
+    }
+
+    // Proof valid — broadcast. Solver's custodial key pays tx fee.
+    const solverKeypair = restoreKeypair(wallet.encryptedSecret);
+    const txHash = await sendAndConfirm([budgetIx, ix], solverKeypair);
+
+    const { fee, payout } = calculateFee(bounty.amount);
+
+    await prisma.$transaction([
+      prisma.cryptoBounty.update({
+        where: { id: bountyId },
+        data: { status: "awarded", answererId: userId, awardTxHash: txHash, platformFee: fee },
+      }),
+      prisma.bountyAttempt.create({
+        data: { bountyId, userId, solution: "zk_proof", verified: true, txHash },
+      }),
+      prisma.paymentLog.create({
+        data: {
+          type: "bounty_awarded", amount: payout, token: "USDC",
+          fromWallet: bounty.vaultPda, toWallet: wallet.publicKey, txHash, bountyId, userId,
+        },
+      }),
+    ]);
+
+    fireWebhooks(bounty.askerId, "bounty.crypto.awarded", {
+      bountyId, answererId: userId, payout: nativeToUsdc(payout), fee: nativeToUsdc(fee), txHash,
+    });
+
+    return Response.json({
+      verified: true, txHash,
+      payout: nativeToUsdc(payout),
+      fee: nativeToUsdc(fee),
+      explorerUrl: explorerUrl(txHash),
+      verifiedBy: "on-chain-zk",
+    });
+  } catch (e: any) {
+    if (e.message?.includes("BountyNotActive") || e.message?.includes("SelfSolve")) {
+      return Response.json({ error: e.message }, { status: 409 });
+    }
+    console.error("ZK Rust payout failed:", e);
+    return Response.json({ error: `ZK proof submission failed: ${e.message}` }, { status: 500 });
   }
 }

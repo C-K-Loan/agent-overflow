@@ -54,14 +54,15 @@ export function hashQuestionId(questionId: string): Buffer {
 // ===== Instruction Discriminators (precomputed) =====
 
 const DISC = {
-  createBounty: Buffer.from([122, 90, 14, 143, 8, 125, 200, 2]),
-  fundBounty: Buffer.from([36, 148, 139, 239, 172, 37, 58, 255]),
-  submitAnswer: Buffer.from([221, 73, 184, 157, 1, 150, 231, 48]),
-  commitAnswer: Buffer.from([119, 52, 56, 79, 116, 29, 97, 31]),
-  revealAnswer: Buffer.from([238, 203, 43, 175, 46, 127, 5, 50]),
-  refund: Buffer.from([2, 96, 183, 251, 63, 208, 46, 46]),
-  claimFees: Buffer.from([82, 251, 233, 156, 12, 52, 184, 202]),
-  initFeeVault: Buffer.from([141, 17, 88, 209, 137, 84, 89, 235]),
+  createBounty:    Buffer.from([122, 90, 14, 143, 8, 125, 200, 2]),
+  fundBounty:      Buffer.from([36, 148, 139, 239, 172, 37, 58, 255]),
+  submitAnswer:    Buffer.from([221, 73, 184, 157, 1, 150, 231, 48]),
+  submitZkProof:   Buffer.from([122, 214, 244, 236, 103, 242, 4, 166]),
+  commitAnswer:    Buffer.from([119, 52, 56, 79, 116, 29, 97, 31]),
+  revealAnswer:    Buffer.from([238, 203, 43, 175, 46, 127, 5, 50]),
+  refund:          Buffer.from([2, 96, 183, 251, 63, 208, 46, 46]),
+  claimFees:       Buffer.from([82, 251, 233, 156, 12, 52, 184, 202]),
+  initFeeVault:    Buffer.from([141, 17, 88, 209, 137, 84, 89, 235]),
 };
 
 // ===== Borsh Encoding Helpers =====
@@ -184,6 +185,40 @@ export function buildSubmitAnswerIx(params: {
       });
     },
   };
+}
+
+/** Build submit_zk_proof instruction (type 9 — SP1 Groth16 on-chain verification) */
+export function buildSubmitZkProofIx(params: {
+  answerer: PublicKey;
+  answererAta: PublicKey;
+  bountyPda: PublicKey;
+  platformFeeAccount: PublicKey;
+  proof: number[];        // ~260 byte Groth16 proof
+  publicValues: number[]; // SP1 public values (contains the bool result)
+}): TransactionInstruction {
+  const [vaultPda] = findVaultPda(params.bountyPda);
+
+  // Borsh-encode: proof (Vec<u8>) then public_values (Vec<u8>)
+  const proofBuf = Buffer.from(params.proof);
+  const pubValBuf = Buffer.from(params.publicValues);
+  const data = Buffer.concat([
+    DISC.submitZkProof,
+    encodeBytes(proofBuf),
+    encodeBytes(pubValBuf),
+  ]);
+
+  return new TransactionInstruction({
+    programId: ESCROW_PROGRAM_ID,
+    keys: [
+      { pubkey: params.bountyPda,          isSigner: false, isWritable: true  },
+      { pubkey: vaultPda,                  isSigner: false, isWritable: true  },
+      { pubkey: params.answererAta,        isSigner: false, isWritable: true  },
+      { pubkey: params.platformFeeAccount, isSigner: false, isWritable: true  },
+      { pubkey: params.answerer,           isSigner: true,  isWritable: true  },
+      { pubkey: TOKEN_PROGRAM_ID,          isSigner: false, isWritable: false },
+    ],
+    data,
+  });
 }
 
 /** Build refund instruction */
