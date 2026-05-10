@@ -1,15 +1,29 @@
 # LI.FI Integration — Task Spec
 
+## Status: ✅ All 4 parts shipped
+
+All parts below are already implemented. No further dev work needed for submission.
+
 ## Who builds what
 
-| Part | Owner |
-|------|-------|
-| Backend quote endpoint (`/api/wallet/bridge-quote`) | **Backend dev** |
-| Frontend: "insufficient balance" bridge nudge in bounty form | **Frontend dev** |
-| Frontend: LI.FI widget on wallet page | **Frontend dev** |
-| SKILL.md + MCP config update | **Frontend dev** (2 lines) |
+**Frontend dev only. No backend, no Anchor changes.**
 
-No Solana/Anchor program changes needed. This is purely application layer.
+| Part | Effort | Status |
+|------|--------|--------|
+| LI.FI widget on wallet page | 1 hr | ✅ Done |
+| SKILL.md + MCP config mention | 5 min | ✅ Done |
+| Backend bridge-quote endpoint | 2 hrs | ✅ Done (bonus) |
+| Insufficient balance nudge in bounty form | 1 hr | ✅ Done (bonus) |
+
+That's it. Everything else is post-hackathon.
+
+---
+
+## Important constraints
+
+- **Mainnet only** — LI.FI does not support Solana devnet as a bridge destination. This integration only works on mainnet. For the hackathon submission: show the UI and the quote API, don't attempt a live bridge demo.
+- **Bridge delay** — Cross-chain bridging takes 1–30 minutes regardless of implementation. There is no way to make this instant. Don't attempt to demo a live bridge execution during judging — show the UI instead.
+- **Demo strategy** — Screenshot the widget on `/wallet`, submit to Superteam Earn with the live URL. Judges want to see the integration exists, not watch a 10-minute bridge confirmation.
 
 ---
 
@@ -198,15 +212,15 @@ GET /api/wallet/bridge-quote?fromChain=eth&fromToken=USDC&amount=50
 
 ## Priority order
 
-| Part | Owner | Effort | Required to qualify |
-|------|-------|--------|-------------------|
-| 1 — Bridge quote endpoint | Backend | 2 hrs | Nice-to-have |
-| 2 — Widget on wallet page | Frontend | 2 hrs | **YES — minimum viable** |
-| 3 — Insufficient balance nudge | Frontend | 1 hr | **YES — shows depth** |
-| 4 — SKILL.md update | Frontend | 5 min | Yes — quick win |
+| Part | Effort | Ship? |
+|------|--------|-------|
+| Widget on wallet page | 1 hr | **YES — do this** |
+| SKILL.md + MCP mention | 5 min | **YES — do this** |
+| Backend bridge-quote endpoint | 2 hrs | Post-hackathon |
+| Insufficient balance nudge in bounty form | 1 hr | Post-hackathon |
+| Async auto-fund on bridge arrival | 2 days | Post-launch (mainnet feature) |
 
-**Ship Part 2 + 3 first.** They're both frontend-only, no backend dependency.
-Part 1 is optional for qualifying but makes the integration deeper.
+**For the hackathon: only the widget + SKILL.md. Everything else is scope creep.**
 
 ---
 
