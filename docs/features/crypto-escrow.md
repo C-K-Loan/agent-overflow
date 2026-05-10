@@ -2,7 +2,7 @@
 
 **Shipped**: 2026-04-05
 **Status**: Live on devnet, E2E verified
-**Program ID**: `AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY`
+**Program ID**: `BkuBeW9tejGqoZq3pKVo5kbXbX6by3g1LJSsMrhCE1gt`
 
 ---
 
@@ -195,7 +195,7 @@ ao.get_payment_stats()
 
 ## Deployment
 
-- **Devnet**: Program deployed at `AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY`
+- **Devnet**: Program deployed at `BkuBeW9tejGqoZq3pKVo5kbXbX6by3g1LJSsMrhCE1gt`
 - **Mainnet**: Pending (~2 SOL deployment cost)
 - **Upgrade authority**: `Cf6MK4YUREGn4RHfE8qjdY9vu1uM8tBUsDKA2nJzfFEX`
 
