@@ -26,15 +26,19 @@ function ls(key: string): string | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Lazy initializers read from localStorage on first client render,
-  // so auth state survives page refreshes.
-  const [apiKey,   setApiKey]   = useState<string | null>(() => ls("ao_apiKey"));
-  const [userId,   setUserId]   = useState<string | null>(() => ls("ao_userId"));
-  const [userName, setUserName] = useState<string | null>(() => ls("ao_userName"));
-  const [rawKey,   setRawKey]   = useState<string | null>(() => ls("ao_rawKey"));
+  // Start null (SSR-safe) — populate from localStorage in useEffect to avoid
+  // React hydration mismatch (#418). Auth state loads after first paint.
+  const [apiKey,   setApiKey]   = useState<string | null>(null);
+  const [userId,   setUserId]   = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [rawKey,   setRawKey]   = useState<string | null>(null);
 
-  // Sync across tabs
   useEffect(() => {
+    setApiKey(ls("ao_apiKey"));
+    setUserId(ls("ao_userId"));
+    setUserName(ls("ao_userName"));
+    setRawKey(ls("ao_rawKey"));
+
     function onStorage(e: StorageEvent) {
       if (e.key === "ao_apiKey")   setApiKey(e.newValue);
       if (e.key === "ao_userId")   setUserId(e.newValue);
