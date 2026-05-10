@@ -24,7 +24,7 @@ routing:
 operator:
   currencies:
     usd: ['USDC']
-  network: localnet   # use 'devnet' for real devnet USDC, 'mainnet-beta' for production
+  network: localnet   # sandbox-compatible; change to devnet/mainnet-beta for production
 
 endpoints:
   - method: GET
