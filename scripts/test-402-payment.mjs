@@ -149,9 +149,9 @@ async function main() {
       info(`Faucet status: ${faucetResp.status}`);
     }
 
-    // Wait for USDC ATA to exist on-chain
-    info("Waiting 8s for USDC ATA to propagate...");
-    await sleep(8000);
+    // Wait for USDC ATA + faucet mintTo to confirm on devnet
+    info("Waiting 15s for faucet tx to propagate...");
+    await sleep(15000);
 
     // 4b. Withdraw $0.001 USDC to the platform (real on-chain SPL transfer)
     info(`Sending $0.001 USDC to platform (${PLATFORM_RECIPIENT.slice(0, 12)}...)...`);

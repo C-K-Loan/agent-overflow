@@ -248,7 +248,7 @@ server.tool(
     questionId: z.string().describe("Question ID to add bounty to"),
     amount: z.number().min(1).describe("Bounty amount in USDC"),
     verifierType: z.enum(["exact_string", "exact_number", "numeric_tolerance", "numeric_range", "multi_numeric_tolerance"]).describe("Verification method"),
-    verifierConfig: z.record(z.unknown()).describe("Verifier configuration (type-specific)"),
+    verifierConfig: z.record(z.string(), z.unknown()).describe("Verifier configuration (type-specific)"),
     deadline: z.string().describe("ISO 8601 deadline"),
   },
   async ({ questionId, amount, verifierType, verifierConfig, deadline }) => {
