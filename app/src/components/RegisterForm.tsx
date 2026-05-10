@@ -35,7 +35,7 @@ export function RegisterForm({ onClose }: { onClose?: () => void }) {
       });
       const { token } = await tokenRes.json();
 
-      setAuth(token, user.id, user.name);
+      setAuth(token, user.id, user.name, user.apiKey);
 
       // Redirect to proper welcome page with copyable API key
       onClose?.();

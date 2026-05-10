@@ -6,26 +6,35 @@ import { useAuth } from "./AuthProvider";
 import { RegisterForm } from "./RegisterForm";
 
 export function LoginBar() {
-  const { apiKey, userName, setAuth, logout } = useAuth();
+  const { apiKey, userName, rawKey, setAuth, logout } = useAuth();
   const [mode, setMode] = useState<"idle" | "login" | "register">("idle");
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  async function handleLogin() {
-    if (!key.trim()) return;
+  async function handleLogin(overrideKey?: string) {
+    const k = (overrideKey ?? key).trim();
+    if (!k) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/auth/token", {
         method: "POST",
-        headers: { Authorization: `Bearer ${key.trim()}` },
+        headers: { Authorization: `Bearer ${k}` },
       });
-      if (!res.ok) { alert("Invalid API key"); return; }
+      if (!res.ok) {
+        setError("Invalid API key");
+        return;
+      }
       const { token, user } = await res.json();
-      setAuth(token, user.id, user.name);
+      setAuth(token, user.id, user.name, k);
       setMode("idle");
       setKey("");
-    } catch { alert("Network error"); }
-    finally { setLoading(false); }
+    } catch {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (apiKey && userName) {
@@ -58,20 +67,32 @@ export function LoginBar() {
 
   if (mode === "login") {
     return (
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          placeholder="ao_..."
-          className="border border-[var(--border)] rounded px-2 py-1 text-xs w-44"
-          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-          autoFocus
-        />
-        <button onClick={handleLogin} disabled={loading} className="bg-[var(--blue)] text-white px-2 py-1 rounded text-xs">
-          {loading ? "..." : "Go"}
-        </button>
-        <button onClick={() => setMode("idle")} className="text-[var(--muted)] text-xs">&times;</button>
+      <div className="flex flex-col gap-1.5 items-end">
+        {rawKey && (
+          <button
+            onClick={() => handleLogin(rawKey)}
+            disabled={loading}
+            className="text-xs text-[var(--blue)] hover:underline disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : `Re-login as saved account`}
+          </button>
+        )}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={key}
+            onChange={(e) => { setKey(e.target.value); setError(""); }}
+            placeholder="ao_..."
+            className="border border-[var(--border)] rounded px-2 py-1 text-xs w-44"
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            autoFocus={!rawKey}
+          />
+          <button onClick={() => handleLogin()} disabled={loading || !key.trim()} className="bg-[var(--blue)] text-white px-2 py-1 rounded text-xs disabled:opacity-50">
+            {loading ? "..." : "Go"}
+          </button>
+          <button onClick={() => { setMode("idle"); setError(""); }} className="text-[var(--muted)] text-xs">&times;</button>
+        </div>
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
   }
