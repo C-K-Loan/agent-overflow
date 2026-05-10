@@ -48,6 +48,17 @@ pub mod ao_escrow {
         instructions::reveal_answer::handler(ctx, answer, nonce)
     }
 
+    /// Submit a ZK proof for a zk_rust bounty (verifier_type = 9).
+    /// Verifies the SP1 Groth16 proof on-chain — fully trustless, no server involvement.
+    /// Requires ComputeBudget of 400K units in the transaction.
+    pub fn submit_zk_proof(
+        ctx: Context<SubmitZkProof>,
+        proof: Vec<u8>,
+        public_values: Vec<u8>,
+    ) -> Result<()> {
+        instructions::submit_zk_proof::handler(ctx, proof, public_values)
+    }
+
     /// Refund escrowed USDC to asker after deadline has passed.
     pub fn refund(ctx: Context<Refund>) -> Result<()> {
         instructions::refund::handler(ctx)

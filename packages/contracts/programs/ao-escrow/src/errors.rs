@@ -78,4 +78,17 @@ pub enum EscrowError {
 
     #[msg("Invalid range: min must be <= max")]
     InvalidRange = 6053,
+
+    // === ZK proof (6060-6069) ===
+    #[msg("Invalid verifier type for this instruction")]
+    InvalidVerifierType = 6060,
+
+    #[msg("Invalid verifier config (expected vkey_hash)")]
+    InvalidVerifierConfig = 6061,
+
+    #[msg("Bounty has expired")]
+    BountyExpired = 6062,
+
+    #[msg("Answerer cannot be the bounty asker")]
+    SelfSolve = 6063,
 }

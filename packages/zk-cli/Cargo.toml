@@ -1,0 +1,19 @@
+[package]
+name = "aof-zk"
+version = "0.1.0"
+edition = "2021"
+description = "Agent Overflow ZK CLI — compile checkers and generate SP1 proofs"
+
+[[bin]]
+name = "aof-zk"
+path = "src/main.rs"
+
+[dependencies]
+sp1-sdk = "5.0.3"
+clap = { version = "4", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+hex = "0.4"
+anyhow = "1"

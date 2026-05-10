@@ -10,8 +10,8 @@ pub enum BountyStatus {
 
 /// Max verifier config size. Sized to fit BPF stack (4096 byte limit).
 /// Supports: exact_string(32B), exact_number(8B), tolerance(16B), range(16B),
-/// multi_numeric up to ~3 vars (3 * (1+8+8+8) = ~75B but we cap at 64).
-pub const VERIFIER_CONFIG_SIZE: usize = 64;
+/// multi_numeric up to ~3 vars (~75B), zk_rust vkeyHash (66B: "0x" + 64 hex).
+pub const VERIFIER_CONFIG_SIZE: usize = 96;
 
 #[account]
 #[derive(InitSpace)]
