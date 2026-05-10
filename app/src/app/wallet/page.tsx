@@ -176,9 +176,14 @@ export default function WalletDashboard() {
           </svg>
           Bridge from Another Chain
         </h2>
-        <p className="text-xs text-[var(--muted)] mb-4">
+        <p className="text-xs text-[var(--muted)] mb-3">
           Have USDC on Ethereum, Base, Arbitrum, or 60+ other chains? Bridge it directly to your Solana wallet.
         </p>
+        {process.env.NEXT_PUBLIC_SOLANA_NETWORK !== "mainnet-beta" && (
+          <div className="rounded-lg border px-3 py-2 text-xs mb-4" style={{ borderColor: "#F4822540", background: "#F4822508", color: "#F48225" }}>
+            ⚠️ Cross-chain bridging requires mainnet. This widget is shown for preview — live bridging will be available at launch.
+          </div>
+        )}
         {depositAddress
           ? <LiFiDepositWidget walletAddress={depositAddress} />
           : <p className="text-sm text-[var(--muted)]">Loading wallet address...</p>
