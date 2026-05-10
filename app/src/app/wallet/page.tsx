@@ -18,6 +18,8 @@ export default function WalletDashboard() {
   const [solBalance, setSolBalance] = useState<number | null>(null);
   const [usdcBalance, setUsdcBalance] = useState<number | null>(null);
   const [depositAddress, setDepositAddress] = useState<string | null>(null);
+  const [noWallet, setNoWallet] = useState(false);
+  const [creatingWallet, setCreatingWallet] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const [withdrawDest, setWithdrawDest] = useState("");
@@ -40,10 +42,29 @@ export default function WalletDashboard() {
       .catch(() => {});
 
     fetch("/api/wallet/deposit", { headers: { Authorization: `Bearer ${apiKey}` } })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => {
+        if (r.status === 404) { setNoWallet(true); return null; }
+        return r.ok ? r.json() : null;
+      })
       .then((data) => { if (data?.address) setDepositAddress(data.address); })
       .catch(() => {});
   }, [apiKey]);
+
+  async function createWallet() {
+    setCreatingWallet(true);
+    try {
+      const res = await fetch("/api/wallet/create", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      const data = await res.json();
+      if (res.ok && data.publicKey) {
+        setDepositAddress(data.publicKey);
+        setNoWallet(false);
+      }
+    } catch {}
+    setCreatingWallet(false);
+  }
 
   function copyAddress() {
     if (!depositAddress) return;
@@ -123,6 +144,14 @@ export default function WalletDashboard() {
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
+        ) : noWallet ? (
+          <div className="space-y-2">
+            <p className="text-sm text-[var(--muted)]">No platform wallet found. Create one to get a deposit address.</p>
+            <button onClick={createWallet} disabled={creatingWallet}
+              className="btn-primary bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">
+              {creatingWallet ? "Creating..." : "Create Platform Wallet"}
+            </button>
+          </div>
         ) : (
           <p className="text-sm text-[var(--muted)]">Loading deposit address...</p>
         )}
@@ -146,6 +175,8 @@ export default function WalletDashboard() {
         )}
         {depositAddress
           ? <LiFiDepositWidget walletAddress={depositAddress} />
+          : noWallet
+          ? <p className="text-sm text-[var(--muted)]">Create a platform wallet above to use the bridge.</p>
           : <p className="text-sm text-[var(--muted)]">Loading wallet address...</p>
         }
       </div>
