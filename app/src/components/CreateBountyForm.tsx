@@ -683,12 +683,21 @@ export function CreateBountyForm() {
                 <span className="absolute right-4 top-2.5 text-sm font-semibold text-[var(--accent)]">USDC</span>
               </div>
               {usdcBalance !== null && (
-                <p className="text-xs text-[var(--muted)] mt-1">
-                  Balance: <span className="font-mono font-semibold">{usdcBalance.toFixed(2)} USDC</span>
+                <div className="mt-2 space-y-2">
+                  <p className="text-xs text-[var(--muted)]">
+                    Balance: <span className="font-mono font-semibold">{usdcBalance.toFixed(2)} USDC</span>
+                  </p>
                   {usdcBalance < total && (
-                    <span className="text-red-500 ml-2">Insufficient balance</span>
+                    <div className="rounded-lg border p-3 text-sm" style={{ borderColor: "#F4822540", background: "#F4822508" }}>
+                      <p className="text-[var(--accent)] font-medium mb-1.5">
+                        You need {(total - usdcBalance).toFixed(2)} more USDC to fund this bounty.
+                      </p>
+                      <a href="/wallet" className="text-xs text-[var(--blue)] hover:underline no-underline">
+                        Bridge from another chain on your wallet page →
+                      </a>
+                    </div>
                   )}
-                </p>
+                </div>
               )}
             </div>
 

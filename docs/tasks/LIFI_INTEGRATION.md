@@ -1,195 +1,228 @@
 # LI.FI Integration — Task Spec
 
-## Why this matters
+## Who builds what
 
-Agent Overflow currently requires Solana USDC to fund bounties. That means:
-- Agents with ETH, USDC on Base, or any non-Solana asset are locked out
-- Human users need to already be in the Solana ecosystem
-- The bounty system is chain-gated, not talent-gated
+| Part | Owner |
+|------|-------|
+| Backend quote endpoint (`/api/wallet/bridge-quote`) | **Backend dev** |
+| Frontend: "insufficient balance" bridge nudge in bounty form | **Frontend dev** |
+| Frontend: LI.FI widget on wallet page | **Frontend dev** |
+| SKILL.md + MCP config update | **Frontend dev** (2 lines) |
 
-LI.FI removes this. An agent with ETH on Ethereum, USDC on Arbitrum, or SOL on Solana
-can fund a bounty or collect a payout in one step. Cross-chain becomes invisible.
-
-This also directly qualifies for the LI.FI Hackathon Track (1st place: 1500 USDC).
+No Solana/Anchor program changes needed. This is purely application layer.
 
 ---
 
-## Judging criteria alignment
+## Why / Prize
 
-| Criterion | Our angle |
-|-----------|-----------|
-| Real world usefulness | Removes the #1 onboarding barrier: "I don't have Solana USDC" |
-| Depth of integration | LI.FI powers the entire deposit/withdrawal flow, not just a widget |
-| UX | One-click bridge from any chain — user never touches a DEX or bridge manually |
-| AI agent integration | LI.FI has an MCP server — agents can bridge funds autonomously via tool call |
-| Post-hackathon potential | Cross-chain payments are table stakes for any serious agent economy |
+The #1 onboarding friction: new users don't have Solana USDC.
+With LI.FI, a user with ETH on Ethereum or USDC on Base can fund a bounty in one step — no manual bridging.
+
+Qualifies for **LI.FI Hackathon Track: 1st place 1500 USDC** (separate from Colosseum).
+Submit via Superteam Earn (different form, 10 minutes extra).
+
+---
+
+## Core idea (simple version)
+
+When a user creates a bounty and doesn't have enough Solana USDC:
+
+1. Show "Bridge from another chain" button in the form
+2. Opens LI.FI widget pre-configured: destination = their Solana platform wallet, token = USDC
+3. User bridges from wherever they have funds
+4. USDC arrives in their platform wallet
+5. They proceed to fund the bounty
+
+That's it. Minimum viable. Qualifies for the track.
 
 ---
 
 ## What to build
 
-### Phase 1 — Cross-chain deposit widget (must-have, ~3 hours)
+### Part 1 — Backend: bridge quote endpoint (backend dev, ~2 hrs)
 
-Embed the LI.FI widget in the wallet page (`app/src/app/wallet/page.tsx`) so users
-can bridge from ANY chain to Solana USDC in one click.
+**New file:** `app/src/app/api/wallet/bridge-quote/route.ts`
+
+```typescript
+// GET /api/wallet/bridge-quote?fromChain=eth&fromToken=USDC&amount=50
+// Returns LI.FI route options for bridging to Solana USDC into the user's platform wallet
+
+import { getUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { type NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const user = await getUser(request);
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const wallet = await prisma.userWallet.findUnique({ where: { userId: user.id } });
+  if (!wallet) return Response.json({ error: "No wallet found" }, { status: 404 });
+
+  const { searchParams } = request.nextUrl;
+  const fromChain = searchParams.get("fromChain") ?? "eth";
+  const fromToken = searchParams.get("fromToken") ?? "USDC";
+  const amount    = searchParams.get("amount") ?? "10";
+
+  // Call LI.FI REST API for a quote
+  const res = await fetch(
+    `https://li.quest/v1/quote?` +
+    `fromChain=${fromChain}&toChain=sol` +
+    `&fromToken=${fromToken}&toToken=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` +
+    `&fromAmount=${parseFloat(amount) * 1_000_000}` +
+    `&toAddress=${wallet.publicKey}` +
+    `&integrator=agent-overflow`,
+    { headers: { "Content-Type": "application/json" } }
+  );
+
+  if (!res.ok) return Response.json({ error: "Bridge quote unavailable" }, { status: 502 });
+  const quote = await res.json();
+
+  return Response.json({
+    toAddress: wallet.publicKey,
+    estimatedOutput: quote.estimate?.toAmount,
+    estimatedTime:   quote.estimate?.executionDuration,
+    tool:            quote.tool,
+    route:           quote, // full quote for SDK execution
+  });
+}
+```
+
+---
+
+### Part 2 — Frontend: LI.FI widget on wallet page (frontend dev, ~2 hrs)
 
 **Install:**
 ```bash
-npm install @lifi/widget @lifi/sdk
+cd app && npm install @lifi/widget
 ```
 
-**Component:**
+**New component:** `app/src/components/LiFiDepositWidget.tsx`
+
 ```tsx
-// app/src/components/LiFiDepositWidget.tsx
 "use client";
 import { LiFiWidget, WidgetConfig } from "@lifi/widget";
 
-const config: WidgetConfig = {
-  toChain: 1151111081099710,     // Solana chain ID in LI.FI
-  toToken: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC mainnet
-  toAddress: {
-    address: userWalletAddress,  // pre-fill with user's platform wallet
-    isRequired: true,
-  },
-  variant: "compact",
-  appearance: "dark",
-  theme: {
-    palette: {
-      primary: { main: "#F48225" },  // Agent Overflow accent
-      background: { default: "#0a0a0a", paper: "#111111" },
-    },
-  },
-  hiddenUI: ["history", "poweredBy"],
-};
+const SOLANA_USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const SOLANA_CHAIN_ID = 1151111081099710;
 
 export function LiFiDepositWidget({ walletAddress }: { walletAddress: string }) {
-  return <LiFiWidget config={{ ...config, toAddress: { address: walletAddress, isRequired: true } }} integrator="agent-overflow" />;
+  const config: WidgetConfig = {
+    toChain:   SOLANA_CHAIN_ID,
+    toToken:   SOLANA_USDC,
+    toAddress: { address: walletAddress, isRequired: true },
+    variant:   "compact",
+    appearance: "dark",
+    theme: {
+      palette: {
+        primary:    { main: "#F48225" },
+        background: { default: "#0a0a0a", paper: "#111111" },
+      },
+    },
+    hiddenUI: ["history", "poweredBy"],
+    integrator: "agent-overflow",
+  };
+
+  return <LiFiWidget config={config} />;
 }
 ```
 
-Add to wallet page below the existing deposit address section.
+**In `app/src/app/wallet/page.tsx`** — add below the existing Deposit section:
 
----
+```tsx
+import { LiFiDepositWidget } from "@/components/LiFiDepositWidget";
 
-### Phase 2 — Cross-chain bounty payout (nice-to-have, ~4 hours)
-
-When a bounty is awarded, let the winner choose which chain to receive payment on.
-LI.FI bridges from Solana USDC to whatever they want.
-
-**Flow:**
-1. Solver wins bounty → server holds USDC in platform wallet
-2. Solver calls `POST /api/wallet/withdraw` with `{ destination, chain, token }` instead of just Solana address
-3. Server calls LI.FI API to get a bridge quote, executes the transaction
-4. Solver receives funds on their preferred chain
-
-**API call (server-side):**
-```typescript
-// app/src/lib/lifi.ts
-import { createConfig, getQuote, executeRoute } from "@lifi/sdk";
-
-createConfig({ integrator: "agent-overflow" });
-
-export async function bridgeToChain(
-  fromWalletSecret: string,
-  toAddress: string,
-  toChain: number,
-  toToken: string,
-  amountUSDC: number
-) {
-  const quote = await getQuote({
-    fromChain: "SOL",
-    toChain,
-    fromToken: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    toToken,
-    fromAmount: String(amountUSDC * 1_000_000),
-    fromAddress: platformWalletAddress,
-    toAddress,
-  });
-
-  return executeRoute(quote.routes[0], { /* signer config */ });
-}
+// After the existing deposit address card:
+<div className="card p-5">
+  <h2 className="font-semibold mb-3">Bridge from Another Chain</h2>
+  <p className="text-xs text-[var(--muted)] mb-4">
+    Don't have Solana USDC? Bridge from Ethereum, Base, Arbitrum, or 60+ other chains.
+  </p>
+  {depositAddress && <LiFiDepositWidget walletAddress={depositAddress} />}
+</div>
 ```
 
 ---
 
-### Phase 3 — LI.FI MCP server integration (agent-native angle, ~2 hours)
+### Part 3 — Frontend: "insufficient balance" nudge in bounty creation (frontend dev, ~1 hr)
 
-This is the narrative win for the hackathon. Agents can bridge funds autonomously
-without any human interaction — via MCP tool calls.
+**In `app/src/components/CreateBountyForm.tsx`** — in Step 4 (Fund Bounty), when `usdcBalance < total`:
 
-Add LI.FI's MCP server to the Agent Overflow MCP config so agents using the platform
-can manage their own cross-chain balances as part of the same session.
+Replace the current "Insufficient balance" text with:
 
-**MCP config addition:**
-```json
+```tsx
+{usdcBalance !== null && usdcBalance < total && (
+  <div className="rounded-lg border p-3 text-sm" style={{ borderColor: "#F4822540", background: "#F4822508" }}>
+    <p className="text-[var(--accent)] font-medium mb-2">
+      You need {(total - usdcBalance).toFixed(2)} more USDC to fund this bounty.
+    </p>
+    <a
+      href="/wallet"
+      className="text-xs text-[var(--blue)] hover:underline"
+    >
+      Bridge from another chain on your wallet page →
+    </a>
+  </div>
+)}
+```
+
+This is deliberately simple — just a link to the wallet page where the full widget lives.
+No need to embed the widget inline in the form.
+
+---
+
+### Part 4 — SKILL.md update (frontend dev, 5 min)
+
+In `app/src/app/SKILL.md/route.ts`, add to the wallet section:
+
+```markdown
+## Funding your wallet from another chain
+
+Agent Overflow supports cross-chain deposits via LI.FI.
+If your agent has USDC on Ethereum, Base, Arbitrum, or 60+ other chains,
+it can bridge to Solana USDC automatically.
+
+Use the LI.FI MCP server alongside Agent Overflow:
+\`\`\`json
 {
   "mcpServers": {
-    "agent-overflow": { "...": "existing config" },
-    "lifi": {
-      "command": "npx",
-      "args": ["-y", "@lifi/mcp-server"],
-      "env": { "LIFI_INTEGRATOR": "agent-overflow" }
-    }
+    "lifi": { "command": "npx", "args": ["-y", "@lifi/mcp-server"], "env": { "LIFI_INTEGRATOR": "agent-overflow" } }
   }
 }
+\`\`\`
+
+Or call the bridge quote endpoint:
+GET /api/wallet/bridge-quote?fromChain=eth&fromToken=USDC&amount=50
 ```
-
-Document in `/SKILL.md` that agents can use LI.FI tools to fund their wallets from any chain.
-
----
-
-### Phase 4 — Register on skills.sh (30 min)
-
-LI.FI has agent skills at skills.sh. Register Agent Overflow there alongside the
-LI.FI integration — it's another discovery surface for agents.
-
----
-
-## Files to change
-
-| File | Change |
-|------|--------|
-| `app/package.json` | Add `@lifi/widget`, `@lifi/sdk` |
-| `app/src/components/LiFiDepositWidget.tsx` | New component (Phase 1) |
-| `app/src/app/wallet/page.tsx` | Add LiFiDepositWidget below deposit section |
-| `app/src/lib/lifi.ts` | New LI.FI SDK wrapper (Phase 2) |
-| `app/src/app/api/wallet/withdraw/route.ts` | Add cross-chain withdrawal via LI.FI (Phase 2) |
-| `app/src/app/SKILL.md/route.ts` | Mention LI.FI MCP integration |
-| `docs/marketing/ACCOUNTS.md` | Add skills.sh registration |
 
 ---
 
 ## Priority order
 
-| Phase | Effort | Must-have for judging? |
-|-------|--------|----------------------|
-| 1 — Deposit widget | 3 hrs | YES — minimum viable integration |
-| 3 — MCP server | 2 hrs | YES — killer angle for AI agent track |
-| 2 — Cross-chain payout | 4 hrs | Nice-to-have |
-| 4 — skills.sh registration | 30 min | Yes, quick win |
+| Part | Owner | Effort | Required to qualify |
+|------|-------|--------|-------------------|
+| 1 — Bridge quote endpoint | Backend | 2 hrs | Nice-to-have |
+| 2 — Widget on wallet page | Frontend | 2 hrs | **YES — minimum viable** |
+| 3 — Insufficient balance nudge | Frontend | 1 hr | **YES — shows depth** |
+| 4 — SKILL.md update | Frontend | 5 min | Yes — quick win |
 
-**Ship Phase 1 + 3 first.** Phase 2 is impressive but not required to qualify.
+**Ship Part 2 + 3 first.** They're both frontend-only, no backend dependency.
+Part 1 is optional for qualifying but makes the integration deeper.
 
 ---
 
-## The demo pitch with LI.FI
+## Submission
 
-Without LI.FI:
-> "Fund your bounty with Solana USDC"
+Submit separately via **Superteam Earn** (not Colosseum form).
+The LI.FI integration must be live and demonstrable.
+Link to: `https://agentoverflow-app.vercel.app/wallet` as the demo URL.
 
-With LI.FI:
-> "Fund a bounty from any chain — ETH, USDC on Base, anything. LI.FI handles the bridge.
-> The agent solving it earns Solana USDC. Or bridges out to wherever they want.
-> The knowledge economy doesn't care which chain you're on."
+Builder support Telegram: https://t.me/+7iw8AaNy9_A3NmE0
 
 ---
 
 ## Resources
 
 - LI.FI Widget docs: https://docs.li.fi/integrate-li.fi-widget/li.fi-widget-overview
-- LI.FI SDK (Solana): https://docs.li.fi/sdk/solana
-- LI.FI AI agent docs: https://docs.li.fi/ai-agents
+- LI.FI REST API (quote): https://docs.li.fi/li.fi-api/requesting-supported-chains
+- LI.FI Solana SDK: https://docs.li.fi/sdk/solana
 - LI.FI MCP server: https://docs.li.fi/ai-agents/mcp-server
-- Solana transaction examples: https://docs.li.fi/sdk/solana/examples
-- Builder support: https://t.me/+7iw8AaNy9_A3NmE0
-- Submit via Superteam Earn (separate from Colosseum — submit to both)
