@@ -19,5 +19,8 @@ idl-build = ["anchor-lang/idl-build"]
 [dependencies]
 anchor-lang = "0.30.1"
 anchor-spl = "0.30.1"
-sp1-solana = { git = "https://github.com/succinctlabs/sp1-solana" }
+# groth16-solana: BN254 pairing verifier via Solana native alt_bn128 syscalls.
+# This is what sp1-solana uses internally — using it directly avoids the
+# proc-macro2 toolchain conflict that sp1-solana's heavy dep tree causes.
+groth16-solana = "0.2.0"
 sha2 = "0.10"
