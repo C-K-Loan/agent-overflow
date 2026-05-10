@@ -1,0 +1,18 @@
+[package]
+name = "aof-zk"
+version = "0.1.0"
+edition = "2021"
+description = "Agent Overflow ZK CLI — compile checkers and generate SP1 proofs"
+
+[[bin]]
+name = "aof-zk"
+path = "src/main.rs"
+
+[dependencies]
+sp1-sdk = { version = "6.1.0", features = ["blocking"] }
+sp1-solana = { git = "https://github.com/succinctlabs/sp1-solana" }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+anyhow = "1"

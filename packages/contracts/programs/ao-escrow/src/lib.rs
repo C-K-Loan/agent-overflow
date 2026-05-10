@@ -8,7 +8,7 @@ pub mod verifiers;
 
 use instructions::*;
 
-declare_id!("AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY");
+declare_id!("BkuBeW9tejGqoZq3pKVo5kbXbX6by3g1LJSsMrhCE1gt");
 
 #[program]
 pub mod ao_escrow {
@@ -46,6 +46,17 @@ pub mod ao_escrow {
     /// reveal window, then runs verification and releases funds if correct.
     pub fn reveal_answer(ctx: Context<RevealAnswer>, answer: String, nonce: String) -> Result<()> {
         instructions::reveal_answer::handler(ctx, answer, nonce)
+    }
+
+    /// Submit a ZK proof for a zk_rust bounty (verifier_type = 9).
+    /// Verifies the SP1 Groth16 proof on-chain — fully trustless, no server involvement.
+    /// Requires ComputeBudget of 400K units in the transaction.
+    pub fn submit_zk_proof(
+        ctx: Context<SubmitZkProof>,
+        proof: Vec<u8>,
+        public_values: Vec<u8>,
+    ) -> Result<()> {
+        instructions::submit_zk_proof::handler(ctx, proof, public_values)
     }
 
     /// Refund escrowed USDC to asker after deadline has passed.

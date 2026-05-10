@@ -15,11 +15,13 @@ export const VERIFIER_TYPES = {
   sat: 6,
   graph_coloring: 7,
   wasm_exec: 8,
+  // Type 9: fully on-chain SP1 ZK proof verification — trustless, Turing complete
+  zk_rust: 9,
 } as const;
 
 /** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through).
  *  Types 0-4 are verified by the Rust program on-chain — do NOT include them here.
- *  Types 5-8 have no Rust implementation yet; TypeScript verification is authoritative. */
+ *  zk_rust (9) is ALSO on-chain (submit_zk_proof instruction) — not in this set. */
 export const TS_ONLY_VERIFIERS = new Set([5, 6, 7, 8]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
@@ -139,6 +141,17 @@ export function serializeVerifierConfig(
       return createHash("sha256").update(wasmBytes).digest();
     }
 
+    case "zk_rust": {
+      // Config: { vkeyHash: string, checkerSource?: string, description?: string }
+      // vkeyHash is the SP1 Groth16 verification key hash (0x-prefixed 66-char hex)
+      // We store it as UTF-8 bytes in verifier_config (66 bytes fits in 64... use 66 max)
+      const vkeyHash = config.vkeyHash as string;
+      if (!vkeyHash) throw new Error("vkeyHash required");
+      if (!/^0x[0-9a-f]{64}$/i.test(vkeyHash)) throw new Error("vkeyHash must be 0x-prefixed 64-char hex");
+      // Store the vkeyHash string as UTF-8 (66 bytes: "0x" + 64 hex chars)
+      return Buffer.from(vkeyHash, "utf8");
+    }
+
     default:
       throw new Error(`Unknown verifier type: ${type}`);
   }
@@ -171,6 +184,9 @@ export async function verifyInTypeScript(
       case 6: return verifySat(configBuf, solution);
       case 7: return verifyGraphColoring(configBuf, solution);
       case 8: return verifyWasmExec(configBuf, solution, fullConfig);
+      // zk_rust (9): verified entirely on-chain via submit_zk_proof instruction.
+      // TypeScript cannot verify a ZK proof — this path should not be reached.
+      case 9: return "zk_rust bounties require on-chain proof submission via submit_zk_proof";
       default: return null;
     }
   } catch (e: any) {
@@ -574,7 +590,7 @@ export const VERIFIER_REGISTRY = [
   {
     type: "wasm_exec",
     name: "WASM Execution",
-    description: "Upload a compiled WASM binary. Your checker receives the solution string via linear memory and returns 1 for correct, 0 for wrong. Enables any problem with a deterministic verifier.",
+    description: "Upload a compiled WASM binary. Your checker receives the solution string via linear memory and returns 1 for correct, 0 for wrong. Enables any problem with a deterministic verifier. Server-side trust model.",
     configSchema: {
       type: "object",
       required: ["wasmBase64", "description"],
@@ -588,6 +604,31 @@ export const VERIFIER_REGISTRY = [
     example: {
       config: { wasmBase64: "AGFzbQ...", description: "Checks if input is the string '97'" },
       correctAnswer: "97",
+    },
+  },
+  {
+    type: "zk_rust",
+    name: "ZK Rust (SP1 — Trustless Turing Complete)",
+    description: "The holy grail: write any Rust checker program, compile it with the SP1 zkVM toolchain, and get a cryptographic proof that the solver's answer is correct — verified on-chain with zero trust in the server. Fully trustless. Turing complete. Any deterministic Rust logic works.",
+    configSchema: {
+      type: "object",
+      required: ["vkeyHash"],
+      properties: {
+        vkeyHash: { type: "string", description: "SP1 Groth16 verification key hash (0x-prefixed 64-char hex). Get from: aof-zk compile <checker.elf>" },
+        checkerSource: { type: "string", description: "Optional: Rust source of the checker for transparency (solvers can verify it matches vkeyHash)." },
+        description: { type: "string", description: "Human-readable description of what the checker verifies." },
+      },
+    },
+    answerFormat: "JSON with 'proof' (base64 Groth16 proof ~260 bytes) and 'publicValues' (base64). Generate with: aof-zk prove <checker.elf> <answer>",
+    limits: "Proof ~260 bytes. Requires 400K compute units per verification. Proof generation: 1-2 min CPU, ~1 min Succinct hosted prover.",
+    trustModel: "Fully on-chain. vkeyHash locked at bounty creation. Server cannot influence result.",
+    tooling: "Install: cargo install aof-zk. Compile: aof-zk compile checker.elf. Prove: aof-zk prove checker.elf 'my answer'",
+    example: {
+      config: {
+        vkeyHash: "0x00bb9e57314d7ee4f65a4b9fb46fbeae0495f2015c5a8a737333680ce6bb424e",
+        description: "Checks if the answer is the string '42'",
+      },
+      submissionFormat: { proof: "<base64>", publicValues: "<base64>" },
     },
   },
 ];
