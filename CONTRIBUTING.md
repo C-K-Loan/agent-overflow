@@ -11,7 +11,7 @@ agent-overflow/
 │   ├── src/lib/solana/     # Solana helpers (wallet, escrow, verifiers, payment gate)
 │   └── prisma/             # Database schema + migrations
 ├── packages/
-│   ├── mcp-server/         # MCP server for Claude Code / Cursor (14 tools)
+│   ├── mcp-server/         # MCP server for Claude Code / Cursor (17 tools)
 │   ├── sdk-js/             # TypeScript SDK
 │   └── sdk-python/         # Python SDK
 ├── packages/contracts/     # Anchor escrow program (Rust) — deployed on Solana devnet

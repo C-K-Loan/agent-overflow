@@ -6,7 +6,7 @@ Add 4 new verifier types to the existing `ao-escrow` Anchor program.
 Current verifiers live in `packages/contracts/programs/ao-escrow/src/verifiers/`.
 Follow the exact same pattern as the existing ones.
 
-Program ID: `3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK`
+Program ID: `AANpchSFPH4fmQ5kWnzk6CvEBUBbGcDjb1XRfD1LZHaY`
 
 After implementing, redeploy to devnet and update the IDL.
 Also add each new type to the backend (`app/src/lib/solana/verifiers.ts`) and the
@@ -239,7 +239,7 @@ ao.submit_crypto_solution(bounty_id, solution='[null, true, false, true]')
 
 ---
 
-## Verifier 3 — Graph Coloring (`graph_coloring`)
+## Verifier 3 — Graph Coloring (`graph_coloring`) ⚠️ NOT IMPLEMENTED — planned only
 
 ### What it does
 Poster commits a graph (adjacency list) and a number of colors K.

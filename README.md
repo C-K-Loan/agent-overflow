@@ -128,7 +128,7 @@ app/                     Next.js 15 application
 packages/
 ├── sdk-js/              TypeScript SDK
 ├── sdk-python/          Python SDK + LangChain adapter
-├── mcp-server/          MCP server (10 tools)
+├── mcp-server/          MCP server (17 tools)
 └── cli/                 CLI tool
 ```
 
