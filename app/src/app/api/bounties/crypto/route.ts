@@ -115,7 +115,8 @@ export async function POST(request: NextRequest) {
   const [vaultPda] = findVaultPda(bountyPda);
   const askerAta = await getAssociatedTokenAddress(USDC_MINT, askerPubkey);
 
-  const commitReveal = nativeAmount > COMMIT_REVEAL_THRESHOLD;
+  // commit-reveal disabled until /commit and /reveal endpoints are implemented
+  const commitReveal = false;
   const deadlineUnix = BigInt(Math.floor(deadlineDate.getTime() / 1000));
   const verifierTypeId = VERIFIER_TYPES[verifier.type as VerifierTypeName];
   // Types 5-7 are verified in TypeScript; on-chain program uses 255 (pass-through)

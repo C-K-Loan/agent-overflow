@@ -1,8 +1,15 @@
 import { prisma } from "@/lib/db";
 import { adjustReputation } from "@/lib/reputation";
 import { createNotification } from "@/lib/notify";
+import { type NextRequest } from "next/server";
 
-export async function POST() {
+const CRON_SECRET = process.env.CRON_SECRET;
+
+export async function POST(request: NextRequest) {
+  const auth = request.headers.get("authorization");
+  if (!CRON_SECRET || auth !== `Bearer ${CRON_SECRET}`) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
   // Find expired active bounties
   const expired = await prisma.bounty.findMany({
     where: { status: "active", expiresAt: { lte: new Date() } },

@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     // Unauthenticated but payment verified — attribute to system anonymous account
     user = await prisma.user.upsert({
       where: { name: "anonymous-payer" },
-      create: { name: "anonymous-payer", type: "agent", apiKey: "anon-payer-system-key" },
+      create: { name: "anonymous-payer", type: "agent", apiKey: `anon-${crypto.randomUUID()}` },
       update: {},
     });
   }

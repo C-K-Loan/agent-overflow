@@ -317,9 +317,54 @@ function verifyWasmExec(config: Buffer, solution: string, fullConfig?: Record<st
   return verifyWasmExecAsync(fullConfig, solution);
 }
 
+const WASM_TIMEOUT_MS = 3000;
+
 async function verifyWasmExecAsync(fullConfig: Record<string, unknown>, solution: string): Promise<string | null> {
   const wasmBase64 = fullConfig.wasmBase64 as string;
   if (!wasmBase64) return "Missing wasmBase64 in config";
+
+  // Run WASM in a Worker thread so an infinite loop can be killed via worker.terminate()
+  const { Worker, isMainThread } = await import("worker_threads");
+  if (!isMainThread) {
+    // Already in a worker — run inline to avoid recursive workers
+    return verifyWasmInline(wasmBase64, solution);
+  }
+
+  return new Promise((resolve) => {
+    const workerCode = `
+      const { parentPort, workerData } = require('worker_threads');
+      const { wasmBase64, solution } = workerData;
+      (async () => {
+        try {
+          const wasmBytes = Buffer.from(wasmBase64, 'base64');
+          const mod = await WebAssembly.compile(wasmBytes);
+          const inst = await WebAssembly.instantiate(mod, {});
+          const exports = inst.exports;
+          if (typeof exports.verify !== 'function') { parentPort.postMessage('WASM must export verify(ptr, len) -> i32'); return; }
+          if (!exports.memory) { parentPort.postMessage('WASM must export memory'); return; }
+          const solBytes = Buffer.from(solution, 'utf8');
+          if (solBytes.length > 1024) { parentPort.postMessage('Solution too long (max 1024 bytes)'); return; }
+          const view = new Uint8Array(exports.memory.buffer);
+          view.set(solBytes, 0);
+          const result = exports.verify(0, solBytes.length);
+          parentPort.postMessage(result !== 0 ? null : 'Wrong answer');
+        } catch (e) {
+          parentPort.postMessage('WASM execution error: ' + e.message);
+        }
+      })();
+    `;
+    const worker = new Worker(workerCode, { eval: true, workerData: { wasmBase64, solution } });
+    const timer = setTimeout(() => {
+      worker.terminate();
+      resolve("WASM execution timed out (3s limit)");
+    }, WASM_TIMEOUT_MS);
+    worker.on("message", (result) => { clearTimeout(timer); worker.terminate(); resolve(result); });
+    worker.on("error", (e) => { clearTimeout(timer); worker.terminate(); resolve(`WASM execution error: ${e.message}`); });
+  });
+}
+
+// Fallback for when already inside a worker thread
+async function verifyWasmInline(wasmBase64: string, solution: string): Promise<string | null> {
   try {
     const wasmBytes = Buffer.from(wasmBase64, "base64");
     const mod = await WebAssembly.compile(wasmBytes);

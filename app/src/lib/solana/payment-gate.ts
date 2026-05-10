@@ -15,6 +15,7 @@ import { PublicKey } from "@solana/web3.js";
 import { getAccount } from "@solana/spl-token";
 import { type NextRequest } from "next/server";
 import { getUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 // Platform fee recipient — faucet keypair's public key (holds USDC)
 const PLATFORM_RECIPIENT = "8rnT86Dad5kudxAdWrDJH5zAM5k5V4vUdtLkypuCr9nA";
@@ -27,8 +28,6 @@ export const FEES = {
 
 export type FeeAction = keyof typeof FEES;
 
-// In-memory cache of verified tx hashes (prevents replay within 10 min)
-const verifiedTxCache = new Map<string, number>();
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
 /** Returns the 402 challenge response body */
@@ -96,27 +95,21 @@ export async function paymentGate(
     );
   }
 
-  // Payment valid — cache it and allow the request through
-  verifiedTxCache.set(txHash, Date.now());
+  // Payment valid — record in DB (durable across cold starts + multiple instances)
+  try {
+    await prisma.paymentProof.create({ data: { txHash, action } });
+  } catch {
+    // Unique constraint violation = already used = replay attempt
+    return Response.json({ error: "Transaction already used (replay prevented)", code: "PAYMENT_INVALID" }, { status: 402 });
+  }
   return null;
 }
 
 /** Verify a Solana tx actually paid the required amount to our address */
 async function verifyPayment(txHash: string, action: FeeAction): Promise<string | null> {
-  // Check replay cache
-  const cached = verifiedTxCache.get(txHash);
-  if (cached) {
-    if (Date.now() - cached < CACHE_TTL_MS) {
-      return "Transaction already used (replay prevented)";
-    }
-    verifiedTxCache.delete(txHash);
-  }
-
-  // Prune stale cache entries
-  const now = Date.now();
-  for (const [k, t] of verifiedTxCache) {
-    if (now - t > CACHE_TTL_MS) verifiedTxCache.delete(k);
-  }
+  // Check DB for replay (durable across serverless cold starts + multi-instance)
+  const existing = await prisma.paymentProof.findUnique({ where: { txHash } });
+  if (existing) return "Transaction already used (replay prevented)";
 
   try {
     const conn = getConnection();

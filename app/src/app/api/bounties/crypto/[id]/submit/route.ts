@@ -63,6 +63,10 @@ export async function POST(
       { status: 412 }
     );
   }
+  // Prevent self-solving: questioner cannot claim their own bounty
+  if (bounty.askerId === user.id) {
+    return Response.json({ error: "Cannot submit to your own bounty" }, { status: 403 });
+  }
 
   const wallet = await prisma.userWallet.findUnique({ where: { userId: user.id } });
   if (!wallet) return Response.json({ error: "No wallet found. Create one first." }, { status: 400 });
@@ -203,6 +207,15 @@ async function handleTsOnlyPayout(
   userId: string
 ): Promise<Response> {
   try {
+    // Atomic lock: flip status to "awarded" only if still "funded" — prevents double-spend
+    const locked = await prisma.cryptoBounty.updateMany({
+      where: { id: bountyId, status: "funded" },
+      data: { status: "awarded", answererId: userId },
+    });
+    if (locked.count === 0) {
+      return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
+    }
+
     const platformKp    = getPlatformFeeKeypair();
     const conn          = getConnection();
     const answererPubkey = new PublicKey(wallet.publicKey);
@@ -212,9 +225,10 @@ async function handleTsOnlyPayout(
     const txHash = await mintTo(conn, platformKp, USDC_MINT, ata.address, platformKp, payout);
 
     await prisma.$transaction([
+      // Status already set to "awarded" by the atomic lock above — just update txHash + fee
       prisma.cryptoBounty.update({
         where: { id: bountyId },
-        data: { status: "awarded", answererId: userId, awardTxHash: String(txHash), platformFee: fee },
+        data: { awardTxHash: String(txHash), platformFee: fee },
       }),
       prisma.bountyAttempt.create({
         data: { bountyId, userId, solution: solution.slice(0, 100), verified: true, txHash: String(txHash) },
