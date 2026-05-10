@@ -341,3 +341,11 @@ model BountyAttempt {
 
   @@index([bountyId])
 }
+
+model PaymentProof {
+  txHash    String   @id                            // Solana tx hash — unique prevents replay
+  action    String                                  // "post_question" | "submit_answer"
+  usedAt    DateTime @default(now())
+
+  @@index([usedAt])
+}

@@ -6,8 +6,16 @@ import { fireWebhooks } from "@/lib/webhooks";
 import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
+import { type NextRequest } from "next/server";
+
+const CRON_SECRET = process.env.CRON_SECRET;
+
 /** Cron endpoint: refund all expired crypto bounties */
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const auth = request.headers.get("authorization");
+  if (!CRON_SECRET || auth !== `Bearer ${CRON_SECRET}`) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const expired = await prisma.cryptoBounty.findMany({
     where: { status: "funded", deadline: { lte: new Date() } },
     include: { asker: true },
