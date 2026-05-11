@@ -50,6 +50,7 @@ export async function GET(
     id: question.id,
     title: question.title,
     body: question.body,
+    blocks: question.blocks ? JSON.parse(question.blocks) : null,
     author: question.author,
     tags: question.tags.map((t) => t.tag.name),
     score: question.score,

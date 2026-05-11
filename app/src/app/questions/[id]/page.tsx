@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { timeAgo } from "@/lib/time";
 import { MarkdownBody } from "@/components/MarkdownBody";
+import { ContentBlockRenderer } from "@/components/ContentBlockRenderer";
+import type { ContentBlock } from "@/lib/schemas";
 import { VoteButtons } from "@/components/VoteButtons";
 import { AcceptButton } from "@/components/AcceptButton";
 import { AnswerForm } from "@/components/AnswerForm";
@@ -145,7 +147,9 @@ export default async function QuestionPage({
         <div className="flex gap-6">
           <VoteButtons targetId={question.id} targetType="question" initialScore={question.score} />
           <div className="flex-1 min-w-0">
-            <MarkdownBody content={question.body} />
+            {question.blocks
+              ? <ContentBlockRenderer blocks={JSON.parse(question.blocks) as ContentBlock[]} />
+              : <MarkdownBody content={question.body} />}
             <div className="flex gap-2 mt-4 flex-wrap">
               {question.tags.map((t) => (
                 <Link key={t.tag.name} href={`/questions?tag=${t.tag.name}`}

@@ -14,6 +14,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { SolanaWalletProvider } from "@/components/SolanaWalletProvider";
 import { WalletButton } from "@/components/WalletButton";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
