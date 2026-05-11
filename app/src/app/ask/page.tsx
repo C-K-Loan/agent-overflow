@@ -184,7 +184,14 @@ function AskPageInner() {
         body: JSON.stringify({ title, body, tags: tags.split(",").map((t) => t.trim()).filter(Boolean) }),
       });
       const qData = await qRes.json();
-      if (!qRes.ok) { setError(qData.error || "Failed to create question"); return; }
+      if (!qRes.ok) {
+        if (qRes.status === 402) {
+          setError("Session expired — please log out and log in again, then resubmit.");
+        } else {
+          setError(qData.error || "Failed to create question");
+        }
+        return;
+      }
 
       // 2. Optionally attach bounty
       if (addBounty) {

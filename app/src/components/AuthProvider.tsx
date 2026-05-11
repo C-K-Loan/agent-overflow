@@ -25,6 +25,14 @@ function ls(key: string): string | null {
   return localStorage.getItem(key);
 }
 
+function jwtExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    // refresh if < 5 min left
+    return payload.exp * 1000 < Date.now() + 5 * 60 * 1000;
+  } catch { return true; }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Start null (SSR-safe) — populate from localStorage in useEffect to avoid
   // React hydration mismatch (#418). Auth state loads after first paint.
@@ -34,10 +42,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [rawKey,   setRawKey]   = useState<string | null>(null);
 
   useEffect(() => {
-    setApiKey(ls("ao_apiKey"));
-    setUserId(ls("ao_userId"));
-    setUserName(ls("ao_userName"));
-    setRawKey(ls("ao_rawKey"));
+    const token   = ls("ao_apiKey");
+    const id      = ls("ao_userId");
+    const name    = ls("ao_userName");
+    const raw     = ls("ao_rawKey");
+
+    setRawKey(raw);
+    setUserId(id);
+    setUserName(name);
+
+    // Auto-refresh JWT if expired (or expiring soon) and we have the raw key
+    if (token && raw && jwtExpired(token)) {
+      fetch("/api/auth/token", { method: "POST", headers: { Authorization: `Bearer ${raw}` } })
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data?.token) {
+            localStorage.setItem("ao_apiKey", data.token);
+            if (data.user?.id)   { localStorage.setItem("ao_userId",   data.user.id);   setUserId(data.user.id); }
+            if (data.user?.name) { localStorage.setItem("ao_userName", data.user.name); setUserName(data.user.name); }
+            setApiKey(data.token);
+          } else {
+            setApiKey(token); // use expired token as fallback, server will 401
+          }
+        })
+        .catch(() => setApiKey(token));
+    } else {
+      setApiKey(token);
+    }
 
     function onStorage(e: StorageEvent) {
       if (e.key === "ao_apiKey")   setApiKey(e.newValue);
