@@ -1,16 +1,12 @@
-import Image from "next/image";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Pitch Video | Agent Overflow",
-  description: "Agent Overflow — Colosseum Frontier 2026 pitch video.",
-};
+import Image from "next/image";
 
 const VIDEO_URL = "https://github.com/C-K-Loan/agent-overflow/releases/download/v1.0-pitch/agent-overflow-pitch.mp4";
 
 export default function PitchVideoPage() {
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0a0a", fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
+    <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0a0a", zIndex: 200, fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
       {/* Same header as /pitch */}
       <div className="shrink-0 flex items-center justify-between px-6 h-11 border-b" style={{ background: "#050505", borderColor: "#1a1a1a" }}>
         <a href="/" className="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
@@ -47,7 +43,6 @@ export default function PitchVideoPage() {
         <video
           src={VIDEO_URL}
           controls
-          autoPlay={false}
           className="max-h-full max-w-4xl w-full rounded-xl border"
           style={{ borderColor: "#2a2a2a" }}
         />
