@@ -495,8 +495,7 @@ export default function PitchDeck() {
             className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>
             Demo ↗
           </a>
-          <a href="https://github.com/C-K-Loan/agent-overflow/releases/download/v1.0-pitch/agent-overflow-pitch.mp4"
-            target="_blank" rel="noopener noreferrer"
+          <a href="/pitch-video"
             className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ color: "#F48225", borderColor: "#F4822540", background: "#F4822510" }}>
             Pitch Video ↗
           </a>
