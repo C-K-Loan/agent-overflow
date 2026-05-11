@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-const TOTAL = 12;
+const TOTAL = 6;
 
 function Slide({ children, orbs = false }: { children: React.ReactNode; orbs?: boolean }) {
   return (
@@ -14,14 +14,14 @@ function Slide({ children, orbs = false }: { children: React.ReactNode; orbs?: b
           <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.05] blur-[120px] pointer-events-none" style={{ background: "#14F195" }} />
         </>
       )}
-      <div className="relative z-10 flex flex-col flex-1 p-10 sm:p-16">{children}</div>
+      <div className="relative z-10 flex flex-col flex-1 p-10 sm:p-14">{children}</div>
     </div>
   );
 }
 
 function Badge({ children, color = "#F48225" }: { children: React.ReactNode; color?: string }) {
   return (
-    <span className="inline-block text-[11px] font-mono font-semibold uppercase tracking-[0.15em] px-3 py-1 rounded-full mb-6"
+    <span className="inline-block text-[11px] font-mono font-semibold uppercase tracking-[0.15em] px-3 py-1 rounded-full mb-5"
       style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>
       {children}
     </span>
@@ -29,65 +29,46 @@ function Badge({ children, color = "#F48225" }: { children: React.ReactNode; col
 }
 
 function H1({ children }: { children: React.ReactNode }) {
-  return <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5">{children}</h1>;
+  return <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-4">{children}</h1>;
 }
 
 function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight mb-5">{children}</h2>;
-}
-
-function Muted({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <p className={`text-[#ABABBA] leading-relaxed ${className}`}>{children}</p>;
+  return <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight mb-4">{children}</h2>;
 }
 
 // ─── Slides ───────────────────────────────────────────────────────────────────
 
-// 1. The hook — the asymmetry
+// 1. Hook + use-case grid
 function Slide01() {
-  return (
-    <Slide orbs>
-      <div className="flex-1 flex flex-col items-center justify-center text-center max-w-4xl mx-auto w-full">
-        <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-8">The single insight behind everything</p>
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.05] mb-6">
-          Finding is hard.<br />
-          <span style={{ color: "#F48225" }}>Verifying is trivial.</span>
-        </h1>
-        <p className="text-xl text-[#ABABBA] max-w-2xl leading-relaxed mb-10">
-          The hardest problems in science share one property.<br />
-          That asymmetry is a market — and nobody has built it yet.
-        </p>
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="" width={32} height={32} className="rounded-xl opacity-80" />
-          <span className="font-bold text-white text-xl tracking-tight">Agent<span className="font-normal text-[#888]">Overflow</span></span>
-        </div>
-        <p className="text-xs text-[#444] mt-8 font-mono">Colosseum Frontier 2026 · MIT Licensed · Live on Solana devnet</p>
-      </div>
-    </Slide>
-  );
-}
-
-// 2. The problem — use cases grid
-function Slide02() {
   const cases = [
-    { icon: "🦠", hard: "Zero-day in a $500M smart contract?", easy: "Deploy exploit on fork → balance goes to zero. Instant.", color: "#F48225" },
-    { icon: "🧬", hard: "Molecule that binds to a cancer receptor?", easy: "Boltz-2 binding affinity score. 20 seconds.", color: "#9945FF" },
-    { icon: "✂️", hard: "CRISPR gene therapy that cures a disease?", easy: "Run CRISPR off-target analysis. Seconds.", color: "#14F195" },
-    { icon: "🔢", hard: "Riemann Hypothesis — open since 1859.", easy: "Check if a counterexample is valid. Run the math.", color: "#00D4FF" },
-    { icon: "🦠", hard: "Protein that neutralizes a pandemic virus?", easy: "Check if it blocks the receptor. Seconds.", color: "#F48225" },
-    { icon: "💊", hard: "Antibiotic bacteria can't resist?", easy: "Pass it through the resistance simulation. Run it.", color: "#9945FF" },
-    { icon: "☢️", hard: "Optimal radiation dose per patient?", easy: "Verify against tissue model. Instant simulation.", color: "#14F195" },
-    { icon: "🧠", hard: "Drug that crosses the blood-brain barrier?", easy: "Check permeability with computational model.", color: "#00D4FF" },
-    { icon: "🌍", hard: "Carbon capture catalyst that matters?", easy: "Check reaction efficiency. Chemistry simulation.", color: "#F48225" },
-    { icon: "🔐", hard: "Reentrancy bug before attackers find it?", easy: "Run the transaction. Vault drains or it doesn't.", color: "#9945FF" },
-    { icon: "🔑", hard: "Weakness in post-quantum crypto scheme?", easy: "Check if a forgery verifies. Verify the math.", color: "#14F195" },
+    { icon: "🦠", hard: "Zero-day in a $500M contract?", easy: "Deploy exploit on fork → balance drains. Instant.", color: "#F48225" },
+    { icon: "🧬", hard: "Molecule that binds to cancer receptor?", easy: "Boltz-2 binding affinity score. 20 seconds.", color: "#9945FF" },
+    { icon: "✂️", hard: "CRISPR therapy that cures a disease?", easy: "Off-target analysis. Seconds.", color: "#14F195" },
+    { icon: "🔢", hard: "Riemann Hypothesis — open since 1859.", easy: "Check if a counterexample is valid.", color: "#00D4FF" },
+    { icon: "🦠", hard: "Protein that neutralises a pandemic virus?", easy: "Check if it blocks the receptor.", color: "#F48225" },
+    { icon: "💊", hard: "Antibiotic bacteria can't resist?", easy: "Pass it through resistance simulation.", color: "#9945FF" },
+    { icon: "☢️", hard: "Optimal radiation dose per patient?", easy: "Verify against tissue model. Instant.", color: "#14F195" },
+    { icon: "🧠", hard: "Drug that crosses the blood-brain barrier?", easy: "Check permeability computationally.", color: "#00D4FF" },
+    { icon: "🌍", hard: "Carbon-capture catalyst that matters?", easy: "Check reaction efficiency. Run it.", color: "#F48225" },
+    { icon: "🔐", hard: "Reentrancy bug before attackers do?", easy: "Run the transaction. Vault drains or not.", color: "#9945FF" },
+    { icon: "🔑", hard: "Weakness in post-quantum crypto?", easy: "Check if forgery verifies. Math.", color: "#14F195" },
     { icon: "📐", hard: "Strategy that beats Sharpe 1.5?", easy: "Run backtester on held-out data. Pass/fail.", color: "#00D4FF" },
   ];
   return (
     <Slide>
-      <div className="flex items-baseline justify-between mb-4">
-        <Badge>The Asymmetry</Badge>
-        <p className="text-xs text-[#555] italic">Finding is hard. Verifying is trivial. That gap is a market.</p>
+      <div className="flex items-baseline justify-between mb-3">
+        <div>
+          <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-1">The insight</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+            Finding is hard. <span style={{ color: "#F48225" }}>Verifying is trivial.</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg opacity-80" />
+          <span className="font-bold text-white text-lg tracking-tight">Agent<span className="font-normal text-[#888]">Overflow</span></span>
+        </div>
       </div>
+      <p className="text-sm text-[#666] mb-4">Every hard problem in science shares this property. That asymmetry is a market — and nobody has built it yet.</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1">
         {cases.map((c) => (
           <div key={c.hard} className="p-3 rounded-xl border flex flex-col gap-1.5" style={{ background: "#0d0d0d", borderColor: `${c.color}25` }}>
@@ -101,141 +82,117 @@ function Slide02() {
   );
 }
 
-// 3. Expert agents exist NOW
-function Slide03() {
-  return (
-    <Slide>
-      <Badge color="#9945FF">The Supply Side Exists</Badge>
-      <H2>Science domain expert agents are being built right now.</H2>
-      <div className="space-y-3 flex-1">
-        {[
-          { agent: "Boltz-2 (MIT / Recursion, 2025)", feat: "Predicts drug-target binding affinity in 20 seconds on a single GPU — matches multi-hour FEP+ simulations", domain: "Molecular Biology" },
-          { agent: "OpenAI o3", feat: "Solves 32% of unpublished research-level FrontierMath problems — no prior model exceeded 2%", domain: "Mathematics" },
-          { agent: "Harmonic Aristotle", feat: "Gold medal at IMO 2025 + solved a 30-year-open Erdős problem in 6 hours of autonomous search", domain: "Formal Proofs" },
-          { agent: "CAI (open-source)", feat: "#1 worldwide across 8,129 teams at Cyber Apocalypse CTF — won $50K prize", domain: "Security" },
-        ].map((a) => (
-          <div key={a.agent} className="flex gap-4 p-4 rounded-xl border items-start" style={{ background: "#0d0d0d", borderColor: "#9945FF30" }}>
-            <div className="shrink-0">
-              <p className="text-xs font-mono font-bold text-white">{a.agent}</p>
-              <p className="text-[10px] mt-0.5" style={{ color: "#9945FF" }}>{a.domain}</p>
-            </div>
-            <p className="text-sm text-[#888] leading-relaxed">{a.feat}</p>
-          </div>
-        ))}
-      </div>
-      <p className="text-xs text-[#444] mt-4 italic">The specialist agent supply side is real. What&apos;s missing is the marketplace to pay them.</p>
-    </Slide>
-  );
-}
-
-// 4. The solution — one line + flow
-function Slide04() {
+// 2. The two-sided market gap
+function Slide02() {
   return (
     <Slide orbs>
-      <Badge color="#14F195">The Solution</Badge>
-      <H1>Agent Overflow</H1>
-      <p className="text-2xl text-[#F48225] font-light mb-8 -mt-2">
-        A ZKP-verified marketplace where expert agents earn USDC solving the hardest problems in science.
-      </p>
-      <div className="grid grid-cols-3 gap-4 flex-1">
-        {[
-          { step: "01", label: "Post", body: "Researcher posts a problem with a Rust verification function and USDC escrow. Any domain.", color: "#F48225" },
-          { step: "02", label: "Solve", body: "Expert agents compete. A specialist finds the answer — molecule, proof, strategy.", color: "#9945FF" },
-          { step: "03", label: "Pay", body: "Solana verifies the ZK proof on-chain. Groth16 pairing passes → USDC releases. No human judge.", color: "#14F195" },
-        ].map((c) => (
-          <div key={c.step} className="p-5 rounded-xl border flex flex-col gap-3"
-            style={{ background: "#0d0d0d", borderColor: `${c.color}30` }}>
-            <span className="text-3xl font-black tabular-nums" style={{ color: c.color }}>{c.step}</span>
-            <p className="font-bold text-white text-lg">{c.label}</p>
-            <p className="text-sm text-[#888] leading-relaxed">{c.body}</p>
-          </div>
-        ))}
-      </div>
-      <p className="text-xs text-[#444] mt-5 italic">The math is the judge. Not us, not a committee — the Groth16 pairing on Solana.</p>
-    </Slide>
-  );
-}
+      <Badge>The Gap</Badge>
+      <H2>Two sides. No bridge. <span style={{ color: "#F48225" }}>Until now.</span></H2>
+      <div className="flex gap-4 flex-1 items-stretch">
 
-// 5. Science domains — all 6
-function Slide05() {
-  const domains = [
-    { icon: "🧬", name: "Molecular Design",     example: "Peptide binding, protein folding, CRISPR off-target minimization", verify: "Boltz-2 affinity score < threshold" },
-    { icon: "⚛️", name: "Quantum Chemistry",     example: "Ground state energies, molecular dynamics, reaction pathways",      verify: "simulation energy metric" },
-    { icon: "🔢", name: "Formal Mathematics",    example: "Millennium problems, SAT/SMT, graph theory, open conjectures",       verify: "Lean proof compiles / SAT check" },
-    { icon: "📐", name: "Optimization & OR",     example: "TSP, portfolio optimization, scheduling, hyperparameter search",      verify: "objective function on-chain" },
-    { icon: "🔐", name: "Security Research",     example: "Smart contract CTFs, hash preimages, zero-day discovery",            verify: "exploit confirmed / SHA-256 check" },
-    { icon: "💻", name: "Algorithms",            example: "NP-hard instances, competitive programming, benchmark beating",      verify: "output hash or runtime metric" },
-  ];
-  return (
-    <Slide>
-      <Badge>Science Domains</Badge>
-      <H2>Every field has hard verifiable problems.</H2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1">
-        {domains.map((d) => (
-          <div key={d.name} className="p-4 rounded-xl border flex flex-col gap-2" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <span className="text-2xl">{d.icon}</span>
-            <p className="font-semibold text-white text-sm">{d.name}</p>
-            <p className="text-xs text-[#888] leading-relaxed flex-1">{d.example}</p>
-            <p className="text-[10px] font-mono pt-2 border-t" style={{ color: "#14F195", borderColor: "#2a2a2a" }}>
-              Verify: {d.verify}
-            </p>
-          </div>
-        ))}
-      </div>
-    </Slide>
-  );
-}
-
-// 6. ZKP technical — the real differentiator
-function Slide06() {
-  return (
-    <Slide>
-      <Badge color="#9945FF">Turing-Complete On-Chain Verification</Badge>
-      <H2>Any Rust program is a verifier. Proven with ZK proofs on Solana.</H2>
-      <div className="flex gap-6 flex-1 items-stretch">
-        <div className="flex-1 space-y-3">
+        {/* Demand side */}
+        <div className="flex-1 rounded-2xl border p-5 flex flex-col gap-3" style={{ background: "#0d0d0d", borderColor: "#9945FF40" }}>
+          <p className="text-xs font-mono uppercase tracking-widest mb-1" style={{ color: "#9945FF" }}>Demand</p>
           {[
-            { label: "Write checker in Rust", sub: "Any logic — binding score, backtester, SAT solver, theorem prover", color: "#F48225" },
-            { label: "Compile to SP1 ELF", sub: "aof-zk compile checker.elf → vkeyHash stored on-chain", color: "#9945FF" },
-            { label: "Solver generates ZK proof", sub: "aof-zk prove checker.elf \"my_answer\" → proof.json (~2 min)", color: "#00D4FF" },
-            { label: "Solana verifies Groth16 pairing", sub: "BN254 pairing on-chain, 400K compute units. Pass → USDC releases.", color: "#14F195", success: true },
-          ].map((s) => (
-            <div key={s.label} className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm`}
-              style={{ background: s.success ? `${s.color}08` : "#111", borderColor: s.color + "40" }}>
-              <div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color }} />
+            { icon: "🏥", who: "Hospitals & pharma", need: "Drug discovery, clinical trial design, protein targets" },
+            { icon: "🔒", who: "Security teams", need: "Smart contract audits, zero-day research, CVE triage" },
+            { icon: "📊", who: "Quant funds", need: "Strategies that survive backtests on unseen data" },
+            { icon: "🔬", who: "Research labs", need: "Computational problems too expensive for in-house compute" },
+          ].map((d) => (
+            <div key={d.who} className="flex gap-3 items-start p-3 rounded-xl" style={{ background: "#0a0a12" }}>
+              <span className="text-xl shrink-0">{d.icon}</span>
               <div>
-                <span className="font-bold" style={{ color: s.color }}>{s.label}</span>
-                <span className="text-[#555] ml-2 text-xs">{s.sub}</span>
+                <p className="text-xs font-semibold text-white">{d.who}</p>
+                <p className="text-[11px] text-[#666] leading-snug">{d.need}</p>
               </div>
             </div>
           ))}
-          <div className="mt-4 p-4 rounded-xl border" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#9945FF" }}>9 verifier types — all live</p>
-            <p className="text-xs text-[#888]">exact_number · numeric_tolerance · exact_string · numeric_range · multi_numeric · hash_preimage · SAT · graph_coloring · <span className="text-white font-semibold">zk_rust (Turing-complete)</span></p>
+          <div className="mt-auto pt-3 border-t space-y-1" style={{ borderColor: "#1a1a1a" }}>
+            <p className="text-[11px] text-[#555]">✗ Can&apos;t verify AI output</p>
+            <p className="text-[11px] text-[#555]">✗ Can&apos;t pay agents directly</p>
+            <p className="text-[11px] text-[#555]">✗ No trustless escrow</p>
           </div>
         </div>
-        <div className="flex-1">
-          <pre className="text-xs leading-relaxed p-5 rounded-xl h-full overflow-auto" style={{ background: "#0d0d0d", border: "1px solid #2a2a2a" }}>
-            <span style={{ color: "#555" }}># 1. Write your checker</span>{"\n"}
-            <span style={{ color: "#9945FF" }}>#[no_mangle]</span>{"\n"}
+
+        {/* Bridge */}
+        <div className="flex flex-col items-center justify-center gap-3 shrink-0 w-28">
+          <div className="text-[#333] text-3xl">←</div>
+          <div className="rounded-2xl border p-4 text-center" style={{ background: "#0d1117", borderColor: "#F4822560" }}>
+            <Image src="/logo.png" alt="" width={32} height={32} className="rounded-xl mx-auto mb-2 opacity-90" />
+            <p className="text-xs font-bold text-white leading-tight">Agent<br />Overflow</p>
+            <p className="text-[10px] mt-2 font-mono" style={{ color: "#F48225" }}>ZKP verified<br />USDC escrow</p>
+          </div>
+          <div className="text-[#333] text-3xl">→</div>
+        </div>
+
+        {/* Supply side */}
+        <div className="flex-1 rounded-2xl border p-5 flex flex-col gap-3" style={{ background: "#0d0d0d", borderColor: "#14F19540" }}>
+          <p className="text-xs font-mono uppercase tracking-widest mb-1" style={{ color: "#14F195" }}>Supply</p>
+          {[
+            { agent: "Boltz-2", feat: "Drug-target binding affinity in 20s — matches days-long FEP+ sims", domain: "Molecular" },
+            { agent: "OpenAI o3", feat: "32% of unpublished research-level FrontierMath (prior best: 2%)", domain: "Mathematics" },
+            { agent: "Harmonic Aristotle", feat: "Gold at IMO 2025. Solved a 30-year Erdős problem in 6 hrs.", domain: "Formal Proofs" },
+            { agent: "CAI", feat: "#1 worldwide at Cyber Apocalypse CTF across 8,129 teams", domain: "Security" },
+          ].map((a) => (
+            <div key={a.agent} className="flex gap-3 items-start p-3 rounded-xl" style={{ background: "#0a0a12" }}>
+              <div className="shrink-0">
+                <p className="text-xs font-semibold text-white">{a.agent}</p>
+                <p className="text-[10px]" style={{ color: "#14F195" }}>{a.domain}</p>
+              </div>
+              <p className="text-[11px] text-[#666] leading-snug">{a.feat}</p>
+            </div>
+          ))}
+          <div className="mt-auto pt-3 border-t space-y-1" style={{ borderColor: "#1a1a1a" }}>
+            <p className="text-[11px] text-[#555]">✗ No way to find real bounties</p>
+            <p className="text-[11px] text-[#555]">✗ No trustless payment rail</p>
+            <p className="text-[11px] text-[#555]">✗ Proof of work = email</p>
+          </div>
+        </div>
+
+      </div>
+    </Slide>
+  );
+}
+
+// 3. How it works — 4-step flow + ZKP
+function Slide03() {
+  return (
+    <Slide>
+      <Badge color="#14F195">How It Works</Badge>
+      <H2>Post a bounty. Agent solves it. ZK proof verifies. USDC releases.</H2>
+      <div className="grid grid-cols-4 gap-3 mb-5">
+        {[
+          { step: "01", label: "Post", body: "Researcher posts a problem with USDC in escrow and a Rust verification function.", color: "#F48225" },
+          { step: "02", label: "Solve", body: "Expert agents compete. A specialist finds the answer — molecule, proof, exploit, strategy.", color: "#9945FF" },
+          { step: "03", label: "Verify", body: "Agent submits ZK proof. Groth16 BN254 pairing checked on-chain. Math is the judge.", color: "#00D4FF" },
+          { step: "04", label: "Pay", body: "Proof passes → Anchor escrow releases USDC automatically. No committee. No wait.", color: "#14F195" },
+        ].map((c) => (
+          <div key={c.step} className="p-4 rounded-xl border flex flex-col gap-2"
+            style={{ background: "#0d0d0d", borderColor: `${c.color}30` }}>
+            <span className="text-2xl font-black tabular-nums" style={{ color: c.color }}>{c.step}</span>
+            <p className="font-bold text-white">{c.label}</p>
+            <p className="text-xs text-[#888] leading-relaxed">{c.body}</p>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-4 flex-1">
+        <div className="flex-1 rounded-xl p-4 border space-y-2" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
+          <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: "#9945FF" }}>10 Verifier Types — all live</p>
+          <p className="text-xs text-[#888] leading-relaxed">
+            exact_number · numeric_tolerance · exact_string · numeric_range · multi_numeric · hash_preimage · SAT · graph_coloring · wasm_exec ·{" "}
+            <span className="text-white font-semibold">zk_rust (Turing-complete)</span>
+          </p>
+          <p className="text-xs text-[#555] pt-2">Any Rust program = a verifier. Write your checker, compile to SP1 ELF, store vkeyHash on-chain.</p>
+        </div>
+        <div className="flex-1 rounded-xl p-4 border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
+          <pre className="text-[11px] leading-relaxed" style={{ color: "#ABABBA" }}>
+            <span style={{ color: "#555" }}># Write any Rust checker</span>{"\n"}
             <span style={{ color: "#14F195" }}>pub extern "C" fn</span>
-            <span style={{ color: "#ABABBA" }}>{" verify(ptr: i32, len: i32)"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"  -> i32 {"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"    let answer = parse_input(ptr, len);"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"    if boltz2_score(answer) < -8.0 {"}</span>{"\n"}
-            <span style={{ color: "#F48225" }}>{"      1"}</span>
-            <span style={{ color: "#555" }}>{" // correct — pay out"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"    } else {"}</span>{"\n"}
-            <span style={{ color: "#555" }}>{"      0 // wrong"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"    }"}</span>{"\n"}
-            <span style={{ color: "#ABABBA" }}>{"}"}</span>{"\n\n"}
-            <span style={{ color: "#555" }}># 2. Get vkey hash</span>{"\n"}
-            <span style={{ color: "#00D4FF" }}>$ aof-zk compile checker.elf</span>{"\n"}
-            <span style={{ color: "#888" }}>{"→ 0x1a2b3c..."}</span>{"\n\n"}
-            <span style={{ color: "#555" }}># 3. Solver proves</span>{"\n"}
+            <span> verify(ptr: i32, len: i32)</span>{"\n"}
+            <span>{"  -> i32 { boltz2_score(...) < -8.0 }"}</span>{"\n\n"}
+            <span style={{ color: "#555" }}># Solver proves &amp; submits</span>{"\n"}
             <span style={{ color: "#00D4FF" }}>$ aof-zk prove checker.elf "MGLTWK..."</span>{"\n"}
-            <span style={{ color: "#888" }}>{"→ proof.json (Groth16)"}</span>{"\n\n"}
-            <span style={{ color: "#555" }}># 4. Solana verifies → USDC releases</span>
+            <span style={{ color: "#888" }}>{"→ proof.json (Groth16) → USDC released"}</span>
           </pre>
         </div>
       </div>
@@ -243,88 +200,47 @@ function Slide06() {
   );
 }
 
-// 7. Market / TAM
-function Slide07() {
-  return (
-    <Slide>
-      <Badge color="#F48225">Market Size</Badge>
-      <H2>A proven model. An enormous upstream pool.</H2>
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { val: "$2.87T", sub: "global R&D spending — the upstream pool of hard verifiable problems", src: "WIPO 2025" },
-          { val: "$116M", sub: "paid by ImmuneFi in security bounties alone — proves the model works", src: "The Block, verified" },
-          { val: "$163M", sub: "sitting in active ImmuneFi escrow right now — demand is real", src: "ImmuneFi live data" },
-        ].map((s) => (
-          <div key={s.val} className="p-5 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <p className="text-3xl sm:text-4xl font-bold tabular-nums mb-2" style={{ color: "#F48225" }}>{s.val}</p>
-            <p className="text-xs text-[#888] leading-tight mb-2">{s.sub}</p>
-            <p className="text-[10px] font-mono" style={{ color: "#555" }}>{s.src}</p>
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-3 gap-4 flex-1">
-        <div className="p-4 rounded-xl border space-y-2" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-          <p className="text-xs font-mono uppercase tracking-widest text-[#555]">TAM</p>
-          <p className="text-2xl font-bold text-white">$2.87T</p>
-          <p className="text-xs text-[#888]">Global R&D — all hard verifiable scientific problems</p>
-        </div>
-        <div className="p-4 rounded-xl border space-y-2" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-          <p className="text-xs font-mono uppercase tracking-widest text-[#555]">SAM</p>
-          <p className="text-2xl font-bold text-white">~$5B</p>
-          <p className="text-xs text-[#888]">Bug bounties + drug discovery compute + quant R&D + AI patent search</p>
-        </div>
-        <div className="p-4 rounded-xl border space-y-2" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
-          <p className="text-xs font-mono uppercase tracking-widest" style={{ color: "#F48225" }}>SOM (Year 1)</p>
-          <p className="text-2xl font-bold text-white">$1M rev</p>
-          <p className="text-xs text-[#888]">1% of $100M bounty volume — ImmuneFi hit $116M in security alone</p>
-        </div>
-      </div>
-    </Slide>
-  );
-}
-
-// 8. Traction / what's built
-function Slide08() {
-  const left = [
-    "ZKP verifier — SP1 Groth16 + BN254 pairing on-chain (Turing-complete)",
-    "Anchor escrow program — 9 verifier types, commit-reveal anti-frontrunning",
-    "538 lines of integration tests · 46/46 ZK e2e checks passing",
-  ];
-  const right = [
-    "56 REST API endpoints · Python SDK · TypeScript SDK · MCP server",
-    "x402 / pay.sh integration — agents pay per-call, no signup needed",
-    "Platform-managed wallets for headless agents · LI.FI cross-chain deposits",
-  ];
+// 4. Traction
+function Slide04() {
   return (
     <Slide>
       <Badge color="#14F195">Traction</Badge>
-      <H2>Not a prototype. Shipped in 4 weeks.</H2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <H2>Not a prototype. <span style={{ color: "#14F195" }}>Shipped in 4 weeks.</span></H2>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
-          { n: "9", label: "Verifier types" },
-          { n: "56", label: "API endpoints" },
-          { n: "3", label: "SDKs" },
-          { n: "ZKP", label: "Turing-complete" },
+          { n: "10", label: "Verifier types", sub: "incl. Turing-complete ZK Rust", color: "#9945FF" },
+          { n: "56",  label: "REST endpoints", sub: "Python + TS SDKs + MCP server", color: "#F48225" },
+          { n: "ZKP", label: "On-chain verify", sub: "Groth16/BN254 on Solana devnet", color: "#14F195" },
+          { n: "x402", label: "pay.sh rail", sub: "Agents pay per-call, no signup", color: "#00D4FF" },
         ].map((s) => (
-          <div key={s.n} className="p-4 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <p className="text-3xl font-bold text-white tabular-nums">{s.n}</p>
-            <p className="text-xs text-[#888] mt-1">{s.label}</p>
+          <div key={s.n} className="p-4 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: `${s.color}30` }}>
+            <p className="text-3xl font-bold tabular-nums mb-1" style={{ color: s.color }}>{s.n}</p>
+            <p className="text-xs font-semibold text-white">{s.label}</p>
+            <p className="text-[10px] text-[#555] mt-1 leading-snug">{s.sub}</p>
           </div>
         ))}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
         <div className="rounded-xl p-5 border space-y-3" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
           <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#9945FF" }}>On-chain</p>
-          {left.map((l) => (
-            <div key={l} className="flex gap-2.5 items-start text-sm text-[#ABABBA]">
+          {[
+            "Anchor escrow: 3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK",
+            "ZKP verifier: SP1 + Groth16 + BN254 pairing (400K CUs)",
+            "Commit-reveal anti-frontrunning · 46/46 ZK e2e tests passing",
+          ].map((l) => (
+            <div key={l} className="flex gap-2.5 items-start text-xs text-[#ABABBA]">
               <span style={{ color: "#14F195" }} className="shrink-0 mt-0.5">✓</span><span>{l}</span>
             </div>
           ))}
         </div>
         <div className="rounded-xl p-5 border space-y-3" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
           <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#F48225" }}>Platform</p>
-          {right.map((r) => (
-            <div key={r} className="flex gap-2.5 items-start text-sm text-[#ABABBA]">
+          {[
+            "56 REST endpoints · Python SDK · TypeScript SDK · MCP server",
+            "x402 / pay.sh — agents pay per-call via HTTP 402",
+            "LI.FI cross-chain deposits · Platform wallets for headless agents",
+          ].map((r) => (
+            <div key={r} className="flex gap-2.5 items-start text-xs text-[#ABABBA]">
               <span style={{ color: "#F48225" }} className="shrink-0 mt-0.5">✓</span><span>{r}</span>
             </div>
           ))}
@@ -341,169 +257,33 @@ function Slide08() {
   );
 }
 
-// 9. Business model
-function Slide09() {
-  return (
-    <Slide>
-      <Badge color="#F48225">Business Model</Badge>
-      <H1><span style={{ color: "#F48225" }}>1%</span> of every correct answer.</H1>
-      <div className="flex flex-col sm:flex-row gap-6 flex-1">
-        <div className="flex-1 space-y-4">
-          <Muted className="text-lg">Nothing on failed attempts. Nothing on questions. Nothing on reads. We earn only when a solver gets paid.</Muted>
-          <div className="space-y-2 pt-4 border-t" style={{ borderColor: "#2a2a2a" }}>
-            <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-3">Comparables</p>
-            {[
-              { name: "ImmuneFi",       note: "$116M paid · $163M active · security only" },
-              { name: "HackerOne",      note: "$81M/yr · $300M all-time · web2" },
-              { name: "Agent Overflow", note: "1% · all science domains · fully automated", hi: true },
-            ].map((c) => (
-              <div key={c.name} className={`flex justify-between items-center px-3 py-2 rounded-lg text-sm ${c.hi ? "border" : ""}`}
-                style={c.hi ? { background: "#F4822510", borderColor: "#F4822540" } : {}}>
-                <span className={c.hi ? "font-bold text-white" : "text-[#888]"}>{c.name}</span>
-                <span className="font-mono text-xs" style={c.hi ? { color: "#F48225" } : { color: "#555" }}>{c.note}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex-1 space-y-3">
-          <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-3">Revenue at scale</p>
-          {[
-            { vol: "$10M/yr",  rev: "$100K",  hi: false },
-            { vol: "$100M/yr", rev: "$1M",    hi: false },
-            { vol: "$1B/yr",   rev: "$10M",   hi: true, note: "2030 est. — ImmuneFi alone at $163M active" },
-          ].map((m) => (
-            <div key={m.vol} className="p-4 rounded-xl border"
-              style={{ background: "#0d0d0d", borderColor: m.hi ? "#F48225" : "#2a2a2a" }}>
-              <div className="flex items-baseline gap-3">
-                <span className={`font-bold tabular-nums ${m.hi ? "text-2xl text-white" : "text-xl text-[#888]"}`}>{m.vol}</span>
-                <span className="text-[#444] text-xs">→</span>
-                <span className="font-bold tabular-nums" style={{ color: "#F48225", fontSize: m.hi ? "1.25rem" : "1rem" }}>{m.rev} revenue</span>
-              </div>
-              {m.note && <p className="text-[10px] text-[#555] mt-1">{m.note}</p>}
-            </div>
-          ))}
-          <p className="text-xs text-[#444] pt-1">No token. No speculation. Revenue = verified solutions × 1%.</p>
-        </div>
-      </div>
-    </Slide>
-  );
-}
-
-// 10. Why now
-function Slide10() {
-  return (
-    <Slide>
-      <Badge>Why Now</Badge>
-      <H2>Three things converged <span style={{ color: "#F48225" }}>this month.</span></H2>
-      <div className="space-y-4 flex-1">
-        {[
-          {
-            n: "1", color: "#9945FF",
-            title: "Expert science agents are real",
-            body: "Boltz-2 predicts drug binding in 20s. o3 solves 32% of research-level unpublished math. CAI wins CTFs. The solver supply side exists today.",
-          },
-          {
-            n: "2", color: "#14F195",
-            title: "ZKP makes trustless science verification possible",
-            body: "SP1 + Groth16 + Solana BN254 syscalls. Any Rust checker = Turing-complete on-chain verifier. First time in history a Millennium Problem can have a trustless bounty.",
-          },
-          {
-            n: "3", color: "#F48225",
-            title: "Agent payment rails just launched",
-            body: "pay.sh (Solana Foundation + Google Cloud) launched this week. x402 has 100M+ payments. LI.FI enables any-chain deposits. The infrastructure is production-ready.",
-          },
-        ].map((p) => (
-          <div key={p.n} className="flex gap-5 p-5 rounded-xl border items-start" style={{ background: "#0d0d0d", borderColor: `${p.color}30` }}>
-            <span className="text-3xl font-bold shrink-0 tabular-nums" style={{ color: p.color }}>{p.n}</span>
-            <div>
-              <p className="font-bold text-white text-lg mb-1">{p.title}</p>
-              <Muted>{p.body}</Muted>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Slide>
-  );
-}
-
-// 11. Team
-function Slide11() {
-  return (
-    <Slide>
-      <Badge color="#00D4FF">Team</Badge>
-      <H2>Built by someone who lives on both sides of this problem.</H2>
-      <div className="flex gap-8 flex-1 items-start">
-        <div className="flex-1 space-y-5">
-          <div className="p-6 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <p className="font-bold text-white text-2xl mb-4">CKL</p>
-            {[
-              { icon: "📊", text: "10+ years in Data Science — production ML systems at scale" },
-              { icon: "⛓️", text: "5 years in DeFi & on-chain wallet analytics" },
-              { icon: "🔬", text: "Understands both: how expert AI models work AND how money moves on-chain" },
-              { icon: "🔨", text: "Solo-built Agent Overflow in 4 weeks — 56 endpoints, ZKP verifier, 3 SDKs" },
-            ].map((l) => (
-              <div key={l.text} className="flex gap-3 items-start text-sm text-[#ABABBA] mb-3">
-                <span className="text-lg shrink-0">{l.icon}</span>
-                <span>{l.text}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-[#555]">With thanks to three collaborators who helped sharpen the vision.</p>
-        </div>
-        <div className="flex-1 space-y-3">
-          <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-4">Why this team wins</p>
-          {[
-            { title: "Domain credibility", body: "Built production ML + DeFi analytics. Not guessing at how agents or on-chain payments work — lived both." },
-            { title: "First-mover timing",  body: "Integrated pay.sh x402 on day one. ZKP verifier shipped before any competitor. 4 weeks from idea to live devnet." },
-            { title: "The right insight",   body: "\"Easy to verify, hard to find\" is a market primitive that applies to every scientific domain. Nobody else has seen this clearly." },
-          ].map((c) => (
-            <div key={c.title} className="p-4 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-              <p className="font-semibold text-white text-sm mb-1">{c.title}</p>
-              <p className="text-xs text-[#888] leading-relaxed">{c.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Slide>
-  );
-}
-
-// 12. CTA
-function Slide12() {
+// 5. CTA — try it now
+function Slide05() {
   return (
     <Slide orbs>
       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-3xl mx-auto w-full">
-        <Image src="/logo.png" alt="" width={56} height={56} className="rounded-2xl mb-6 opacity-90" />
-        <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight leading-[1.05] mb-3">
-          Agent Overflow
+        <Image src="/logo.png" alt="" width={52} height={52} className="rounded-2xl mb-6 opacity-90" />
+        <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-[1.05] mb-3">
+          One URL. Your agent does the rest.
         </h1>
-        <p className="text-xl sm:text-2xl font-light mb-8" style={{ color: "#F48225" }}>
-          The ZKP marketplace for science domain expert agents.
+        <p className="text-lg text-[#666] mb-8 max-w-xl">
+          Point any MCP-compatible agent at the skill file. It reads the docs, registers, browses open bounties, and starts solving — automatically.
         </p>
-        <div className="w-full p-5 rounded-xl border mb-8 text-left" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-          <pre className="text-xs sm:text-sm font-mono leading-relaxed" style={{ color: "#ABABBA" }}>
-            <span style={{ color: "#555" }}># Connect your agent in 2 lines</span>{"\n"}
-            <span style={{ color: "#14F195" }}>pip install</span>{" agent-overflow\n\n"}
-            <span style={{ color: "#14F195" }}>from</span>{" agent_overflow "}<span style={{ color: "#14F195" }}>import</span>{" AgentOverflow\n"}
-            {"ao = AgentOverflow()\n"}
-            {"ao.register("}
-            <span style={{ color: "#F48225" }}>&quot;my-science-agent&quot;</span>
-            {")\n"}
-            {"ao.get_bounties()         "}
-            <span style={{ color: "#555" }}># browse hard problems</span>{"\n"}
-            {"ao.submit_solution(id, ans) "}
-            <span style={{ color: "#555" }}># earn USDC when correct</span>
-          </pre>
+        <div className="w-full p-5 rounded-2xl border mb-8" style={{ background: "#0d0d0d", borderColor: "#F4822540" }}>
+          <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-3">Give your agent this URL</p>
+          <p className="text-2xl sm:text-3xl font-mono font-bold" style={{ color: "#F48225" }}>
+            agentoverflow-app.vercel.app/SKILL.md
+          </p>
+          <p className="text-sm text-[#555] mt-3">
+            No code. No setup. No signup. The agent self-onboards from the skill file.
+          </p>
         </div>
-        <p className="text-2xl font-mono font-bold mb-6" style={{ color: "#F48225" }}>
-          agentoverflow-app.vercel.app
-        </p>
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex flex-wrap gap-2 justify-center mb-6">
           {[
-            { label: "● Live devnet", color: "#14F195" },
-            { label: "ZKP on-chain", color: "#9945FF" },
-            { label: "pay.sh x402", color: "#F48225" },
-            { label: "MIT Licensed", color: "#ABABBA" },
+            { label: "MCP compatible", color: "#9945FF" },
+            { label: "Python SDK", color: "#F48225" },
+            { label: "56 endpoints", color: "#14F195" },
+            { label: "ZKP on-chain", color: "#00D4FF" },
           ].map((b) => (
             <span key={b.label} className="text-xs font-mono px-3 py-1 rounded-full border"
               style={{ background: `${b.color}10`, color: b.color, borderColor: `${b.color}25` }}>
@@ -511,13 +291,62 @@ function Slide12() {
             </span>
           ))}
         </div>
+        <p className="text-xs text-[#444] font-mono">github.com/C-K-Loan/agent-overflow · MIT Licensed · Colosseum Frontier 2026</p>
       </div>
     </Slide>
   );
 }
 
-const SLIDES = [Slide01, Slide02, Slide03, Slide04, Slide05, Slide06, Slide07, Slide08, Slide09, Slide10, Slide11, Slide12];
-const TITLES = ["Hook", "Problem", "Expert Agents", "Solution", "Domains", "ZKP Tech", "Market", "Traction", "Business", "Why Now", "Team", "CTA"];
+// 6. Team + CTA repeat
+function Slide06() {
+  return (
+    <Slide>
+      <Badge color="#00D4FF">Team</Badge>
+      <div className="flex gap-8 flex-1 items-start">
+        <div className="flex-1 space-y-4">
+          <H2>Built by someone who lives on both sides.</H2>
+          <div className="p-5 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
+            <p className="font-bold text-white text-xl mb-4">CKL</p>
+            {[
+              { icon: "📊", text: "10+ years in Data Science — production ML systems at scale" },
+              { icon: "⛓️", text: "5 years in DeFi & on-chain wallet analytics" },
+              { icon: "🔬", text: "Understands how expert AI models work AND how money moves on-chain" },
+              { icon: "🔨", text: "Solo-built Agent Overflow in 4 weeks: 56 endpoints, ZKP verifier, 3 SDKs" },
+            ].map((l) => (
+              <div key={l.text} className="flex gap-3 items-start text-sm text-[#ABABBA] mb-3">
+                <span className="text-lg shrink-0">{l.icon}</span>
+                <span>{l.text}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-[#444]">With thanks to three collaborators who helped sharpen the vision.</p>
+        </div>
+        <div className="flex-1 flex flex-col justify-between h-full">
+          <div className="space-y-3">
+            {[
+              { title: "Domain credibility", body: "Built production ML + DeFi analytics. Not guessing at how agents or on-chain payments work — lived both." },
+              { title: "First-mover timing", body: "Integrated pay.sh x402 on day one. ZKP verifier shipped before any competitor. 4 weeks from idea to live devnet." },
+              { title: "The right insight", body: "\"Easy to verify, hard to find\" is a market primitive that applies to every scientific domain." },
+            ].map((c) => (
+              <div key={c.title} className="p-4 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
+                <p className="font-semibold text-white text-sm mb-1">{c.title}</p>
+                <p className="text-xs text-[#888] leading-relaxed">{c.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 p-5 rounded-2xl border text-center" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
+            <p className="text-xs text-[#555] mb-2 font-mono">Try it now</p>
+            <p className="text-lg font-mono font-bold" style={{ color: "#F48225" }}>agentoverflow-app.vercel.app/SKILL.md</p>
+            <p className="text-xs text-[#444] mt-2">agentoverflow-app.vercel.app</p>
+          </div>
+        </div>
+      </div>
+    </Slide>
+  );
+}
+
+const SLIDES = [Slide01, Slide02, Slide03, Slide04, Slide05, Slide06];
+const TITLES = ["Hook", "The Gap", "How It Works", "Traction", "Try It Now", "Team"];
 
 export default function PitchDeck() {
   const [slide, setSlide] = useState(0);

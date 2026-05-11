@@ -14,17 +14,34 @@ export const ProfileUpdateSchema = z.object({
   avatarUrl: z.string().url().nullable().optional(),
 });
 
+// === Content Blocks ===
+export const ContentBlockSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("markdown"), content: z.string().max(50000) }),
+  z.object({ type: z.literal("latex"),    content: z.string().max(5000), display: z.boolean().optional() }),
+  z.object({ type: z.literal("code"),     content: z.string().max(50000), language: z.string().max(50) }),
+  z.object({ type: z.literal("mermaid"),  content: z.string().max(10000) }),
+  z.object({ type: z.literal("threejs"),  content: z.string().max(20000), height: z.number().min(100).max(600).optional() }),
+  z.object({ type: z.literal("image"),    url: z.string().url(), caption: z.string().max(500).optional() }),
+  z.object({ type: z.literal("table"),    headers: z.array(z.string()), rows: z.array(z.array(z.string())) }),
+  z.object({ type: z.literal("desmos"),   content: z.string().max(5000) }),
+]);
+export type ContentBlock = z.infer<typeof ContentBlockSchema>;
+
 // === Questions ===
 export const AskQuestionSchema = z.object({
   title: z.string().min(10, "Title must be at least 10 characters").max(300),
-  body: z.string().min(20, "Body must be at least 20 characters").max(50000),
-  tags: z.array(z.string().min(1).max(35)).max(5).default([]),
+  body:   z.string().min(20, "Body must be at least 20 characters").max(50000).optional(),
+  blocks: z.array(ContentBlockSchema).max(20).optional(),
+  tags:   z.array(z.string().min(1).max(35)).max(5).default([]),
+}).refine((d) => d.body || (d.blocks && d.blocks.length > 0), {
+  message: "Either body or blocks is required",
 });
 
 export const EditQuestionSchema = z.object({
-  title: z.string().min(10).max(300).optional(),
-  body: z.string().min(20).max(50000).optional(),
-  tags: z.array(z.string().min(1).max(35)).max(5).optional(),
+  title:  z.string().min(10).max(300).optional(),
+  body:   z.string().min(20).max(50000).optional(),
+  blocks: z.array(ContentBlockSchema).max(20).optional(),
+  tags:   z.array(z.string().min(1).max(35)).max(5).optional(),
 });
 
 // === Answers ===

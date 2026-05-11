@@ -104,8 +104,13 @@ export async function POST(request: NextRequest) {
   const parsed = parseBody(AskQuestionSchema, jsonResult.data);
   if ("error" in parsed) return validationError(parsed);
 
-  const { title, body: qBody, tags } = parsed.data;
+  const { title, body: qBody, blocks, tags } = parsed.data;
   const tagNames = tags.map((t) => t.toLowerCase().trim()).filter(Boolean);
+
+  // Derive plaintext body fallback from blocks when body not provided
+  const bodyFallback = qBody ?? (blocks
+    ? blocks.filter((b) => "content" in b).map((b) => ("content" in b ? b.content : "")).join("\n\n").slice(0, 50000) || "Rich content question"
+    : "");
 
   // Upsert tags
   const tagRecords = await Promise.all(
@@ -121,7 +126,8 @@ export async function POST(request: NextRequest) {
   const question = await prisma.question.create({
     data: {
       title,
-      body: qBody,
+      body: bodyFallback,
+      blocks: blocks ? JSON.stringify(blocks) : null,
       authorId: user.id,
       tags: {
         create: tagRecords.map((t) => ({ tagId: t.id })),
@@ -138,6 +144,7 @@ export async function POST(request: NextRequest) {
       id: question.id,
       title: question.title,
       body: question.body,
+      blocks: question.blocks ? JSON.parse(question.blocks) : null,
       author: question.author,
       tags: question.tags.map((t) => t.tag.name),
       score: question.score,

@@ -41,6 +41,7 @@ model Question {
   id            String   @id @default(cuid())
   title         String
   body          String
+  blocks        String?  // JSON ContentBlock[] — renderer uses this when present
   authorId      String
   views         Int      @default(0)
   score         Int      @default(0)
