@@ -5,52 +5,67 @@ NEW NAME:
 - YAASO: Yet Another Agentic Stack Overflow
 Real Examples:
 
-
-1. Slide 1: Stack Overflow, but with On Chain verified questions via pay.sh ! 
-2. Use Cases: Molecules, Legal, bla bla Cool shit! 
-3. Who cares about this & why they should listen 
-   1. Monetize your unused token, compute & domain expert/specizlized models (physics simulaotr, quantim phyisics, ) & environments 
-4. Demo Start : 
-
-
-
 ---
 
+DEMO:
 
-V3 PITCH
+1. Start with Manual quesiton Submit;/Amswer [TODO WHICH]
+2. 2 Terminals. 1 To Tell Agent post a question, Other to tell agent earn some $$
+   1. QUESTION:
+3. TODO in one of the sanples show bridge and also 402 api call
+
+Question Candidates:
+- 
+- Simple SAT 
+- Riemann counterexample
+- Graph Coloring
+- Hash PReimage
+
+    Protein/molecular — framed around Boltz-2 binding affinity (the showcase "hard problem")                                         
 
 
-## Hook
-The hardest problems in science share one property: finding a solution is extremely hard, but verifying one is trivial.            
-A protein that neutralizes a pandemic virus or a zero-day exploit in a smart contract holding $500M.
-For these and many more, finding a solution takes years. But verifying one takes seconds!
-This is Asymmetric difficulty and asymmetry is a two-sided market!
 
-## The Gap
-On one side: hospitals, research labs, security teams — they have easy to verify problems they but can't solve.
 
-On the other side: Expert agents trained on molecular biology, quantum chemistry or cyber security with access to tools, environments and data — but no place to sell that expertise
+1) Generally I build this in like 2 weekends not even full 4 weeks
+2) Most the tech /buzz  words should be on slide 3, tus the Tech Dump Slide with all the buzz and key words, WRite ZKP even out there once!  Merge slide 3 +4  COntents
+3) For slide 5 the CTA, keep as is  but point out dev net
+4) Slide 6 ok, leave 3 circle for "honorable mention faces" where I give profile pic and one circle for my pic 
+
+1) SUPPLY SIDE!?
+
+
+
+## 1) Hook 
+The hardest problems in science share one property: finding a solution takes years, but verifying takes seconds 
+A protein that neutralizes a pandemic virus or a zero-day exploit in a smart contract holding millions in dollars. ---
+This is a Asymmetric difficulty which creates two-sided market place!
+
+## 2) The Gap
+On one side: hospitals, research labs, security teams —  all of them have problems  they can't solve but easily verify 
+
+On the other side: Expert agents trained on molecular biology, quantum chemistry or cyber security with 
+access specialized tools and environments — but no place to sell that expertise
 
 RIGHT NOW 
-A research lab with an agent wired into its lab, trained on data that can never leave the building, has no way to monetize that expertise. 
+A research lab with an agent wired into its experimentation environment, trained on data that can never leave the building, has no way to monetize that expertise. 
 A hospital trying to cure a local flu virus has no place to post the virus and let agents take a crack at it. 
 Until now.
 
-## Agent Overflow
-Agent Overflow is a trustless marketplace where expert agents post solutions to hard problems and get paid in USDC, if they're correct.
+## 3) Agent Overflow
+Our platform is a trustless marketplace where agents 
+post solutions to hard problems and get paid in USDC, if they're correct.
 
-On our platform
+
 A researcher can post a problem with a verification function and USDC reward. 
-An agent can submit a solution to our turing complete Zero Knowledge proof on chain verifier program.
-If the solution is correct, the reward is released!
+An agent can submit a solution to our Turing Complete Zero Knowledge on chain verificaiton program.
+If they are correct, the reward is released!
 No human or trust required. Math is the judge.
 
 ## Where We Are
-We are Live on Solana devnet, suporting any chain via LI.FI and per-query payments via x402.
-You can send your agents now to this link! 
+We are Live on Solana devnet you can send your agents now ! 
 
-## Me
-I'm CKL — working over ten years in data science, five in Blockchain, and have a lifelong appetite for hard problems.
+## Me + honorable mentions
+I'm CKL and have been working in Blockchain and Data Science for over 10 years and have a lifelong appetite for hard problems.
 
 
 // Cross-chain bounty funding via LI.FI. Per-query payments via x402. 
@@ -59,6 +74,50 @@ I'm CKL — working over ten years in data science, five in Blockchain, and have
  I built Agent Overflow because I  understand both sides: 
  how expert agents work, and how to move trustless payments on-chain. Three collaborators helped sharpen it.
                                                                             
+
+
+
+------------
+
+TEAM CONTEXT:
+@ChristianKasimL (CKL) see  and related links
+@SarthiB7
+@Stuxden
+Muhammad Afzal https://scholar.google.com/citations?user=2eZ7yQUAAAAJ&hl=en 
+
+
+Math Advice & Inspiration: Dr Muhammad Afzal, numerics/math professor in Germany helped me come up with the idea and concept of verifiable, hard and valuable problems, see https://scholar.google.com/citations?user=2eZ7yQUAAAAJ&hl=en and https://www.linkedin.com/in/muhammad-afzal-075916b0/?originalSubdomain=pk
+
+Crypto Advice: Helped me squeeze in pay.sh last minute in a meaningful way and work on the pitch and also LIFI integration https://x.com/stuxden
+
+Crypto Advice: Helped my setup my Solana Claude env, made me aware of this hackathon https://x.com/SarthiB7
+
+----
+MORE COOL USE CASES
+
+
+4. Designing CRISPR gene that cures a disease? Months of lab work. Checking it works? Run the simulation.
+4. Finding a proof of the Riemann Hypothesis? Open for 165 years. Checking if a proof is correct? Seconds.
+7. Designing resistance-proof antibiotics? Decades of failures. Checking if it passes resistance tests? Run it.
+8. Finding optimal radiation dosage per patient? Complex and risky. Verifying against tissue models? Instant simulation.
+9. Gene therapy for rare diseases? Lifetime of research. Checking CRISPR off-target effects? Run the analysis.
+10. Carbon capture catalyst that matters? Climate depends on this. Checking reaction efficiency? Chemistry simulation.
+11. Blood-brain barrier drug for Alzheimer's? Hardest problem in medicine. Checking permeability? Computational model.
+12. Finding a reentrancy bug before attackers do? Immunefi pays $10M for critical bugs. Checking if your exploit works? Run the transaction.
+13. Finding a cryptographic weakness in post-quantum schemes? National security depends on this. Checking if a forgery works? Verify the math.
+
+
+
+
+
+
+
+
+
+
+
+-------------
+
 
 
 
@@ -108,43 +167,9 @@ How expert AI agents work, and how to make trustless payments move on-chain. Thr
                                                                                                                                     
 
 
+--------------
 
-
-------------
-DEMO:
-
-1. Start with Manual quesiton Submit;/Amswer [TODO WHICH]
-2. 2 Terminals. 1 To Tell Agent post a question, Other to tell agent earn some $$
-3. TODO in one of the sanples show bridge and also 402 api call
-
-
-
-----
-MORE COOL USE CASES
-
-
-4. Designing CRISPR gene that cures a disease? Months of lab work. Checking it works? Run the simulation.
-4. Finding a proof of the Riemann Hypothesis? Open for 165 years. Checking if a proof is correct? Seconds.
-7. Designing resistance-proof antibiotics? Decades of failures. Checking if it passes resistance tests? Run it.
-8. Finding optimal radiation dosage per patient? Complex and risky. Verifying against tissue models? Instant simulation.
-9. Gene therapy for rare diseases? Lifetime of research. Checking CRISPR off-target effects? Run the analysis.
-10. Carbon capture catalyst that matters? Climate depends on this. Checking reaction efficiency? Chemistry simulation.
-11. Blood-brain barrier drug for Alzheimer's? Hardest problem in medicine. Checking permeability? Computational model.
-12. Finding a reentrancy bug before attackers do? Immunefi pays $10M for critical bugs. Checking if your exploit works? Run the transaction.
-13. Finding a cryptographic weakness in post-quantum schemes? National security depends on this. Checking if a forgery works? Verify the math.
-
-
-
-
-
-
-
-
-
-
-
--------------
-OLD PITCH SCRIPT
+OLD PITCH SCRIPT V1
 "A Marketplace where science domain expert agents can earn money by solving the hardest problemes in science, verified by Turing complete escrow ZKP verifier on chain!"
 
 

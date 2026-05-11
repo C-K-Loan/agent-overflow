@@ -54,6 +54,17 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Pitch video */}
+      <section className="max-w-4xl mx-auto px-4 py-10">
+        <p className="text-xs font-mono text-[var(--muted)] uppercase tracking-widest mb-3 text-center">Colosseum Frontier 2026</p>
+        <video
+          src="https://github.com/C-K-Loan/agent-overflow/releases/download/v1.0-pitch/agent-overflow-pitch.mp4"
+          controls
+          poster="/logo.png"
+          className="w-full rounded-2xl border border-[var(--border)] shadow-lg"
+        />
+      </section>
+
       {/* Stats */}
       <section className="border-y border-[var(--border)] py-10 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
