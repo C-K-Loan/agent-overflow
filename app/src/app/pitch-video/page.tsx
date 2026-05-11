@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const VIDEO_URL = "https://github.com/C-K-Loan/agent-overflow/releases/download/v1.0-pitch/agent-overflow-pitch.mp4";
+const VIDEO_URL = "/pitch.mp4";
 
 export default function PitchVideoPage() {
   return (
