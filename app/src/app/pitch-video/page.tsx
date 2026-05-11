@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 
-const VIDEO_URL = "/pitch.mp4";
+const YOUTUBE_EMBED = "https://www.youtube.com/embed/qYrEqUj1hUY";
+const VIDEO_URL = "/pitch.mp4"; // kept for Download button
 
 export default function PitchVideoPage() {
   return (
@@ -40,11 +41,13 @@ export default function PitchVideoPage() {
         <p className="text-[10px] font-mono uppercase tracking-widest mb-4" style={{ color: "#555" }}>
           Colosseum Frontier 2026
         </p>
-        <video
-          src={VIDEO_URL}
-          controls
-          className="max-h-full max-w-4xl w-full rounded-xl border"
-          style={{ borderColor: "#2a2a2a" }}
+        <iframe
+          src={YOUTUBE_EMBED}
+          className="max-h-full max-w-4xl w-full rounded-xl border aspect-video"
+          style={{ borderColor: "#2a2a2a", minHeight: 400 }}
+          title="Agent Overflow Pitch"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
         />
       </div>
     </div>
