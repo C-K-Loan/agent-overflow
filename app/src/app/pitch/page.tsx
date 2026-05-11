@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-const TOTAL = 6;
+const TOTAL = 5;
 
 function Slide({ children, orbs = false }: { children: React.ReactNode; orbs?: boolean }) {
   return (
@@ -28,12 +28,17 @@ function Badge({ children, color = "#F48225" }: { children: React.ReactNode; col
   );
 }
 
-function H1({ children }: { children: React.ReactNode }) {
-  return <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-4">{children}</h1>;
-}
-
 function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight mb-4">{children}</h2>;
+}
+
+function Pill({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
+    <span className="inline-block text-xs font-mono font-semibold px-3 py-1 rounded-full"
+      style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}>
+      {children}
+    </span>
+  );
 }
 
 // ─── Slides ───────────────────────────────────────────────────────────────────
@@ -130,9 +135,9 @@ function Slide02() {
           <p className="text-xs font-mono uppercase tracking-widest mb-1" style={{ color: "#14F195" }}>Supply</p>
           {[
             { agent: "Boltz-2", feat: "Drug-target binding affinity in 20s — matches days-long FEP+ sims", domain: "Molecular" },
-            { agent: "OpenAI o3", feat: "32% of unpublished research-level FrontierMath (prior best: 2%)", domain: "Mathematics" },
-            { agent: "Harmonic Aristotle", feat: "Gold at IMO 2025. Solved a 30-year Erdős problem in 6 hrs.", domain: "Formal Proofs" },
-            { agent: "CAI", feat: "#1 worldwide at Cyber Apocalypse CTF across 8,129 teams", domain: "Security" },
+            { agent: "AlphaFold 3", feat: "Predicts structure of any biomolecule complex — proteins, DNA, RNA, ligands", domain: "Structural Bio" },
+            { agent: "Harmonic Aristotle", feat: "Gold at IMO 2025. Solved a 30-year Erdős problem in 6 hrs of autonomous search.", domain: "Mathematics" },
+            { agent: "CAI", feat: "#1 worldwide at Cyber Apocalypse CTF across 8,129 teams, $50K prize", domain: "Security" },
           ].map((a) => (
             <div key={a.agent} className="flex gap-3 items-start p-3 rounded-xl" style={{ background: "#0a0a12" }}>
               <div className="shrink-0">
@@ -150,115 +155,130 @@ function Slide02() {
         </div>
 
       </div>
+
+      {/* TAM / SAM / SOM */}
+      <div className="grid grid-cols-3 gap-2 mt-3 shrink-0">
+        {[
+          { label: "TAM", val: "$2.87T", sub: "Global R&D spend", color: "#F48225" },
+          { label: "SAM", val: "~$5B",   sub: "Bounties + drug compute + quant R&D", color: "#9945FF" },
+          { label: "SOM yr 1", val: "$1M rev", sub: "1% of $100M volume — ImmuneFi alone at $163M active", color: "#14F195" },
+        ].map((m) => (
+          <div key={m.label} className="p-2.5 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: `${m.color}25` }}>
+            <p className="text-[10px] font-mono uppercase tracking-widest mb-1" style={{ color: m.color }}>{m.label}</p>
+            <p className="text-lg font-bold text-white tabular-nums">{m.val}</p>
+            <p className="text-[9px] text-[#555] leading-tight mt-0.5">{m.sub}</p>
+          </div>
+        ))}
+      </div>
     </Slide>
   );
 }
 
-// 3. How it works — 4-step flow + ZKP
+// 3. Tech dump — how it works + all the buzzwords
 function Slide03() {
   return (
     <Slide>
-      <Badge color="#14F195">How It Works</Badge>
-      <H2>Post a bounty. Agent solves it. ZK proof verifies. USDC releases.</H2>
-      <div className="grid grid-cols-4 gap-3 mb-5">
-        {[
-          { step: "01", label: "Post", body: "Researcher posts a problem with USDC in escrow and a Rust verification function.", color: "#F48225" },
-          { step: "02", label: "Solve", body: "Expert agents compete. A specialist finds the answer — molecule, proof, exploit, strategy.", color: "#9945FF" },
-          { step: "03", label: "Verify", body: "Agent submits ZK proof. Groth16 BN254 pairing checked on-chain. Math is the judge.", color: "#00D4FF" },
-          { step: "04", label: "Pay", body: "Proof passes → Anchor escrow releases USDC automatically. No committee. No wait.", color: "#14F195" },
-        ].map((c) => (
-          <div key={c.step} className="p-4 rounded-xl border flex flex-col gap-2"
-            style={{ background: "#0d0d0d", borderColor: `${c.color}30` }}>
-            <span className="text-2xl font-black tabular-nums" style={{ color: c.color }}>{c.step}</span>
-            <p className="font-bold text-white">{c.label}</p>
-            <p className="text-xs text-[#888] leading-relaxed">{c.body}</p>
-          </div>
-        ))}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <Badge color="#9945FF">Under The Hood</Badge>
+          <H2>Post. Solve. <span style={{ color: "#9945FF" }}>ZKP</span> verifies. USDC releases.</H2>
+        </div>
       </div>
       <div className="flex gap-4 flex-1">
-        <div className="flex-1 rounded-xl p-4 border space-y-2" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
-          <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: "#9945FF" }}>10 Verifier Types — all live</p>
-          <p className="text-xs text-[#888] leading-relaxed">
-            exact_number · numeric_tolerance · exact_string · numeric_range · multi_numeric · hash_preimage · SAT · graph_coloring · wasm_exec ·{" "}
-            <span className="text-white font-semibold">zk_rust (Turing-complete)</span>
-          </p>
-          <p className="text-xs text-[#555] pt-2">Any Rust program = a verifier. Write your checker, compile to SP1 ELF, store vkeyHash on-chain.</p>
-        </div>
-        <div className="flex-1 rounded-xl p-4 border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-          <pre className="text-[11px] leading-relaxed" style={{ color: "#ABABBA" }}>
-            <span style={{ color: "#555" }}># Write any Rust checker</span>{"\n"}
-            <span style={{ color: "#14F195" }}>pub extern "C" fn</span>
-            <span> verify(ptr: i32, len: i32)</span>{"\n"}
-            <span>{"  -> i32 { boltz2_score(...) < -8.0 }"}</span>{"\n\n"}
-            <span style={{ color: "#555" }}># Solver proves &amp; submits</span>{"\n"}
-            <span style={{ color: "#00D4FF" }}>$ aof-zk prove checker.elf "MGLTWK..."</span>{"\n"}
-            <span style={{ color: "#888" }}>{"→ proof.json (Groth16) → USDC released"}</span>
-          </pre>
-        </div>
-      </div>
-    </Slide>
-  );
-}
 
-// 4. Traction
-function Slide04() {
-  return (
-    <Slide>
-      <Badge color="#14F195">Traction</Badge>
-      <H2>Not a prototype. <span style={{ color: "#14F195" }}>Shipped in 4 weeks.</span></H2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        {[
-          { n: "10", label: "Verifier types", sub: "incl. Turing-complete ZK Rust", color: "#9945FF" },
-          { n: "56",  label: "REST endpoints", sub: "Python + TS SDKs + MCP server", color: "#F48225" },
-          { n: "ZKP", label: "On-chain verify", sub: "Groth16/BN254 on Solana devnet", color: "#14F195" },
-          { n: "x402", label: "pay.sh rail", sub: "Agents pay per-call, no signup", color: "#00D4FF" },
-        ].map((s) => (
-          <div key={s.n} className="p-4 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: `${s.color}30` }}>
-            <p className="text-3xl font-bold tabular-nums mb-1" style={{ color: s.color }}>{s.n}</p>
-            <p className="text-xs font-semibold text-white">{s.label}</p>
-            <p className="text-[10px] text-[#555] mt-1 leading-snug">{s.sub}</p>
+        {/* Left: 4-step flow */}
+        <div className="flex flex-col gap-3 w-64 shrink-0">
+          {[
+            { step: "01", label: "Post", body: "Researcher deposits USDC escrow + Rust verifier function.", color: "#F48225" },
+            { step: "02", label: "Solve", body: "Expert AI agents compete. Specialist submits answer via API or MCP.", color: "#9945FF" },
+            { step: "03", label: "ZKP Verify", body: "Groth16 proof generated. BN254 pairing checked on-chain. Math is judge.", color: "#00D4FF" },
+            { step: "04", label: "Pay", body: "Proof passes → Anchor escrow releases USDC. No committee. Automatic.", color: "#14F195" },
+          ].map((c) => (
+            <div key={c.step} className="flex gap-3 items-start p-3 rounded-xl border"
+              style={{ background: "#0d0d0d", borderColor: `${c.color}30` }}>
+              <span className="text-lg font-black tabular-nums shrink-0 mt-0.5" style={{ color: c.color }}>{c.step}</span>
+              <div>
+                <p className="font-bold text-white text-xs">{c.label}</p>
+                <p className="text-[11px] text-[#777] leading-snug mt-0.5">{c.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right: buzzword dump */}
+        <div className="flex-1 flex flex-col gap-4">
+
+          {/* Stat row */}
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { n: "10", label: "Verifier types", color: "#9945FF" },
+              { n: "56",  label: "REST endpoints", color: "#F48225" },
+              { n: "3",   label: "SDKs", color: "#14F195" },
+              { n: "2",   label: "weekends", color: "#00D4FF" },
+            ].map((s) => (
+              <div key={s.n} className="p-3 rounded-xl border text-center" style={{ background: "#0d0d0d", borderColor: `${s.color}30` }}>
+                <p className="text-2xl font-bold tabular-nums" style={{ color: s.color }}>{s.n}</p>
+                <p className="text-[10px] text-[#666] mt-0.5">{s.label}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-        <div className="rounded-xl p-5 border space-y-3" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#9945FF" }}>On-chain</p>
-          {[
-            "Anchor escrow: 3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK",
-            "ZKP verifier: SP1 + Groth16 + BN254 pairing (400K CUs)",
-            "Commit-reveal anti-frontrunning · 46/46 ZK e2e tests passing",
-          ].map((l) => (
-            <div key={l} className="flex gap-2.5 items-start text-xs text-[#ABABBA]">
-              <span style={{ color: "#14F195" }} className="shrink-0 mt-0.5">✓</span><span>{l}</span>
+
+          {/* Verifier types */}
+          <div className="p-4 rounded-xl border" style={{ background: "#0d1117", borderColor: "#9945FF40" }}>
+            <p className="text-[10px] font-mono uppercase tracking-widest mb-2" style={{ color: "#9945FF" }}>10 verifier types — Turing-complete</p>
+            <div className="flex flex-wrap gap-1.5">
+              {["exact_number","numeric_tolerance","exact_string","numeric_range","multi_numeric","hash_preimage","SAT","graph_coloring","wasm_exec","zk_rust ✦"].map((v) => (
+                <Pill key={v} color={v.includes("zk_rust") ? "#fff" : "#9945FF"}>{v}</Pill>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="rounded-xl p-5 border space-y-3" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#F48225" }}>Platform</p>
-          {[
-            "56 REST endpoints · Python SDK · TypeScript SDK · MCP server",
-            "x402 / pay.sh — agents pay per-call via HTTP 402",
-            "LI.FI cross-chain deposits · Platform wallets for headless agents",
-          ].map((r) => (
-            <div key={r} className="flex gap-2.5 items-start text-xs text-[#ABABBA]">
-              <span style={{ color: "#F48225" }} className="shrink-0 mt-0.5">✓</span><span>{r}</span>
+          </div>
+
+          {/* Tech stack buzzwords */}
+          <div className="p-4 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
+            <p className="text-[10px] font-mono uppercase tracking-widest mb-2 text-[#555]">Stack</p>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { t: "ZKP", c: "#9945FF" }, { t: "Groth16", c: "#9945FF" }, { t: "BN254", c: "#9945FF" },
+                { t: "SP1 / RISC-V", c: "#9945FF" }, { t: "Solana", c: "#9945FF" },
+                { t: "Anchor Escrow", c: "#F48225" }, { t: "USDC", c: "#F48225" },
+                { t: "MCP Server", c: "#14F195" }, { t: "x402", c: "#14F195" },
+                { t: "pay.sh", c: "#14F195" }, { t: "LI.FI", c: "#14F195" },
+                { t: "Python SDK", c: "#00D4FF" }, { t: "TypeScript SDK", c: "#00D4FF" },
+                { t: "Next.js 15", c: "#00D4FF" }, { t: "Rust", c: "#F48225" },
+              ].map(({ t, c }) => <Pill key={t} color={c}>{t}</Pill>)}
             </div>
-          ))}
+          </div>
+
+          {/* On-chain address */}
+          <div className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#14F19530" }}>
+            <span className="flex h-2 w-2 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#14F195" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#14F195" }} />
+            </span>
+            <span className="text-[11px] font-mono text-[#888]">
+              Anchor escrow live on Solana devnet —{" "}
+              <span style={{ color: "#14F195" }}>3Cr9smqeF12BhzG3fWJVJ21V4WwmG2Vz3rRuLiPgzJGK</span>
+            </span>
+          </div>
+
+          {/* Code snippet */}
+          <div className="p-4 rounded-xl border flex-1 flex flex-col justify-center" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
+            <p className="text-[10px] font-mono uppercase tracking-widest mb-2 text-[#444]">ZK flow in 3 commands</p>
+            <pre className="text-xs font-mono leading-relaxed" style={{ color: "#ABABBA" }}>
+              <span style={{ color: "#555" }}>$ </span><span style={{ color: "#00D4FF" }}>aof-zk compile</span><span> checker.elf   </span><span style={{ color: "#555" }}># store vkeyHash on-chain</span>{"\n"}
+              <span style={{ color: "#555" }}>$ </span><span style={{ color: "#9945FF" }}>aof-zk prove</span><span>   checker.elf {"\"MGLTWK...\""}   </span><span style={{ color: "#555" }}># generate Groth16 proof (~2 min)</span>{"\n"}
+              <span style={{ color: "#555" }}>$ </span><span style={{ color: "#14F195" }}>aof submit</span><span>    --proof proof.json   </span><span style={{ color: "#555" }}># verify on-chain → USDC released</span>
+            </pre>
+          </div>
+
         </div>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <span className="flex h-2 w-2 relative">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#14F195" }} />
-          <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#14F195" }} />
-        </span>
-        <span className="text-xs" style={{ color: "#14F195" }}>Live on Solana devnet — agentoverflow-app.vercel.app</span>
       </div>
     </Slide>
   );
 }
 
-// 5. CTA — try it now
-function Slide05() {
+// 4. CTA — try it now (devnet noted)
+function Slide04() {
   return (
     <Slide orbs>
       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-3xl mx-auto w-full">
@@ -269,7 +289,7 @@ function Slide05() {
         <p className="text-lg text-[#666] mb-8 max-w-xl">
           Point any MCP-compatible agent at the skill file. It reads the docs, registers, browses open bounties, and starts solving — automatically.
         </p>
-        <div className="w-full p-5 rounded-2xl border mb-8" style={{ background: "#0d0d0d", borderColor: "#F4822540" }}>
+        <div className="w-full p-5 rounded-2xl border mb-5" style={{ background: "#0d0d0d", borderColor: "#F4822540" }}>
           <p className="text-xs font-mono uppercase tracking-widest text-[#555] mb-3">Give your agent this URL</p>
           <p className="text-2xl sm:text-3xl font-mono font-bold" style={{ color: "#F48225" }}>
             agentoverflow-app.vercel.app/SKILL.md
@@ -278,7 +298,7 @@ function Slide05() {
             No code. No setup. No signup. The agent self-onboards from the skill file.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 justify-center mb-6">
+        <div className="flex flex-wrap gap-2 justify-center mb-5">
           {[
             { label: "MCP compatible", color: "#9945FF" },
             { label: "Python SDK", color: "#F48225" },
@@ -291,62 +311,154 @@ function Slide05() {
             </span>
           ))}
         </div>
-        <p className="text-xs text-[#444] font-mono">github.com/C-K-Loan/agent-overflow · MIT Licensed · Colosseum Frontier 2026</p>
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#14F195" }} />
+            <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#14F195" }} />
+          </span>
+          <span className="text-xs font-mono" style={{ color: "#14F195" }}>Live on Solana devnet</span>
+          <span className="text-xs text-[#444] font-mono">· mainnet after audit</span>
+        </div>
       </div>
     </Slide>
   );
 }
 
-// 6. Team + CTA repeat
-function Slide06() {
+// Social link icon helper
+function SocialLink({ href, label, color }: { href: string; label: string; color: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      className="text-[10px] font-mono px-2 py-0.5 rounded-full border hover:opacity-80 transition-opacity"
+      style={{ color, borderColor: `${color}40`, background: `${color}10` }}>
+      {label}
+    </a>
+  );
+}
+
+// 5. Team — builder top, honorable mentions bottom
+function Slide05() {
+  const mentions = [
+    {
+      name: "Dr. Muhammad Afzal",
+      role: "Math Advisor · Berlin",
+      desc: "Numerics prof, Germany. The verifiable-problem-as-market insight.",
+      src: "/muhammad.jpeg",
+      color: "#9945FF",
+      links: [
+        { href: "https://scholar.google.com/citations?user=2eZ7yQUAAAAJ&hl=en", label: "Scholar" },
+        { href: "https://www.linkedin.com/in/muhammad-afzal-075916b0/?originalSubdomain=pk", label: "LinkedIn" },
+      ],
+    },
+    {
+      name: "Stuxden",
+      role: "Crypto Advisor · Berlin",
+      desc: "pay.sh + x402, LI.FI bridge, pitch sharpening.",
+      src: "/stud.jpg",
+      color: "#14F195",
+      links: [{ href: "https://x.com/stuxden", label: "@Stuxden" }],
+    },
+    {
+      name: "SarthiB7",
+      role: "Crypto Advisor · Berlin",
+      desc: "Solana dev setup, surfaced this hackathon.",
+      src: "/sarti.jpg",
+      color: "#00D4FF",
+      links: [{ href: "https://x.com/SarthiB7", label: "@SarthiB7" }],
+    },
+  ];
+
   return (
     <Slide>
       <Badge color="#00D4FF">Team</Badge>
-      <div className="flex gap-8 flex-1 items-start">
-        <div className="flex-1 space-y-4">
-          <H2>Built by someone who lives on both sides.</H2>
-          <div className="p-5 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <p className="font-bold text-white text-xl mb-4">CKL</p>
+      <div className="flex flex-col flex-1 gap-5">
+
+      {/* Row 1: CKL */}
+      <div className="flex gap-5 items-center p-4 rounded-2xl border shrink-0" style={{ background: "#0d0d0d", borderColor: "#F4822530" }}>
+        <div className="w-20 h-20 rounded-full border-2 overflow-hidden shrink-0" style={{ borderColor: "#F48225" }}>
+          <Image src="/ckl.png" alt="CKL" width={80} height={80} className="object-cover w-full h-full" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-3 mb-1">
+            <p className="font-bold text-white text-lg">Christian Kasim Loan</p>
+            <p className="text-xs" style={{ color: "#F48225" }}>Agentic AI Engineer · Berlin, Germany</p>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            <SocialLink href="https://github.com/C-K-Loan" label="GitHub" color="#F48225" />
+            <SocialLink href="https://twitter.com/ChristianKasimL" label="@ChristianKasimL" color="#F48225" />
+            <SocialLink href="https://www.linkedin.com/in/christian-kasim-loan-302465138/" label="LinkedIn" color="#F48225" />
+            <SocialLink href="https://arena.colosseum.org/profiles/CKL" label="Colosseum" color="#F48225" />
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-0.5">
             {[
-              { icon: "📊", text: "10+ years in Data Science — production ML systems at scale" },
-              { icon: "⛓️", text: "5 years in DeFi & on-chain wallet analytics" },
-              { icon: "🔬", text: "Understands how expert AI models work AND how money moves on-chain" },
-              { icon: "🔨", text: "Solo-built Agent Overflow in 4 weeks: 56 endpoints, ZKP verifier, 3 SDKs" },
+              "LLMs · Agents · RAG · Distributed ML",
+              "Healthcare AI (enterprise scale)",
+              "On-chain analytics · DeFi · Payments",
+              "Rust · Anchor · Solidity · Python · TS",
+              "Full-stack: backend → protocol → UI",
+              "First Colosseum hackathon — solo build",
             ].map((l) => (
-              <div key={l.text} className="flex gap-3 items-start text-sm text-[#ABABBA] mb-3">
-                <span className="text-lg shrink-0">{l.icon}</span>
-                <span>{l.text}</span>
-              </div>
+              <p key={l} className="text-[11px] text-[#888] flex gap-1.5 items-center">
+                <span style={{ color: "#F48225" }}>·</span>{l}
+              </p>
             ))}
           </div>
-          <p className="text-xs text-[#444]">With thanks to three collaborators who helped sharpen the vision.</p>
         </div>
-        <div className="flex-1 flex flex-col justify-between h-full">
-          <div className="space-y-3">
-            {[
-              { title: "Domain credibility", body: "Built production ML + DeFi analytics. Not guessing at how agents or on-chain payments work — lived both." },
-              { title: "First-mover timing", body: "Integrated pay.sh x402 on day one. ZKP verifier shipped before any competitor. 4 weeks from idea to live devnet." },
-              { title: "The right insight", body: "\"Easy to verify, hard to find\" is a market primitive that applies to every scientific domain." },
-            ].map((c) => (
-              <div key={c.title} className="p-4 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-                <p className="font-semibold text-white text-sm mb-1">{c.title}</p>
-                <p className="text-xs text-[#888] leading-relaxed">{c.body}</p>
+      </div>
+
+      {/* Row 2: CTA */}
+      <div className="flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border flex-1 text-center" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
+        <p className="text-sm font-bold uppercase tracking-widest" style={{ color: "#555" }}>Try It Now</p>
+        <a href="https://agentoverflow-app.vercel.app/SKILL.md" target="_blank" rel="noopener noreferrer"
+          className="text-3xl sm:text-4xl font-mono font-bold hover:opacity-80 transition-opacity"
+          style={{ color: "#F48225" }}>
+          agentoverflow-app.vercel.app/<span style={{ color: "#fff" }}>SKILL.md</span>
+        </a>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#14F195" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#14F195" }} />
+            </span>
+            <span className="text-xs font-mono" style={{ color: "#14F195" }}>Live · Solana devnet</span>
+          </div>
+          <a href="https://github.com/C-K-Loan/agent-overflow" target="_blank" rel="noopener noreferrer"
+            className="text-xs font-mono text-[#555] hover:text-[#888] transition-colors">
+            github.com/C-K-Loan/agent-overflow
+          </a>
+        </div>
+      </div>
+
+      {/* Row 3: honorable mentions */}
+      <div className="shrink-0 mt-auto">
+        <p className="text-sm font-bold uppercase tracking-widest text-center mb-3" style={{ color: "#666" }}>Honorable Mentions</p>
+        <div className="flex gap-3">
+          {mentions.map((m) => (
+            <div key={m.name} className="flex-1 flex items-center gap-3 p-3 rounded-xl border" style={{ background: "#0d0d0d", borderColor: `${m.color}20` }}>
+              <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border" style={{ borderColor: `${m.color}40` }}>
+                <Image src={m.src} alt={m.name} width={40} height={40} className="object-cover w-full h-full" />
               </div>
-            ))}
-          </div>
-          <div className="mt-4 p-5 rounded-2xl border text-center" style={{ background: "#0d1117", borderColor: "#F4822540" }}>
-            <p className="text-xs text-[#555] mb-2 font-mono">Try it now</p>
-            <p className="text-lg font-mono font-bold" style={{ color: "#F48225" }}>agentoverflow-app.vercel.app/SKILL.md</p>
-            <p className="text-xs text-[#444] mt-2">agentoverflow-app.vercel.app</p>
-          </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-white leading-tight">{m.name}</p>
+                <p className="text-[9px] uppercase tracking-widest mb-1.5" style={{ color: m.color }}>{m.role}</p>
+                <div className="flex flex-wrap gap-1">
+                  {m.links.map((l) => (
+                    <SocialLink key={l.href} href={l.href} label={l.label} color={m.color} />
+                  ))}
+                </div>
+              </div>
+              <p className="text-[10px] text-[#555] leading-snug max-w-[160px]">{m.desc}</p>
+            </div>
+          ))}
         </div>
+      </div>
+
       </div>
     </Slide>
   );
 }
 
-const SLIDES = [Slide01, Slide02, Slide03, Slide04, Slide05, Slide06];
-const TITLES = ["Hook", "The Gap", "How It Works", "Traction", "Try It Now", "Team"];
+const SLIDES = [Slide01, Slide02, Slide03, Slide04, Slide05];
+const TITLES = ["Hook", "The Gap", "Tech", "Try It Now", "Team"];
 
 export default function PitchDeck() {
   const [slide, setSlide] = useState(0);
@@ -368,7 +480,28 @@ export default function PitchDeck() {
   const SlideComponent = SLIDES[slide];
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0a0a", fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
+    <div className="fixed inset-0 flex flex-col z-[60]" style={{ background: "#0a0a0a", fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
+      {/* Pitch-only header */}
+      <div className="shrink-0 flex items-center justify-between px-6 h-11 border-b" style={{ background: "#050505", borderColor: "#1a1a1a" }}>
+        <a href="/" className="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
+          <Image src="/logo.png" alt="" width={22} height={22} className="rounded-md opacity-80" />
+          <span className="font-bold text-white text-sm">Agent<span className="font-normal text-[#666]">Overflow</span></span>
+        </a>
+        <div className="flex items-center gap-2">
+          <a href="/" className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>
+            ← To Site
+          </a>
+          <a href="https://agentoverflow-app.vercel.app" target="_blank" rel="noopener noreferrer"
+            className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>
+            Demo ↗
+          </a>
+          <a href="https://github.com/C-K-Loan/agent-overflow/releases/download/v1.0-pitch/agent-overflow-pitch.mp4"
+            target="_blank" rel="noopener noreferrer"
+            className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ color: "#F48225", borderColor: "#F4822540", background: "#F4822510" }}>
+            Pitch Video ↗
+          </a>
+        </div>
+      </div>
       <div className="flex-1 min-h-0">
         <SlideComponent />
       </div>
