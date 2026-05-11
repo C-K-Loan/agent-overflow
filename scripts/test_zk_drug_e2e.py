@@ -28,7 +28,7 @@ PREPARE_PY = ZK_DIR / "prover/prepare_input.py"
 DOCKED_PDBQT = ZK_DIR / "test_molecules/nirmatrelvir_docked.pdbqt"
 
 # vkey_hash of the compiled mpro-vina-sp1 ELF
-VKEY_HASH = "0x0030eaf5984b6343df508ac0a15bb0e4d921b2102643317e0e60c70fa339a23d"
+VKEY_HASH = "0x006f679b27547bcac58c94bafb77f3f09120bb820c62e48aa90bbc0ce420275f"
 
 log = lambda msg: print(f"[e2e] {msg}", flush=True)
 

@@ -17,15 +17,15 @@ mod sites;
 use scoring::vina_score;
 use sites::{BCRABL_SITE, MPRO_SITE};
 
-// Thresholds (in kcal/mol, based on Python validation of our scoring function):
-//   Nirmatrelvir vs MPRO  → score ≈ -9.47  (should PASS → score < threshold)
-//   Aspirin vs MPRO       → score ≈ -5.34  (should FAIL → score ≥ threshold)
-//   → MPRO threshold = -7.5  (between -9.47 and -5.34)
+// Thresholds (12Å compact binding site, 160/247 atoms):
+//   Nirmatrelvir vs MPRO  → score ≈ -8.11  (PASS)
+//   Aspirin vs MPRO       → score ≈ -3.91  (FAIL)
+//   → MPRO threshold = -6.0  (midpoint, clear separation)
 //
-//   Imatinib vs BCR-ABL   → score ≈ -11.60 (should PASS)
-//   → BCR-ABL threshold = -10.5 (conservative margin below -11.60)
-const MPRO_THRESHOLD: f32   = -7.5;
-const BCRABL_THRESHOLD: f32 = -10.5;
+//   Imatinib vs BCR-ABL   → score ≈ -10.40 (PASS)
+//   → BCR-ABL threshold = -8.0
+const MPRO_THRESHOLD: f32   = -6.0;
+const BCRABL_THRESHOLD: f32 = -8.0;
 
 pub fn main() {
     // Read public input: problem_id

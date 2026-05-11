@@ -1,0 +1,942 @@
+[
+  {
+    "x": -7.581,
+    "y": 27.734,
+    "z": 60.852,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -4.066,
+    "y": 24.193,
+    "z": 68.768,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -9.218,
+    "y": 24.075,
+    "z": 65.426,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -8.883,
+    "y": 22.919,
+    "z": 65.137,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -8.224,
+    "y": 25.031,
+    "z": 66.06,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -7.589,
+    "y": 24.392,
+    "z": 67.2,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -7.184,
+    "y": 25.49,
+    "z": 65.034,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -6.155,
+    "y": 24.392,
+    "z": 64.757,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -7.836,
+    "y": 25.859,
+    "z": 63.814,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": true,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -8.679,
+    "y": 26.336,
+    "z": 64.021,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -7.223,
+    "y": 23.434,
+    "z": 67.099,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -12.39,
+    "y": 24.71,
+    "z": 63.786,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.471,
+    "y": 23.771,
+    "z": 64.549,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -10.433,
+    "y": 24.568,
+    "z": 65.192,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -12.225,
+    "y": 22.902,
+    "z": 65.57,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -10.645,
+    "y": 25.536,
+    "z": 65.472,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -13.749,
+    "y": 23.365,
+    "z": 60.446,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -13.172,
+    "y": 24.0,
+    "z": 59.565,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": true,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -13.426,
+    "y": 22.114,
+    "z": 60.755,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -12.666,
+    "y": 21.638,
+    "z": 60.248,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -13.935,
+    "y": 21.62,
+    "z": 61.502,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -13.619,
+    "y": 23.139,
+    "z": 63.389,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -12.897,
+    "y": 21.176,
+    "z": 57.345,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -12.895,
+    "y": 20.398,
+    "z": 58.304,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -10.033,
+    "y": 23.28,
+    "z": 57.77,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -9.813,
+    "y": 23.898,
+    "z": 56.723,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -10.576,
+    "y": 21.862,
+    "z": 57.717,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.833,
+    "y": 21.886,
+    "z": 56.978,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -9.566,
+    "y": 20.912,
+    "z": 57.064,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -9.998,
+    "y": 19.462,
+    "z": 57.089,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -10.765,
+    "y": 18.928,
+    "z": 56.06,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -9.644,
+    "y": 18.629,
+    "z": 58.142,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -11.166,
+    "y": 17.606,
+    "z": 56.08,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -10.039,
+    "y": 17.304,
+    "z": 58.17,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -10.8,
+    "y": 16.798,
+    "z": 57.136,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "A"
+  },
+  {
+    "x": -11.196,
+    "y": 15.481,
+    "z": 57.16,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": true,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -10.934,
+    "y": 14.899,
+    "z": 57.917,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -11.9,
+    "y": 22.477,
+    "z": 56.137,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -10.291,
+    "y": 26.181,
+    "z": 58.567,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -9.35,
+    "y": 25.159,
+    "z": 59.202,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -9.826,
+    "y": 23.791,
+    "z": 58.986,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -7.92,
+    "y": 25.337,
+    "z": 58.687,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -6.915,
+    "y": 24.506,
+    "z": 59.46,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -6.614,
+    "y": 23.372,
+    "z": 59.09,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -6.392,
+    "y": 25.069,
+    "z": 60.544,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -5.703,
+    "y": 24.554,
+    "z": 61.111,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -6.675,
+    "y": 26.021,
+    "z": 60.818,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -10.009,
+    "y": 23.197,
+    "z": 59.808,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -11.897,
+    "y": 25.136,
+    "z": 59.269,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -11.914,
+    "y": 12.636,
+    "z": 59.601,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.601,
+    "y": 11.554,
+    "z": 60.109,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -13.339,
+    "y": 12.882,
+    "z": 59.131,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -14.252,
+    "y": 13.122,
+    "z": 60.337,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -9.519,
+    "y": 14.591,
+    "z": 61.062,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -10.482,
+    "y": 15.206,
+    "z": 61.53,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -9.684,
+    "y": 13.609,
+    "z": 59.906,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.059,
+    "y": 13.638,
+    "z": 59.435,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -8.716,
+    "y": 13.934,
+    "z": 58.766,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -8.832,
+    "y": 13.083,
+    "z": 57.5,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -7.882,
+    "y": 13.589,
+    "z": 56.425,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -8.563,
+    "y": 11.619,
+    "z": 57.811,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.388,
+    "y": 14.482,
+    "z": 58.946,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -8.28,
+    "y": 17.118,
+    "z": 62.054,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -7.951,
+    "y": 17.473,
+    "z": 60.919,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -7.978,
+    "y": 15.712,
+    "z": 62.559,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -8.278,
+    "y": 14.733,
+    "z": 61.524,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -6.512,
+    "y": 15.609,
+    "z": 62.983,
+    "radius": 2.0,
+    "is_hydrophobic": true,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -6.236,
+    "y": 14.393,
+    "z": 63.847,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -7.08,
+    "y": 13.508,
+    "z": 63.983,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -5.048,
+    "y": 14.345,
+    "z": 64.438,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -4.803,
+    "y": 13.544,
+    "z": 65.037,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -4.372,
+    "y": 15.109,
+    "z": 64.297,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -7.523,
+    "y": 14.144,
+    "z": 61.145,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -10.611,
+    "y": 19.402,
+    "z": 61.819,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -10.969,
+    "y": 20.518,
+    "z": 61.421,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -9.293,
+    "y": 19.269,
+    "z": 62.548,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -8.918,
+    "y": 17.918,
+    "z": 62.905,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -9.151,
+    "y": 17.565,
+    "z": 63.844,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -13.788,
+    "y": 18.683,
+    "z": 61.871,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -14.921,
+    "y": 18.811,
+    "z": 61.394,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -12.628,
+    "y": 18.343,
+    "z": 60.945,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -11.343,
+    "y": 18.306,
+    "z": 61.628,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -12.901,
+    "y": 16.998,
+    "z": 60.267,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -13.231,
+    "y": 16.013,
+    "z": 61.229,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": true,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -13.106,
+    "y": 16.385,
+    "z": 62.138,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -10.989,
+    "y": 17.403,
+    "z": 61.975,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -14.451,
+    "y": 21.446,
+    "z": 63.35,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": true,
+    "ad4_type": "OA"
+  },
+  {
+    "x": -14.607,
+    "y": 19.162,
+    "z": 64.101,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -13.539,
+    "y": 18.826,
+    "z": 63.171,
+    "radius": 1.75,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "N"
+  },
+  {
+    "x": -14.1,
+    "y": 19.11,
+    "z": 65.541,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -14.043,
+    "y": 17.445,
+    "z": 66.228,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "SA"
+  },
+  {
+    "x": -12.579,
+    "y": 18.697,
+    "z": 63.523,
+    "radius": 1.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": true,
+    "ad4_type": "HD"
+  },
+  {
+    "x": -11.804,
+    "y": 14.454,
+    "z": 68.341,
+    "radius": 2.0,
+    "is_hydrophobic": false,
+    "is_acceptor": false,
+    "is_donor": false,
+    "ad4_type": "C"
+  },
+  {
+    "x": -10.606,
+    "y": 14.442,
+    "z": 68.036,
+    "radius": 1.6,
+    "is_hydrophobic": false,
+    "is_acceptor": true,
+    "is_donor": false,
+    "ad4_type": "OA"
+  }
+]
