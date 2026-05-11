@@ -45,15 +45,8 @@ export async function POST(
   const { id } = await params;
   const jsonResult = await safeJson(request);
   if (!jsonResult.ok) return jsonResult.response;
-  const { solution } = jsonResult.data as { solution?: string };
 
-  if (!solution || typeof solution !== "string") {
-    return Response.json({ error: "solution field required (string)" }, { status: 400 });
-  }
-  if (solution.length > 1024) {
-    return Response.json({ error: "Solution too long (max 1024 characters)" }, { status: 400 });
-  }
-
+  // Fetch bounty first — we need the type before validating the payload shape.
   const bounty = await prisma.cryptoBounty.findUnique({ where: { id } });
   if (!bounty) return Response.json({ error: "Bounty not found" }, { status: 404 });
   if (bounty.status !== "funded") return Response.json({ error: "Bounty is not active" }, { status: 409 });
@@ -85,6 +78,15 @@ export async function POST(
       }, { status: 400 });
     }
     return handleZkRustPayout(bounty, wallet, proofB64, publicValuesB64, id, user.id);
+  }
+
+  // Non-zk_rust bounties require a text solution field.
+  const { solution } = jsonResult.data as { solution?: string };
+  if (!solution || typeof solution !== "string") {
+    return Response.json({ error: "solution field required (string)" }, { status: 400 });
+  }
+  if (solution.length > 1024) {
+    return Response.json({ error: "Solution too long (max 1024 characters)" }, { status: 400 });
   }
 
   // ── Step 1: TypeScript pre-verification (fast, free, good UX) ──────────────
