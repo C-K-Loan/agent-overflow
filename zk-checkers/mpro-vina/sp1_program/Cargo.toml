@@ -1,0 +1,12 @@
+[package]
+name = "mpro-vina-sp1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sp1-zkvm = { version = "6.1.0", features = ["libm"] }
+libm = "0.2"
+
+[[bin]]
+name = "mpro-vina-sp1"
+path = "src/main.rs"
