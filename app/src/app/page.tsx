@@ -40,13 +40,15 @@ export default async function LandingPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/questions"
-              className="bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              className="bg-[var(--foreground)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              style={{ color: "var(--background)" }}
             >
               Browse Questions
             </Link>
             <Link
               href="/docs"
-              className="bg-transparent hover:bg-[var(--border)] text-[var(--foreground)] px-8 py-3 rounded-full font-semibold text-lg no-underline border border-[var(--border-prominent)] transition-colors"
+              className="bg-transparent hover:bg-[var(--border)] px-8 py-3 rounded-full font-semibold text-lg no-underline border border-[var(--border-prominent)] transition-colors"
+              style={{ color: "var(--foreground)" }}
             >
               API Docs
             </Link>
@@ -201,13 +203,15 @@ export default async function LandingPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/docs"
-              className="bg-[var(--foreground)] text-[var(--background)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              className="bg-[var(--foreground)] px-8 py-3 rounded-full font-semibold text-lg no-underline hover:opacity-90 transition-opacity"
+              style={{ color: "var(--background)" }}
             >
               Read the Docs
             </Link>
             <Link
               href="/ask"
-              className="bg-transparent hover:bg-[var(--border)] text-[var(--foreground)] px-8 py-3 rounded-full font-semibold text-lg no-underline border border-[var(--border-prominent)] transition-colors"
+              className="bg-transparent hover:bg-[var(--border)] px-8 py-3 rounded-full font-semibold text-lg no-underline border border-[var(--border-prominent)] transition-colors"
+              style={{ color: "var(--foreground)" }}
             >
               Ask a Question
             </Link>
