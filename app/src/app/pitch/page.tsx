@@ -66,46 +66,37 @@ function Slide01() {
   );
 }
 
-// 2. The problem — concrete science examples
+// 2. The problem — use cases grid
 function Slide02() {
+  const cases = [
+    { icon: "🦠", hard: "Zero-day in a $500M smart contract?", easy: "Deploy exploit on fork → balance goes to zero. Instant.", color: "#F48225" },
+    { icon: "🧬", hard: "Molecule that binds to a cancer receptor?", easy: "Boltz-2 binding affinity score. 20 seconds.", color: "#9945FF" },
+    { icon: "✂️", hard: "CRISPR gene therapy that cures a disease?", easy: "Run CRISPR off-target analysis. Seconds.", color: "#14F195" },
+    { icon: "🔢", hard: "Riemann Hypothesis — open since 1859.", easy: "Check if a counterexample is valid. Run the math.", color: "#00D4FF" },
+    { icon: "🦠", hard: "Protein that neutralizes a pandemic virus?", easy: "Check if it blocks the receptor. Seconds.", color: "#F48225" },
+    { icon: "💊", hard: "Antibiotic bacteria can't resist?", easy: "Pass it through the resistance simulation. Run it.", color: "#9945FF" },
+    { icon: "☢️", hard: "Optimal radiation dose per patient?", easy: "Verify against tissue model. Instant simulation.", color: "#14F195" },
+    { icon: "🧠", hard: "Drug that crosses the blood-brain barrier?", easy: "Check permeability with computational model.", color: "#00D4FF" },
+    { icon: "🌍", hard: "Carbon capture catalyst that matters?", easy: "Check reaction efficiency. Chemistry simulation.", color: "#F48225" },
+    { icon: "🔐", hard: "Reentrancy bug before attackers find it?", easy: "Run the transaction. Vault drains or it doesn't.", color: "#9945FF" },
+    { icon: "🔑", hard: "Weakness in post-quantum crypto scheme?", easy: "Check if a forgery verifies. Verify the math.", color: "#14F195" },
+    { icon: "📐", hard: "Strategy that beats Sharpe 1.5?", easy: "Run backtester on held-out data. Pass/fail.", color: "#00D4FF" },
+  ];
   return (
     <Slide>
-      <Badge>The Problem</Badge>
-      <H2>Science has hard problems. Paying for solutions is impossible.</H2>
-      <div className="space-y-3 flex-1">
-        {[
-          {
-            domain: "Molecular Biology",
-            hard: "Find a molecule that folds correctly and binds to this receptor",
-            easy: "Run Boltz-2 — binding affinity score in 20 seconds",
-          },
-          {
-            domain: "Formal Mathematics",
-            hard: "The Riemann Hypothesis has been open since 1859",
-            easy: "Check if a submitted zero is off the critical line — numerical, instant",
-          },
-          {
-            domain: "Quantitative Finance",
-            hard: "Discover a strategy that beats Sharpe 1.5 on this held-out dataset",
-            easy: "Run the backtester — pass/fail in seconds",
-          },
-        ].map((item) => (
-          <div key={item.domain} className="p-4 rounded-xl border" style={{ background: "#0d0d0d", borderColor: "#2a2a2a" }}>
-            <p className="text-xs font-mono font-bold mb-2" style={{ color: "#F48225" }}>{item.domain}</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-[10px] text-[#555] uppercase tracking-widest mb-1">Hard to find</p>
-                <p className="text-sm text-[#888]">{item.hard}</p>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "#14F195" }}>Easy to verify</p>
-                <p className="text-sm text-[#ABABBA]">{item.easy}</p>
-              </div>
-            </div>
+      <div className="flex items-baseline justify-between mb-4">
+        <Badge>The Asymmetry</Badge>
+        <p className="text-xs text-[#555] italic">Finding is hard. Verifying is trivial. That gap is a market.</p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1">
+        {cases.map((c) => (
+          <div key={c.hard} className="p-3 rounded-xl border flex flex-col gap-1.5" style={{ background: "#0d0d0d", borderColor: `${c.color}25` }}>
+            <span className="text-lg">{c.icon}</span>
+            <p className="text-xs text-[#888] leading-snug">{c.hard}</p>
+            <p className="text-[10px] leading-snug mt-auto" style={{ color: c.color }}>{c.easy}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-[#444] mt-4 italic">No trustless marketplace exists to post these problems, verify solutions, and pay automatically.</p>
     </Slide>
   );
 }
