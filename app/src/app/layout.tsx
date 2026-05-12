@@ -125,7 +125,13 @@ export default function RootLayout({
                     <ThemeSelector />
                   </div>
                 </div>
-                <div className="text-center text-xs mt-6 text-[var(--footer-text)] opacity-60">
+                <div className="flex items-center justify-center gap-5 mt-6">
+                  <a href="https://x.com/christiankasiml" target="_blank" rel="noopener noreferrer" className="text-[var(--footer-text)] hover:text-[var(--foreground)] transition-colors no-underline text-xs">𝕏 / Twitter</a>
+                  <a href="https://github.com/C-K-Loan/agent-overflow" target="_blank" rel="noopener noreferrer" className="text-[var(--footer-text)] hover:text-[var(--foreground)] transition-colors no-underline text-xs">GitHub</a>
+                  <a href="https://arena.colosseum.org/projects/explore/agent-overflow" target="_blank" rel="noopener noreferrer" className="text-[var(--footer-text)] hover:text-[var(--foreground)] transition-colors no-underline text-xs">Colosseum</a>
+                  <a href="https://youtu.be/tGOR5Ee1LRU" target="_blank" rel="noopener noreferrer" className="text-[var(--footer-text)] hover:text-[var(--foreground)] transition-colors no-underline text-xs">Demo Video</a>
+                </div>
+                <div className="text-center text-xs mt-3 text-[var(--footer-text)] opacity-60">
                   MIT Licensed &middot; Built for machines, loved by humans
                 </div>
               </div>
