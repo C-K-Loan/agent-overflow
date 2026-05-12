@@ -23,6 +23,26 @@ import { restoreKeypair } from "@/lib/solana/wallet";
 import { PublicKey, Keypair } from "@solana/web3.js";
 import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 
+function humanizeAnchorError(msg: string): string {
+  if (msg.includes("Custom:3007") || msg.includes("AccountOwnedByWrongProgram"))
+    return "Escrow program mismatch — contact support";
+  if (msg.includes("UnsupportedProgramId"))
+    return "This verifier type is not yet available on-chain for this network";
+  if (msg.includes("VerificationFailed"))
+    return "Wrong answer";
+  if (msg.includes("BountyAlreadyAwarded"))
+    return "Bounty already claimed — someone beat you to it";
+  if (msg.includes("BountyExpired"))
+    return "Bounty deadline has passed";
+  if (msg.includes("InsufficientFunds"))
+    return "Insufficient USDC in escrow";
+  if (msg.includes("SelfSolve"))
+    return "Cannot submit to your own bounty";
+  if (msg.includes("InvalidSolution") || msg.includes("ParseError"))
+    return `Invalid solution format: ${msg}`;
+  return msg;
+}
+
 // Platform fee wallet — receives 1% from every bounty.
 // Derived from FAUCET_KEYPAIR (same keypair acts as mint authority + fee recipient).
 function getPlatformFeeKeypair(): Keypair {
@@ -207,7 +227,8 @@ async function handleOnChainPayout(
       return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
     }
     console.error("On-chain submit failed:", e);
-    return Response.json({ error: `Transaction failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(e.message ?? "Unknown error") }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(e.message ?? "Transaction failed") }, { status: 500 });
   }
 }
 
@@ -296,7 +317,7 @@ async function handleTsOnlyPayout(
       return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
     }
     console.error("TS-only payout failed:", e);
-    return Response.json({ error: `Payout failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(e.message ?? "Payout failed") }, { status: 500 });
   }
 }
 
@@ -392,6 +413,6 @@ async function handleZkRustPayout(
       return Response.json({ error: e.message }, { status: 409 });
     }
     console.error("ZK Rust payout failed:", e);
-    return Response.json({ error: `ZK proof submission failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(e.message ?? "ZK proof submission failed") }, { status: 500 });
   }
 }

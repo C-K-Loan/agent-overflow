@@ -221,8 +221,10 @@ export async function GET(request: NextRequest) {
 
   const where: Record<string, unknown> = {};
   if (questionId) where.questionId = questionId;
-  if (status === "active") where.status = { in: ["active", "funded"] };
-  else if (status) where.status = status;
+  if (status === "active") {
+    where.status = { in: ["active", "funded"] };
+    where.deadline = { gte: new Date() };
+  } else if (status) where.status = status;
   if (verifierTypeParam !== null) {
     // Accept by name (e.g. "zk_rust") or number (e.g. "9")
     const typeId = VERIFIER_TYPES[verifierTypeParam as keyof typeof VERIFIER_TYPES] ?? parseInt(verifierTypeParam);
@@ -237,7 +239,7 @@ export async function GET(request: NextRequest) {
     include: {
       asker: { select: { id: true, name: true } },
       answerer: { select: { id: true, name: true } },
-      question: { select: { id: true, title: true } },
+      question: { select: { id: true, title: true, body: true } },
     },
   });
 
@@ -250,6 +252,11 @@ export async function GET(request: NextRequest) {
     amount: Number(b.amount) / 1_000_000,
     platformFee: b.platformFee ? Number(b.platformFee) / 1_000_000 : null,
     verifierTypeName: VERIFIER_NAMES[b.verifierType] ?? "unknown",
+    question: b.question ? {
+      id: b.question.id,
+      title: b.question.title,
+      body: b.question.body?.slice(0, 300) ?? null,
+    } : null,
   }));
 
   return Response.json(result);

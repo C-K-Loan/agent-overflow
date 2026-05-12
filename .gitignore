@@ -15,3 +15,5 @@ math-fun/
 .DS_Store
 .vercel
 app/test-ledger/
+app/target/
+target/

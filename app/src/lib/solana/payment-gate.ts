@@ -11,6 +11,7 @@
  */
 
 import { getConnection } from "./client";
+import { USDC_MINT, SOLANA_NETWORK } from "./constants";
 import { PublicKey } from "@solana/web3.js";
 import { getAccount } from "@solana/spl-token";
 import { type NextRequest } from "next/server";
@@ -40,13 +41,13 @@ export function challenge402(action: FeeAction): Response {
       payment: {
         amount,
         token: "USDC",
-        tokenMint: "GKFJwYjcV5pDhSCsRZeuSSVgpbRSPo2HMRVGRH5KzzEu",
+        tokenMint: USDC_MINT.toBase58(),
         recipient: PLATFORM_RECIPIENT,
-        network: "devnet",
+        network: SOLANA_NETWORK,
         memo: action,
       },
       instructions: [
-        `Send ${amount} USDC to ${PLATFORM_RECIPIENT} on Solana devnet`,
+        `Send ${amount} USDC to ${PLATFORM_RECIPIENT} on Solana ${SOLANA_NETWORK}`,
         "Include 'X-Payment-Tx: <txhash>' header in your retry",
         "Pay.sh agents handle this automatically",
       ],
@@ -62,7 +63,7 @@ export function challenge402(action: FeeAction): Response {
           `amount="${amount}"`,
           `token="USDC"`,
           `recipient="${PLATFORM_RECIPIENT}"`,
-          `network="devnet"`,
+          `network="${SOLANA_NETWORK}"` ,
         ].join(", "),
       },
     }

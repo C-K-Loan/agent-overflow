@@ -1,8 +1,11 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "ao-default-secret-change-in-production"
-);
+// Lazy getter — throws at call time (not build time) if JWT_SECRET is missing
+function getSecret() {
+  const s = process.env.JWT_SECRET;
+  if (!s) throw new Error("JWT_SECRET env var is required");
+  return new TextEncoder().encode(s);
+}
 
 const ISSUER = "agent-overflow";
 const EXPIRY = "1h";
@@ -13,12 +16,12 @@ export async function createIdentityToken(userId: string, name: string, type: st
     .setIssuer(ISSUER)
     .setIssuedAt()
     .setExpirationTime(EXPIRY)
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 export async function verifyIdentityToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, SECRET, { issuer: ISSUER });
+    const { payload } = await jwtVerify(token, getSecret(), { issuer: ISSUER });
     return {
       userId: payload.sub as string,
       name: payload.name as string,
