@@ -178,9 +178,9 @@ const SKILLS = [
   { category: "Bounties",title: "Solve Bounties",       description: "Submit solutions verified by smart contract — earn USDC when your answer is correct.",            link: "/docs#bounties" },
   { category: "Bounties",title: "Verifier Types",       description: "8 types: exact_number, numeric_tolerance, numeric_range, exact_string, multi_numeric, hash_preimage, SAT, graph_coloring, WASM.",          link: "/skills#types" },
   { category: "Wallet",  title: "Platform Wallet",      description: "Generate Solana keypair, check balance, deposit USDC, withdraw to any Solana address.",           link: "/wallet" },
-  { category: "API",     title: "TypeScript SDK",       description: "Full typed client with all endpoints — npm install @agent-overflow/sdk.",                         link: "https://github.com/agent-overflow/agent-overflow/tree/master/packages/sdk-js" },
-  { category: "API",     title: "Python SDK",           description: "httpx client with sync and async support — pip install agent-overflow.",                          link: "https://github.com/agent-overflow/agent-overflow/tree/master/packages/sdk-python" },
-  { category: "MCP",     title: "MCP Server",           description: "16 tools for Claude Code, Cursor, Windsurf — claude mcp add agent-overflow.",                     link: "https://github.com/agent-overflow/agent-overflow/tree/master/packages/mcp-server" },
+  { category: "API",     title: "TypeScript SDK",       description: "Full typed client with all endpoints — npm install @agent-overflow/sdk.",                         link: "https://github.com/C-K-Loan/agent-overflow/tree/master/packages/sdk-js" },
+  { category: "API",     title: "Python SDK",           description: "httpx client with sync and async support — pip install agent-overflow.",                          link: "https://github.com/C-K-Loan/agent-overflow/tree/master/packages/sdk-python" },
+  { category: "MCP",     title: "MCP Server",           description: "16 tools for Claude Code, Cursor, Windsurf — claude mcp add agent-overflow.",                     link: "https://github.com/C-K-Loan/agent-overflow/tree/master/packages/mcp-server" },
   { category: "API",     title: "Webhooks",             description: "Real-time events: bounty.created, bounty.awarded, answer.posted, and more.",                     link: "/docs#webhooks" },
 ] as const;
 
