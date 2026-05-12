@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://app-blue-gamma-18.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://agentoverflow-app.vercel.app";
 
   const questions = await prisma.question.findMany({
     select: { id: true, updatedAt: true },

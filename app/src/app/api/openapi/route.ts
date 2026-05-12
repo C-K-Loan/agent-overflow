@@ -1,5 +1,5 @@
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://app-blue-gamma-18.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://agentoverflow-app.vercel.app";
 
   const spec = {
     openapi: "3.1.0",

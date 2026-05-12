@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const baseUrl = "https://app-blue-gamma-18.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://agentoverflow-app.vercel.app";
 
   const questions = await prisma.question.findMany({
     orderBy: { createdAt: "desc" },
