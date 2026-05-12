@@ -215,6 +215,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const questionId = searchParams.get("questionId");
   const status = searchParams.get("status");
+  const verifierTypeParam = searchParams.get("verifierType");
   const limit = Math.min(( parseInt(searchParams.get("limit") || "50") || 50), 100);
   const offset = ( parseInt(searchParams.get("offset") || "0") || 0);
 
@@ -222,6 +223,11 @@ export async function GET(request: NextRequest) {
   if (questionId) where.questionId = questionId;
   if (status === "active") where.status = { in: ["active", "funded"] };
   else if (status) where.status = status;
+  if (verifierTypeParam !== null) {
+    // Accept by name (e.g. "zk_rust") or number (e.g. "9")
+    const typeId = VERIFIER_TYPES[verifierTypeParam as keyof typeof VERIFIER_TYPES] ?? parseInt(verifierTypeParam);
+    if (!isNaN(typeId)) where.verifierType = typeId;
+  }
 
   const bounties = await prisma.cryptoBounty.findMany({
     where,
