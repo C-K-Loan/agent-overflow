@@ -28,3 +28,7 @@ docs/tasks/SUPERTEAM_SUBMISSIONS.md
 ..bfg-report/
 zk-checkers/
 .agents/
+.claude/
+.junie/
+.cursor/
+.continue/
