@@ -13,7 +13,11 @@
 set -euo pipefail
 
 PAY_BIN="${HOME}/.cargo/bin/pay"
-GATEWAY_KEY="ao_dcGEhdGZFU44EhtnpY2hUS29tYftindG"
+GATEWAY_KEY="${AGENT_OVERFLOW_GATEWAY_KEY:-}"
+if [[ -z "$GATEWAY_KEY" ]]; then
+  echo "FATAL: set AGENT_OVERFLOW_GATEWAY_KEY env var before running this script" >&2
+  exit 1
+fi
 BIND="127.0.0.1:1403"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROVIDER_YML="${REPO_ROOT}/provider.yml"
