@@ -69,6 +69,14 @@ export default function BountyListPage() {
   const [sort, setSort] = useState("amount");
   const [bounties, setBounties] = useState<BountyItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prices, setPrices] = useState({ usdc: 1.0, sol: 150.0 });
+
+  useEffect(() => {
+    fetch("/api/market/prices")
+      .then((r) => r.json())
+      .then((p) => setPrices(p))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const VTYPE: Record<number, string> = {
@@ -204,6 +212,11 @@ export default function BountyListPage() {
                   {b.amount}
                 </div>
                 <div className="text-[10px] font-semibold text-[var(--accent)] uppercase">USDC</div>
+                {prices.usdc !== 1.0 && (
+                  <div className="text-[10px] text-[var(--muted)] font-mono mt-0.5">
+                    ~${(b.amount * prices.usdc).toFixed(2)}
+                  </div>
+                )}
               </div>
 
               {/* Divider */}

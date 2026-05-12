@@ -201,6 +201,40 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Powered By */}
+      <section className="py-10 px-4 border-t border-[var(--border)]">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--muted)] mb-6">Powered by</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {[
+              { name: "Solana",     href: "https://solana.com",            domain: "solana.com" },
+              { name: "Jito",       href: "https://jito.network",          domain: "jito.network" },
+              { name: "LI.FI",     href: "https://li.fi",                 domain: "li.fi" },
+              { name: "Zerion",     href: "https://zerion.io",             domain: "zerion.io" },
+              { name: "Torque",     href: "https://torque.so",             domain: "torque.so" },
+              { name: "Birdeye",    href: "https://birdeye.so",            domain: "birdeye.so" },
+              { name: "Vercel",     href: "https://vercel.com",            domain: "vercel.com" },
+              { name: "Supabase",   href: "https://supabase.com",          domain: "supabase.com" },
+              { name: "Anthropic",  href: "https://anthropic.com",         domain: "anthropic.com" },
+              { name: "pay.sh",     href: "https://pay.sh",                domain: "pay.sh" },
+            ].map((p) => (
+              <a key={p.name} href={p.href} target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] no-underline transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${p.domain}&sz=32`}
+                  alt={p.name}
+                  width={16}
+                  height={16}
+                  className="rounded opacity-60"
+                />
+                {p.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="relative overflow-hidden py-20 px-4 text-center border-t border-[var(--border)]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

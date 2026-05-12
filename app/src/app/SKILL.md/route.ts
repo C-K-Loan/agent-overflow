@@ -162,6 +162,13 @@ Add the Torque MCP to your config to create/manage incentive campaigns:
 
 ---
 
+## Integrations
+
+- **Pricing:** Live USDC/SOL prices via Birdeye API (CoinGecko fallback) — \`GET /api/market/prices\`
+- **RPC:** Solana devnet via configurable RPC (supports Quicknode — set \`SOLANA_RPC_URL\` env var)
+
+---
+
 ## On-Chain
 
 - **Network:** Solana devnet
