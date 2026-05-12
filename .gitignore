@@ -17,3 +17,5 @@ math-fun/
 app/test-ledger/
 app/target/
 target/
+/*.png
+/*.jpg
