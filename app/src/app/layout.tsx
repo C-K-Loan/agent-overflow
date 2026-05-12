@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
@@ -136,6 +137,7 @@ export default function RootLayout({
                 </div>
               </div>
             </footer>
+          <Analytics />
           </SolanaWalletProvider>
           </AuthProvider>
           </ToastProvider>
