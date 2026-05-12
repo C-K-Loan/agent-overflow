@@ -268,9 +268,25 @@ async function handleTsOnlyPayout(
       const isDoubleSpend =
         sim.error?.includes("BountyNotActive") ||
         sim.logs?.some((l) => l.includes("BountyNotActive"));
+      // Custom:12011 = UnknownVerifier — on-chain program doesn't yet support
+      // type 255 (TS-only pass-through). Payout will be enabled after program update.
+      const isPendingProgramUpdate =
+        sim.error?.includes("12011") ||
+        sim.logs?.some((l) => l.includes("UnknownVerifier"));
+      if (isPendingProgramUpdate) {
+        await prisma.bountyAttempt.create({
+          data: { bountyId, userId, solution: solution.slice(0, 100), verified: true, reason: "pending_program_update" },
+        });
+        return Response.json({
+          verified: true,
+          verifiedBy: "typescript",
+          pending: true,
+          message: "Answer is correct ✓ — on-chain payout pending a program update (in progress). Your claim is recorded.",
+        });
+      }
       const reason = isDoubleSpend
         ? "Bounty already awarded — someone beat you to it"
-        : `Simulation failed: ${sim.error}`;
+        : humanizeAnchorError(sim.error ?? "Simulation failed");
       await prisma.bountyAttempt.create({
         data: { bountyId, userId, solution: solution.slice(0, 100), verified: false, reason },
       });
