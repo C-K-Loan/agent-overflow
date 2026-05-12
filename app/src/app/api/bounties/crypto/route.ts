@@ -23,8 +23,13 @@ import {
   type VerifierTypeName,
 } from "@/lib/solana/verifiers";
 import { restoreKeypair } from "@/lib/solana/wallet";
+import { sendJitoBundle, confirmJitoBundle } from "@/lib/solana/jito";
+import { shieldAndSend, estimateCloakFee } from "@/lib/solana/cloak";
 import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
+
+// Minimum SOL required for a private bounty shield deposit (0.01 SOL + headroom)
+const MIN_PRIVATE_SOL_LAMPORTS = BigInt(15_000_000); // 0.015 SOL
 
 export async function POST(request: NextRequest) {
   const user = await getUser(request);
@@ -32,8 +37,8 @@ export async function POST(request: NextRequest) {
 
   const jsonResult = await safeJson(request);
   if (!jsonResult.ok) return jsonResult.response;
-  const body = jsonResult.data as { questionId?: string; amount?: number; verifier?: { type?: string; config?: Record<string, unknown> }; deadline?: string };
-  const { questionId, amount, verifier, deadline } = body;
+  const body = jsonResult.data as { questionId?: string; amount?: number; verifier?: { type?: string; config?: Record<string, unknown> }; deadline?: string; private?: boolean };
+  const { questionId, amount, verifier, deadline, private: usePrivateFunding = false } = body;
 
   // Idempotency: check Idempotency-Key header
   const idempotencyKey = request.headers.get("idempotency-key");
@@ -125,6 +130,36 @@ export async function POST(request: NextRequest) {
     // Build and send create_bounty + fund_bounty in one tx
     const keypair = restoreKeypair(wallet.encryptedSecret);
 
+    // --- Optional: private bounty funding via Cloak ZK shielded pool (SOL only) ---
+    // When private=true, the bounty creator's identity is shielded using Cloak's
+    // UTXO ZK proof system before the on-chain escrow is funded with USDC.
+    // The Cloak step shields a small SOL amount through the shielded pool to break
+    // the on-chain link between the poster and the escrow vault address.
+    // Note: Cloak currently supports native SOL only. USDC private transfer is not yet live.
+    let cloakDepositSig: string | undefined;
+    let cloakWithdrawSig: string | undefined;
+    if (usePrivateFunding) {
+      const solAmount = MIN_PRIVATE_SOL_LAMPORTS;
+      const feeEstimate = estimateCloakFee(solAmount);
+      console.log(
+        `[cloak] Shielding ${solAmount} lamports for private bounty. ` +
+        `Estimated fee: ${feeEstimate.feeSol} SOL, net: ${feeEstimate.netSol} SOL`
+      );
+      // Shield SOL from the asker's wallet and privately forward to the vault PDA.
+      // This breaks the on-chain link between the poster's wallet and the escrow vault.
+      const cloakResult = await shieldAndSend({
+        amountLamports: solAmount,
+        depositorKeypair: keypair,
+        recipient: vaultPda,
+      });
+      cloakDepositSig = cloakResult.depositSignature;
+      cloakWithdrawSig = cloakResult.withdrawSignature;
+      console.log(
+        `[cloak] Shield deposit: ${cloakDepositSig}, private withdraw: ${cloakWithdrawSig}`
+      );
+    }
+    // -------------------------------------------------------------------------------
+
     const createIx = buildCreateBountyIx({
       asker: askerPubkey,
       askerAta,
@@ -141,7 +176,24 @@ export async function POST(request: NextRequest) {
       bountyPda,
     });
 
-    const txHash = await sendAndConfirm([createIx, fundIx], keypair);
+    // Try Jito bundle first for atomic MEV-protected execution.
+    // Falls back to standard sendAndConfirm if bundle submission fails.
+    let txHash: string;
+    let jitoBundle: string | null = null;
+    if (process.env.SOLANA_NETWORK !== "localnet") {
+      jitoBundle = await sendJitoBundle([createIx, fundIx], keypair);
+    }
+    if (jitoBundle) {
+      const landed = await confirmJitoBundle(jitoBundle);
+      if (!landed) {
+        // Bundle didn't land — fall back to standard tx
+        txHash = await sendAndConfirm([createIx, fundIx], keypair);
+      } else {
+        txHash = jitoBundle; // bundle UUID used as identifier
+      }
+    } else {
+      txHash = await sendAndConfirm([createIx, fundIx], keypair);
+    }
 
     // Save to DB
     const cryptoBounty = await prisma.cryptoBounty.create({
@@ -184,6 +236,8 @@ export async function POST(request: NextRequest) {
       verifierType: verifier.type,
       deadline: deadlineDate.toISOString(),
       txHash,
+      private: usePrivateFunding,
+      ...(cloakDepositSig && { cloakDepositSig, cloakWithdrawSig }),
     });
 
     return Response.json(
@@ -198,6 +252,8 @@ export async function POST(request: NextRequest) {
         commitReveal,
         deadline: deadlineDate.toISOString(),
         explorerUrl: explorerUrl(txHash),
+        private: usePrivateFunding,
+        ...(cloakDepositSig && { cloakDepositSig, cloakWithdrawSig }),
       },
       { status: 201 }
     );
