@@ -37,7 +37,7 @@ import { SOLANA_RPC_URL } from "./constants";
 // ---------------------------------------------------------------------------
 
 const CLOAK_RELAY_URL = "https://api.cloak.ag";
-const LAMPORTS_PER_SOL = 1_000_000_000n;
+const LAMPORTS_PER_SOL = BigInt(1_000_000_000);
 
 // ---------------------------------------------------------------------------
 // Types
