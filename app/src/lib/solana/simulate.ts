@@ -3,7 +3,6 @@ import {
   TransactionInstruction,
   Keypair,
   PublicKey,
-  SendTransactionError,
 } from "@solana/web3.js";
 import { getConnection } from "./client";
 

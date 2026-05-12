@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
+import type { CryptoBounty, UserWallet } from "@/generated/prisma/client";
 import { safeJson } from "@/lib/schemas";
 import { paymentGate } from "@/lib/solana/payment-gate";
 import { fireWebhooks } from "@/lib/webhooks";
@@ -18,6 +19,7 @@ import {
   verifyInTypeScript,
   serializeVerifierConfig,
   VERIFIER_TYPES,
+  type VerifierTypeName,
 } from "@/lib/solana/verifiers";
 import { restoreKeypair } from "@/lib/solana/wallet";
 import { PublicKey, Keypair } from "@solana/web3.js";
@@ -95,7 +97,7 @@ export async function POST(
   // These bounties don't take a text solution — they take a pre-generated ZK proof.
   // The proof + public_values are passed as separate fields.
   if (bounty.verifierType === VERIFIER_TYPES.zk_rust) {
-    const body = (jsonResult.data as any);
+    const body = (jsonResult.data as Record<string, string>);
     const proofB64: string = body.proof;
     const publicValuesB64: string = body.publicValues;
     if (!proofB64 || !publicValuesB64) {
@@ -111,7 +113,7 @@ export async function POST(
   // For types 0-4 this mirrors the Rust on-chain logic exactly.
   // For types 5-8 (type 255 on-chain) this IS the authoritative check.
   try {
-    const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as any;
+    const verifierTypeName = (Object.entries(VERIFIER_TYPES).find(([, v]) => v === bounty.verifierType)?.[0]) as VerifierTypeName;
     const configJson = JSON.parse(bounty.verifierConfig);
     const configBuf = serializeVerifierConfig(verifierTypeName, configJson);
     const tsError = await verifyInTypeScript(bounty.verifierType, configBuf, solution, configJson);
@@ -121,8 +123,8 @@ export async function POST(
       });
       return Response.json({ verified: false, reason: tsError });
     }
-  } catch (e: any) {
-    return Response.json({ error: `Verifier config error: ${e.message}` }, { status: 500 });
+  } catch (e: unknown) {
+    return Response.json({ error: `Verifier config error: ${(e as Error).message}` }, { status: 500 });
   }
 
   // ── Step 2: Route by verifier type ────────────────────────────────────────
@@ -139,8 +141,8 @@ export async function POST(
 // Rust program verifies on-chain + transfers USDC from vault atomically.
 // Fully trustless: no backend involvement in the verification or payment.
 async function handleOnChainPayout(
-  bounty: any,
-  wallet: any,
+  bounty: CryptoBounty,
+  wallet: UserWallet,
   solution: string,
   bountyId: string,
   userId: string
@@ -222,13 +224,13 @@ async function handleOnChainPayout(
       explorerUrl: explorerUrl(txHash),
       verifiedBy: "on-chain",
     });
-  } catch (e: any) {
-    if (e.message?.includes("BountyNotActive")) {
+  } catch (e: unknown) {
+    const msg = (e as Error).message ?? "";
+    if (msg.includes("BountyNotActive")) {
       return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
     }
     console.error("On-chain submit failed:", e);
-    return Response.json({ error: humanizeAnchorError(e.message ?? "Unknown error") }, { status: 500 });
-    return Response.json({ error: humanizeAnchorError(e.message ?? "Transaction failed") }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(msg || "Unknown error") }, { status: 500 });
   }
 }
 
@@ -237,8 +239,8 @@ async function handleOnChainPayout(
 // verifier_type = 255 (pass-through), so submit_answer skips on-chain verification
 // and releases USDC from vault atomically. The solver's custodial key signs the tx.
 async function handleTsOnlyPayout(
-  bounty: any,
-  wallet: any,
+  bounty: CryptoBounty,
+  wallet: UserWallet,
   solution: string,
   bountyId: string,
   userId: string
@@ -328,12 +330,13 @@ async function handleTsOnlyPayout(
       explorerUrl: explorerUrl(txHash),
       verifiedBy: "typescript",
     });
-  } catch (e: any) {
-    if (e.message?.includes("BountyNotActive")) {
+  } catch (e: unknown) {
+    const msg = (e as Error).message ?? "";
+    if (msg.includes("BountyNotActive")) {
       return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
     }
     console.error("TS-only payout failed:", e);
-    return Response.json({ error: humanizeAnchorError(e.message ?? "Payout failed") }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(msg || "Payout failed") }, { status: 500 });
   }
 }
 
@@ -341,8 +344,8 @@ async function handleTsOnlyPayout(
 // Proof is verified ON-CHAIN by the Anchor program's submit_zk_proof instruction.
 // No trust in server — the chain verifies the SP1 Groth16 proof atomically with payout.
 async function handleZkRustPayout(
-  bounty: any,
-  wallet: any,
+  bounty: CryptoBounty,
+  wallet: UserWallet,
   proofB64: string,
   publicValuesB64: string,
   bountyId: string,
@@ -424,11 +427,12 @@ async function handleZkRustPayout(
       explorerUrl: explorerUrl(txHash),
       verifiedBy: "on-chain-zk",
     });
-  } catch (e: any) {
-    if (e.message?.includes("BountyNotActive") || e.message?.includes("SelfSolve")) {
-      return Response.json({ error: e.message }, { status: 409 });
+  } catch (e: unknown) {
+    const msg = (e as Error).message ?? "";
+    if (msg.includes("BountyNotActive") || msg.includes("SelfSolve")) {
+      return Response.json({ error: msg }, { status: 409 });
     }
     console.error("ZK Rust payout failed:", e);
-    return Response.json({ error: humanizeAnchorError(e.message ?? "ZK proof submission failed") }, { status: 500 });
+    return Response.json({ error: humanizeAnchorError(msg || "ZK proof submission failed") }, { status: 500 });
   }
 }

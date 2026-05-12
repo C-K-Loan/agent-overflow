@@ -131,17 +131,21 @@ async function verifyPayment(txHash: string, action: FeeAction): Promise<string 
     const recipient = PLATFORM_RECIPIENT;
 
     // Scan top-level and inner instructions for a USDC credit to our address
-    const instructions = tx.transaction.message.instructions as any[];
-    const innerAll = (tx.meta?.innerInstructions ?? []).flatMap((ii: any) => ii.instructions ?? []);
+    const instructions = tx.transaction.message.instructions as Record<string, unknown>[];
+    const innerAll = (tx.meta?.innerInstructions ?? []).flatMap(
+      (ii: { instructions?: Record<string, unknown>[] }) => ii.instructions ?? []
+    );
     const allIxs = [...instructions, ...innerAll];
 
     for (const ix of allIxs) {
-      const type: string = ix.parsed?.type ?? "";
-      const info = ix.parsed?.info ?? {};
+      const parsed = ix.parsed as { type?: string; info?: Record<string, unknown> } | undefined;
+      const type: string = parsed?.type ?? "";
+      const info: Record<string, unknown> = parsed?.info ?? {};
 
       if (type === "transferChecked" || type === "transfer") {
-        const dest: string = info.destination ?? info.to ?? "";
-        const amt: string = info.amount ?? info.tokenAmount?.amount ?? "0";
+        const dest: string = (info.destination ?? info.to ?? "") as string;
+        const tokenAmount = info.tokenAmount as { amount?: string } | undefined;
+        const amt: string = (info.amount ?? tokenAmount?.amount ?? "0") as string;
         if ((dest === recipient || await isAtaOf(dest, recipient)) && BigInt(amt) >= requiredNative) {
           return null; // Payment verified ✓
         }
@@ -149,8 +153,9 @@ async function verifyPayment(txHash: string, action: FeeAction): Promise<string 
 
       // mintTo: faucet/mint-authority credits USDC directly to platform ATA (devnet only)
       if (type === "mintTo" || type === "mintToChecked") {
-        const dest: string = info.account ?? info.destination ?? "";
-        const amt: string = info.amount ?? info.tokenAmount?.amount ?? "0";
+        const dest: string = (info.account ?? info.destination ?? "") as string;
+        const tokenAmount = info.tokenAmount as { amount?: string } | undefined;
+        const amt: string = (info.amount ?? tokenAmount?.amount ?? "0") as string;
         if ((dest === recipient || await isAtaOf(dest, recipient)) && BigInt(amt) >= requiredNative) {
           return null; // mintTo platform ATA — verified ✓
         }
@@ -158,8 +163,8 @@ async function verifyPayment(txHash: string, action: FeeAction): Promise<string 
     }
 
     return `No qualifying USDC transfer found (need ${FEES[action]} USDC to ${recipient})`;
-  } catch (e: any) {
-    return `Payment verification failed: ${e.message}`;
+  } catch (e: unknown) {
+    return `Payment verification failed: ${(e as Error).message}`;
   }
 }
 

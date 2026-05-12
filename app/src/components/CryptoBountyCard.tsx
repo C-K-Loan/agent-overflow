@@ -96,10 +96,6 @@ const STATUS_STYLES: Record<string, { border: string; badge: string; badgeText: 
   },
 };
 
-const SOLSCAN_BASE = process.env.NEXT_PUBLIC_SOLANA_NETWORK === "mainnet-beta"
-  ? "https://solscan.io/tx/"
-  : "https://solscan.io/tx/{hash}?cluster=devnet";
-
 function solscanUrl(hash: string) {
   if (process.env.NEXT_PUBLIC_SOLANA_NETWORK === "mainnet-beta") {
     return `https://solscan.io/tx/${hash}`;

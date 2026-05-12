@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [rawKey,   setRawKey]   = useState<string | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setApiKey(ls("ao_apiKey"));
     setUserId(ls("ao_userId"));
     setUserName(ls("ao_userName"));

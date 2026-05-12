@@ -111,6 +111,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeName>("dark");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(getInitialTheme());
   }, []);
 

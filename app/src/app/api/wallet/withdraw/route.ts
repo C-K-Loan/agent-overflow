@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
       destination,
       explorerUrl: explorerUrl(txHash),
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Withdrawal failed:", e);
-    return Response.json({ error: `Withdrawal failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: `Withdrawal failed: ${(e as Error).message}` }, { status: 500 });
   }
 }

@@ -190,8 +190,8 @@ export async function verifyInTypeScript(
       case 9: return "zk_rust bounties require on-chain proof submission via submit_zk_proof";
       default: return null;
     }
-  } catch (e: any) {
-    return e.message;
+  } catch (e: unknown) {
+    return (e as Error).message;
   }
 }
 
@@ -213,7 +213,6 @@ function verifyNumericTolerance(config: Buffer, answer: string): string | null {
   if (config.length < 16) return "Invalid config";
   const target  = config.readBigInt64LE(0);
   const epsilon = config.readBigUInt64LE(8);
-  const SCALE = BigInt(FIXED_POINT_SCALE);
   const val = BigInt(Math.round(parseFloat(answer) * FIXED_POINT_SCALE));
   if (isNaN(parseFloat(answer))) return "Answer must be a number";
   const diff = val - target < BigInt(0) ? target - val : val - target;
@@ -224,7 +223,6 @@ function verifyNumericRange(config: Buffer, answer: string): string | null {
   if (config.length < 16) return "Invalid config";
   const min = config.readBigInt64LE(0);
   const max = config.readBigInt64LE(8);
-  const SCALE = BigInt(FIXED_POINT_SCALE);
   const val = BigInt(Math.round(parseFloat(answer) * FIXED_POINT_SCALE));
   if (isNaN(parseFloat(answer))) return "Answer must be a number";
   return (val >= min && val <= max) ? null : `Answer ${answer} is outside the valid range`;
@@ -395,8 +393,8 @@ async function verifyWasmInline(wasmBase64: string, solution: string): Promise<s
     view.set(solBytes, 0);
     const result = exports.verify(0, solBytes.length);
     return result !== 0 ? null : "Wrong answer";
-  } catch (e: any) {
-    return `WASM execution error: ${e.message}`;
+  } catch (e: unknown) {
+    return `WASM execution error: ${(e as Error).message}`;
   }
 }
 

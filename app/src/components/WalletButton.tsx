@@ -19,6 +19,7 @@ export function WalletButton() {
 
   useEffect(() => {
     if (!publicKey) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBalance(null);
       return;
     }

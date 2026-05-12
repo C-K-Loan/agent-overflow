@@ -34,10 +34,10 @@ export function getUsdcMint(): PublicKey {
 
 // Convenience aliases — use these in code that runs at request time
 export const ESCROW_PROGRAM_ID = new Proxy({} as PublicKey, {
-  get(_, prop) { return (getEscrowProgramId() as any)[prop]; },
+  get(_, prop) { return (getEscrowProgramId() as unknown as Record<string | symbol, unknown>)[prop]; },
 });
 export const USDC_MINT = new Proxy({} as PublicKey, {
-  get(_, prop) { return (getUsdcMint() as any)[prop]; },
+  get(_, prop) { return (getUsdcMint() as unknown as Record<string | symbol, unknown>)[prop]; },
 });
 
 // PDA seed constants (must match Rust program)

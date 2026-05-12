@@ -1,6 +1,5 @@
 import {
   PublicKey,
-  Transaction,
   TransactionInstruction,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,

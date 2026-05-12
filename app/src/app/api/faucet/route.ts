@@ -2,10 +2,9 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { type NextRequest } from "next/server";
 import { getConnection } from "@/lib/solana/client";
-import { USDC_MINT, SOLANA_NETWORK, explorerUrl } from "@/lib/solana/constants";
+import { USDC_MINT, SOLANA_NETWORK } from "@/lib/solana/constants";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
-import { restoreKeypair } from "@/lib/solana/wallet";
 
 // Faucet config
 const SOL_DRIP = 0.05 * LAMPORTS_PER_SOL;  // 0.05 SOL (covers 6+ bounty escrows + all txs)
@@ -109,8 +108,8 @@ export async function POST(request: NextRequest) {
           connection, mintAuthority, USDC_MINT, ata.address, mintAuthority, USDC_DRIP
         );
         usdcTxHash = String(sig);
-      } catch (e: any) {
-        usdcTxHash = "mint_failed: " + e.message;
+      } catch (e: unknown) {
+        usdcTxHash = "mint_failed: " + (e as Error).message;
       }
     } else {
       usdcTxHash = "no_faucet_keypair_configured";
@@ -141,9 +140,9 @@ export async function POST(request: NextRequest) {
       message: "Funds received! Please return unused funds when done. Happy hacking!",
       nextDripAt: new Date(Date.now() + COOLDOWN_MS).toISOString(),
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Faucet error:", e);
-    return Response.json({ error: `Faucet failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: `Faucet failed: ${(e as Error).message}` }, { status: 500 });
   }
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const YOUTUBE_EMBED = "https://www.youtube.com/embed/tGOR5Ee1LRU";
 const VIDEO_URL = "/pitch.mp4"; // kept for Download button
@@ -10,19 +11,19 @@ export default function PitchVideoPage() {
     <div className="fixed inset-0 flex flex-col z-[200]" style={{ background: "#0a0a0a", fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
       {/* Same header as /pitch */}
       <div className="shrink-0 flex items-center justify-between px-6 h-11 border-b" style={{ background: "#050505", borderColor: "#1a1a1a" }}>
-        <a href="/" className="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
+        <Link href="/" className="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
           <Image src="/logo.png" alt="" width={22} height={22} className="rounded-md opacity-80" />
           <span className="font-bold text-white text-sm">Agent<span className="font-normal text-[#666]">Overflow</span></span>
-        </a>
+        </Link>
         <div className="flex items-center gap-2">
-          <a href="/" className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity"
+          <Link href="/" className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity"
             style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>
             ← To Site
-          </a>
-          <a href="/pitch" className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity"
+          </Link>
+          <Link href="/pitch" className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity"
             style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>
             Pitch Deck
-          </a>
+          </Link>
           <a href="https://agentoverflow-app.vercel.app" target="_blank" rel="noopener noreferrer"
             className="text-xs font-mono px-3 py-1 rounded-full border hover:opacity-80 transition-opacity"
             style={{ color: "#ABABBA", borderColor: "#2a2a2a", background: "#0d0d0d" }}>

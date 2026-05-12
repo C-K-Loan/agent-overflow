@@ -29,7 +29,11 @@ export default function WalletDashboard() {
 
   // SOL balance — needs connected Solana wallet
   useEffect(() => {
-    if (!publicKey) { setSolBalance(null); return; }
+    if (!publicKey) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSolBalance(null);
+      return;
+    }
     connection.getBalance(publicKey).then((l) => setSolBalance(l / LAMPORTS_PER_SOL)).catch(() => {});
   }, [publicKey, connection]);
 

@@ -68,8 +68,8 @@ export async function POST(
       txHash,
       explorerUrl: explorerUrl(txHash),
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Refund failed:", e);
-    return Response.json({ error: `Refund failed: ${e.message}` }, { status: 500 });
+    return Response.json({ error: `Refund failed: ${(e as Error).message}` }, { status: 500 });
   }
 }

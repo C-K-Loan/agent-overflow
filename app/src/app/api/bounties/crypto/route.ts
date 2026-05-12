@@ -13,7 +13,6 @@ import {
   explorerUrl,
   usdcToNative,
   USDC_MINT,
-  COMMIT_REVEAL_THRESHOLD,
   MIN_BOUNTY_AMOUNT,
   MAX_BOUNTY_AMOUNT,
 } from "@/lib/solana";
@@ -104,8 +103,8 @@ export async function POST(request: NextRequest) {
   let configBuf: Buffer;
   try {
     configBuf = serializeVerifierConfig(verifier.type as VerifierTypeName, verifier.config || {});
-  } catch (e: any) {
-    return Response.json({ error: `Invalid verifier config: ${e.message}` }, { status: 400 });
+  } catch (e: unknown) {
+    return Response.json({ error: `Invalid verifier config: ${(e as Error).message}` }, { status: 400 });
   }
 
   // Derive PDAs
@@ -202,10 +201,10 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Create crypto bounty failed:", e);
     return Response.json(
-      { error: `Transaction failed: ${e.message}` },
+      { error: `Transaction failed: ${(e as Error).message}` },
       { status: 500 }
     );
   }

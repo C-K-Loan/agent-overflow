@@ -15,6 +15,20 @@ interface BountyItem {
   createdAt: string;
 }
 
+interface RawBountyItem {
+  id: string;
+  questionId?: string;
+  questionTitle?: string;
+  amount: number;
+  status: string;
+  deadline: string;
+  createdAt: string;
+  verifierType?: number;
+  verifierTypeName?: string;
+  verifier?: { type: string };
+  question?: { title?: string };
+}
+
 const TABS = ["active", "awarded", "expired"] as const;
 const SORTS = [
   { key: "amount", label: "Highest" },
@@ -57,26 +71,32 @@ export default function BountyListPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const VTYPE: Record<number, string> = {
+      0: "exact_string", 1: "exact_number", 2: "numeric_tolerance",
+      3: "numeric_range", 4: "multi_numeric_tolerance",
+      5: "hash_preimage", 6: "sat", 7: "graph_coloring",
+      8: "wasm_exec", 9: "zk_rust",
+    };
+    let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetch(`/api/bounties/crypto?status=${tab}&sort=${sort}`)
       .then((r) => (r.ok ? r.json() : { bounties: [] }))
       .then((data) => {
-        const raw = Array.isArray(data) ? data : data.bounties ?? [];
-        const VTYPE: Record<number, string> = {
-          0: "exact_string", 1: "exact_number", 2: "numeric_tolerance",
-          3: "numeric_range", 4: "multi_numeric_tolerance",
-          5: "hash_preimage", 6: "sat", 7: "graph_coloring",
-          8: "wasm_exec", 9: "zk_rust",
-        };
-        setBounties(raw.map((b: any) => ({
+        if (cancelled) return;
+        const raw: RawBountyItem[] = Array.isArray(data) ? data : data.bounties ?? [];
+        setBounties(raw.map((b) => ({
           ...b,
+          questionId: b.questionId ?? "",
+          status: (b.status as BountyItem["status"]) ?? "active",
           questionTitle: b.question?.title ?? b.questionTitle ?? "",
           currency: "USDC",
-          verifier: b.verifier ?? { type: b.verifierTypeName ?? VTYPE[b.verifierType] ?? "unknown" },
+          verifier: b.verifier ?? { type: b.verifierTypeName ?? VTYPE[b.verifierType ?? -1] ?? "unknown" },
         })));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [tab, sort]);
 
   return (

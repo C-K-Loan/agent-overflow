@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { buildRefundIx, explorerUrl, USDC_MINT } from "@/lib/solana";
+import { buildRefundIx, USDC_MINT } from "@/lib/solana";
 import { sendAndConfirm } from "@/lib/solana/simulate";
 import { restoreKeypair } from "@/lib/solana/wallet";
 import { fireWebhooks } from "@/lib/webhooks";
@@ -67,8 +67,8 @@ export async function POST(request: NextRequest) {
       });
 
       results.push({ bountyId: bounty.id, action: "refunded", txHash });
-    } catch (e: any) {
-      results.push({ bountyId: bounty.id, action: "error", error: e.message });
+    } catch (e: unknown) {
+      results.push({ bountyId: bounty.id, action: "error", error: (e as Error).message });
     }
   }
 
