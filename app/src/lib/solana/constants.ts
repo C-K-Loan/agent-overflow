@@ -63,6 +63,6 @@ export function explorerUrl(txHash: string): string {
     return `https://explorer.solana.com/tx/${txHash}?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899`;
   }
   const cluster = SOLANA_NETWORK === "mainnet-beta" ? "" : `?cluster=${SOLANA_NETWORK}`;
-  return `https://solscan.io/tx/${txHash}${cluster}`;
+  return `https://solscan.io/tx/${txHash}${cluster}`.trim();
 }
 // 1778360908

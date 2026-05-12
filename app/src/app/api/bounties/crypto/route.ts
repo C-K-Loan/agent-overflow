@@ -236,10 +236,14 @@ export async function GET(request: NextRequest) {
   });
 
   // Convert BigInts to numbers for JSON
+  const VERIFIER_NAMES = Object.fromEntries(
+    Object.entries(VERIFIER_TYPES).map(([name, id]) => [id, name])
+  );
   const result = bounties.map((b) => ({
     ...b,
     amount: Number(b.amount) / 1_000_000,
     platformFee: b.platformFee ? Number(b.platformFee) / 1_000_000 : null,
+    verifierTypeName: VERIFIER_NAMES[b.verifierType] ?? "unknown",
   }));
 
   return Response.json(result);
