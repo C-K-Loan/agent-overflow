@@ -21,7 +21,7 @@ import {
 } from "@/lib/solana/verifiers";
 import { restoreKeypair } from "@/lib/solana/wallet";
 import { PublicKey, Keypair } from "@solana/web3.js";
-import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 
 // Platform fee wallet — receives 1% from every bounty.
 // Derived from FAUCET_KEYPAIR (same keypair acts as mint authority + fee recipient).
@@ -212,9 +212,9 @@ async function handleOnChainPayout(
 }
 
 // ── TS-only payout (types 5-8) ───────────────────────────────────────────────
-// Verification already passed in Step 1. On-chain the bounty uses type 255
-// (pass-through). Faucet mints payout USDC directly to solver.
-// TODO: once Rust program supports types 5-8 natively, route through on-chain.
+// Verification already passed in Step 1. On-chain the bounty was created with
+// verifier_type = 255 (pass-through), so submit_answer skips on-chain verification
+// and releases USDC from vault atomically. The solver's custodial key signs the tx.
 async function handleTsOnlyPayout(
   bounty: any,
   wallet: any,
@@ -222,55 +222,79 @@ async function handleTsOnlyPayout(
   bountyId: string,
   userId: string
 ): Promise<Response> {
+  const answererPubkey = new PublicKey(wallet.publicKey);
+  const bountyPda      = new PublicKey(bounty.escrowPda);
+
   try {
-    // Atomic lock: flip status to "awarded" only if still "funded" — prevents double-spend
-    const locked = await prisma.cryptoBounty.updateMany({
-      where: { id: bountyId, status: "funded" },
-      data: { status: "awarded", answererId: userId },
+    const platformKp     = getPlatformFeeKeypair();
+    const answererAta    = await getAssociatedTokenAddress(USDC_MINT, answererPubkey);
+    const platformFeeAta = await getOrCreateAssociatedTokenAccount(
+      getConnection(), platformKp, USDC_MINT, platformKp.publicKey
+    );
+
+    const { ix } = buildSubmitAnswerIx({
+      answerer:           answererPubkey,
+      answererAta,
+      bountyPda,
+      platformFeeAccount: platformFeeAta.address,
     });
-    if (locked.count === 0) {
-      return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
+    // Pass the verified solution; the on-chain verifier (type 255) is a no-op pass-through
+    const submitIx = ix(solution);
+
+    // Simulate first — catches double-spend (BountyNotActive) cheaply
+    const sim = await simulateTransaction([submitIx], answererPubkey);
+    if (!sim.success) {
+      const isDoubleSpend =
+        sim.error?.includes("BountyNotActive") ||
+        sim.logs?.some((l) => l.includes("BountyNotActive"));
+      const reason = isDoubleSpend
+        ? "Bounty already awarded — someone beat you to it"
+        : `Simulation failed: ${sim.error}`;
+      await prisma.bountyAttempt.create({
+        data: { bountyId, userId, solution: solution.slice(0, 100), verified: false, reason },
+      });
+      return Response.json(
+        { error: reason },
+        { status: isDoubleSpend ? 409 : 500 }
+      );
     }
 
-    const platformKp    = getPlatformFeeKeypair();
-    const conn          = getConnection();
-    const answererPubkey = new PublicKey(wallet.publicKey);
+    // Simulation passed — broadcast. Solver's custodial key signs.
+    const solverKeypair = restoreKeypair(wallet.encryptedSecret);
+    const txHash = await sendAndConfirm([submitIx], solverKeypair);
+
     const { fee, payout } = calculateFee(bounty.amount);
-
-    const ata    = await getOrCreateAssociatedTokenAccount(conn, platformKp, USDC_MINT, answererPubkey);
-    const txHash = await mintTo(conn, platformKp, USDC_MINT, ata.address, platformKp, payout);
-
     await prisma.$transaction([
-      // Status already set to "awarded" by the atomic lock above — just update txHash + fee
       prisma.cryptoBounty.update({
         where: { id: bountyId },
-        data: { awardTxHash: String(txHash), platformFee: fee },
+        data: { status: "awarded", answererId: userId, awardTxHash: txHash, platformFee: fee },
       }),
       prisma.bountyAttempt.create({
-        data: { bountyId, userId, solution: solution.slice(0, 100), verified: true, txHash: String(txHash) },
+        data: { bountyId, userId, solution: solution.slice(0, 100), verified: true, txHash },
       }),
       prisma.paymentLog.create({
         data: {
           type: "bounty_awarded", amount: payout, token: "USDC",
-          fromWallet: platformKp.publicKey.toBase58(), toWallet: wallet.publicKey,
-          txHash: String(txHash), bountyId, userId,
+          fromWallet: bounty.vaultPda, toWallet: wallet.publicKey, txHash, bountyId, userId,
         },
       }),
     ]);
 
     fireWebhooks(bounty.askerId, "bounty.crypto.awarded", {
-      bountyId, answererId: userId, payout: nativeToUsdc(payout), fee: nativeToUsdc(fee), txHash: String(txHash),
+      bountyId, answererId: userId, payout: nativeToUsdc(payout), fee: nativeToUsdc(fee), txHash,
     });
 
     return Response.json({
-      verified: true,
-      txHash: String(txHash),
+      verified: true, txHash,
       payout: nativeToUsdc(payout),
       fee: nativeToUsdc(fee),
-      explorerUrl: explorerUrl(String(txHash)),
+      explorerUrl: explorerUrl(txHash),
       verifiedBy: "typescript",
     });
   } catch (e: any) {
+    if (e.message?.includes("BountyNotActive")) {
+      return Response.json({ error: "Bounty already awarded — someone beat you to it" }, { status: 409 });
+    }
     console.error("TS-only payout failed:", e);
     return Response.json({ error: `Payout failed: ${e.message}` }, { status: 500 });
   }
