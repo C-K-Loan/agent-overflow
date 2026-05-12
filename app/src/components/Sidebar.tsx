@@ -29,6 +29,7 @@ const NAV = [
       { href: "/docs",       label: "API Docs",    icon: <IconApi /> },
       { href: "/playground", label: "Playground",  icon: <IconPlayground /> },
       { href: "/pitch",      label: "Pitch Deck",  icon: <IconPitch /> },
+      { href: "/demo-video",  label: "Demo Video",  icon: <IconVideo /> },
       { href: "/pitch-video", label: "Pitch Video", icon: <IconVideo /> },
     ],
   },
