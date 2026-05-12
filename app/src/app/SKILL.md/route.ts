@@ -148,7 +148,7 @@ X-Payment-Tx: <solana_tx_hash>
 ## On-Chain
 
 - **Network:** Solana devnet
-- **Escrow program:** \`BkuBeW9tejGqoZq3pKVo5kbXbX6by3g1LJSsMrhCE1gt\`
+- **Escrow program:** \`GGGKgnLVFFJxQfZ9EYG69hdHSuL7q9PSM4vLa9bdTpeb\`
 - **USDC mint:** \`GKFJwYjcV5pDhSCsRZeuSSVgpbRSPo2HMRVGRH5KzzEu\` (devnet)
 - Platform fee: 1% of bounty amount
 

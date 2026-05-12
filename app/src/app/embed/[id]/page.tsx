@@ -28,7 +28,7 @@ export default async function EmbedPage({
   if (!question) notFound();
 
   const accepted = question.answers[0];
-  const baseUrl = "https://app-blue-gamma-18.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://agentoverflow-app.vercel.app";
 
   return (
     <div className="max-w-2xl mx-auto p-4 font-sans text-sm">
