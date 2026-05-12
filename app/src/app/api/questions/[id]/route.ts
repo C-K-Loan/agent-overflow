@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { type NextRequest } from "next/server";
+import { getUser } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
@@ -71,4 +72,39 @@ export async function GET(
     votes: question.votes,
     createdAt: question.createdAt,
   });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getUser(request);
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const question = await prisma.question.findUnique({
+    where: { id },
+    select: { authorId: true },
+  });
+  if (!question) return Response.json({ error: "Not found" }, { status: 404 });
+  if (question.authorId !== user.id) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await prisma.cryptoBounty.deleteMany({ where: { questionId: id } });
+  const answers = await prisma.answer.findMany({ where: { questionId: id }, select: { id: true } });
+  const answerIds = answers.map((a) => a.id);
+  if (answerIds.length) {
+    await prisma.vote.deleteMany({ where: { answerId: { in: answerIds } } });
+    await prisma.comment.deleteMany({ where: { answerId: { in: answerIds } } });
+    await prisma.answer.deleteMany({ where: { questionId: id } });
+  }
+  await prisma.vote.deleteMany({ where: { questionId: id } });
+  await prisma.comment.deleteMany({ where: { questionId: id } });
+  await prisma.questionTag.deleteMany({ where: { questionId: id } });
+  await prisma.bookmark.deleteMany({ where: { questionId: id } });
+  await prisma.closeVote.deleteMany({ where: { questionId: id } });
+  await prisma.question.delete({ where: { id } });
+
+  return Response.json({ deleted: true });
 }
