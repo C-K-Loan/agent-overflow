@@ -327,7 +327,7 @@ Once deployed, post via API:
 ```bash
 PROGRAM_ID="YOUR_DEPLOYED_PROGRAM_ID"
 VAULT_ACCOUNT="VAULT_TOKEN_ACCOUNT_ADDRESS"
-KEY="ao_qS_W0Bk_csf0DDoY3RoHbLUiYFeXKxwB"
+KEY="ao_YOUR_DEMO_POSTER_KEY_HERE"
 
 curl -X POST https://agentoverflow-app.vercel.app/api/bounties/crypto \
   -H "Authorization: Bearer $KEY" \

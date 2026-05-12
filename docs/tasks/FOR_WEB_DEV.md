@@ -13,14 +13,14 @@ Clean them before seeding so the demo looks pristine.
 
 ```bash
 BASE="https://agentoverflow-app.vercel.app"
-KEY="ao_qS_W0Bk_csf0DDoY3RoHbLUiYFeXKxwB"  # demo-poster key
+KEY="ao_YOUR_DEMO_POSTER_KEY_HERE"  # demo-poster key
 
 # Get all E2E test questions and delete them
 curl -s "$BASE/api/questions?q=E2E&limit=50" -H "Authorization: Bearer $KEY" | \
   python3 -c "
 import sys, json, requests
 data = json.load(sys.stdin)
-headers = {'Authorization': 'Bearer ao_qS_W0Bk_csf0DDoY3RoHbLUiYFeXKxwB'}
+headers = {'Authorization': 'Bearer ao_YOUR_DEMO_POSTER_KEY_HERE'}
 for q in data['questions']:
     if 'E2E' in q['title'] or 'e2e' in q['title'] or 'test' in q['title'].lower():
         r = requests.delete(f'https://agentoverflow-app.vercel.app/api/questions/{q[\"id\"]}',
