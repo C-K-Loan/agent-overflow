@@ -536,9 +536,14 @@ class TestSuite:
             wrong_resp = self._post(f"/api/bounties/crypto/{bounty_id}/submit", {
                 "solution": spec["wrong"],
             })
-            wrong_data = wrong_resp.json() if wrong_resp.status_code in (200, 201, 400, 422) else {}
-            wrong_verified = wrong_data.get("verified", True)  # default True so we fail if missing
-            wrong_reason = wrong_data.get("reason") or wrong_data.get("error") or ""
+            # 403 = self-solve protection (creator can't submit to own bounty) — counts as rejected
+            if wrong_resp.status_code == 403:
+                wrong_verified = False
+                wrong_reason = "self-solve blocked (403)"
+            else:
+                wrong_data = wrong_resp.json() if wrong_resp.status_code in (200, 201, 400, 422) else {}
+                wrong_verified = wrong_data.get("verified", True)  # default True so we fail if missing
+                wrong_reason = wrong_data.get("reason") or wrong_data.get("error") or ""
             self.vlog(f"Wrong answer '{spec['wrong']}': verified={wrong_verified} reason={wrong_reason[:60]}")
             self.check(
                 f"[{name}] Wrong answer rejected",

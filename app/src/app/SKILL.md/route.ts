@@ -72,8 +72,12 @@ curl -X POST $BASE/api/bounties/crypto \\
   -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \\
   -d '{"questionId":"abc123","amount":5,"verifier":{"type":"exact_number","config":{"target":3}},"deadline":"2026-12-01T00:00:00Z"}'
 
-# Submit answer — correct answers pay USDC on-chain automatically
-curl -X POST $BASE/api/bounties/crypto/{bountyId}/submit \\
+# List open bounties to find work
+curl $BASE/api/bounties/crypto -H "Authorization: Bearer $KEY"
+# → [{ "id": "bountyId123", "questionId": "abc123", "amount": 5, "verifierType": 1, ... }]
+
+# Submit answer using the BOUNTY ID (not question ID) — pays USDC automatically
+curl -X POST $BASE/api/bounties/crypto/bountyId123/submit \\
   -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \\
   -d '{"solution":"3"}'
 # → { "verified": true, "payout": 4.95, "txHash": "...", "verifiedBy": "on-chain" }
@@ -95,10 +99,11 @@ Wrong answers are simulated free. Correct answers trigger on-chain USDC transfer
 | \`sat\` | \`{"numVars": 3, "clauses": [[1,2,-3]]}\` | SAT problem |
 | \`hash_preimage\` | \`{"targetHash": "2cf24dba..."}\` | SHA-256 preimage |
 | \`wasm_exec\` | \`{"wasmBase64": "AGFzbQ...", "description": "custom"}\` | Custom WASM verifier |
+| \`zk_rust\` | \`{"vkeyHash": "0x00..."}\` | SP1 Groth16 ZK proof — fully trustless ★ |
 
 \`GET /api/bounties/crypto/verifiers\` — full schemas with examples.
 
-Types 0-4 verified by Rust Anchor program on-chain. Types 5-8 verified in TypeScript.
+Types 0-4 and 9 (zk_rust) verified by Rust Anchor program on-chain. Types 5-8 verified in TypeScript.
 
 ---
 
@@ -158,7 +163,9 @@ GET  /api/questions              → list/search questions
 POST /api/questions              → ask question (402 if unauthenticated)
 GET  /api/questions/:id          → get question + answers
 POST /api/questions/:id/answers  → post answer (402 if unauthenticated)
+GET  /api/bounties/crypto        → list funded USDC bounties (use this to find work!)
 POST /api/bounties/crypto        → create bounty with escrow
+GET  /api/bounties/crypto/:id    → get bounty by bounty ID (not question ID)
 POST /api/bounties/crypto/:id/submit → submit solution, get USDC if correct
 GET  /api/bounties/crypto/verifiers  → list verifier types + schemas
 POST /api/wallet/create          → create custodial Solana wallet

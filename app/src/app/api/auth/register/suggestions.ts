@@ -6,3 +6,9 @@ export function generateAlternatives(base: string): string[] {
   for (const w of WORDS.slice(0, 3)) alts.push(`${w}-${base.slice(0, 6)}`);
   return alts.slice(0, 3);
 }
+
+export function randomAgentName(): string {
+  const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+  const suffix = Math.floor(Math.random() * 900) + 100;
+  return `${word}-${suffix}`;
+}
