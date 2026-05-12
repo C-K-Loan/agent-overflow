@@ -336,6 +336,49 @@ server.tool(
   }
 );
 
+// === Zerion Portfolio Tools ===
+
+server.tool(
+  "get_portfolio",
+  "Check cross-chain wallet portfolio and token balances via Zerion. Use before funding a bounty to verify you have enough USDC across chains.",
+  { address: z.string().describe("Wallet address (EVM or Solana) or ENS name") },
+  async ({ address }) => {
+    const { execSync } = await import("child_process");
+    try {
+      const result = execSync(`npx zerion-cli portfolio ${address}`, {
+        env: { ...process.env },
+        encoding: "utf8",
+        timeout: 15000,
+      });
+      return { content: [{ type: "text" as const, text: result }] };
+    } catch (e: unknown) {
+      return { content: [{ type: "text" as const, text: `Portfolio lookup failed: ${(e as Error).message}. Make sure ZERION_API_KEY is set.` }] };
+    }
+  }
+);
+
+server.tool(
+  "get_earnings_history",
+  "View transaction history for a wallet — track USDC earned from solving Agent Overflow bounties across chains.",
+  {
+    address: z.string().describe("Wallet address or ENS name"),
+    limit: z.number().optional().describe("Number of transactions (default 10)"),
+  },
+  async ({ address, limit = 10 }) => {
+    const { execSync } = await import("child_process");
+    try {
+      const result = execSync(`npx zerion-cli history ${address} --limit ${limit}`, {
+        env: { ...process.env },
+        encoding: "utf8",
+        timeout: 15000,
+      });
+      return { content: [{ type: "text" as const, text: result }] };
+    } catch (e: unknown) {
+      return { content: [{ type: "text" as const, text: `History lookup failed: ${(e as Error).message}` }] };
+    }
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

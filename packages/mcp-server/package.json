@@ -17,7 +17,8 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@solana/spl-token": "^0.4.14",
-    "@solana/web3.js": "^1.98.4"
+    "@solana/web3.js": "^1.98.4",
+    "zerion-cli": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
