@@ -2,8 +2,8 @@ import { createHash } from "crypto";
 import { FIXED_POINT_SCALE } from "./constants";
 
 /** Verifier type IDs (must match Rust program).
- *  Types 5-7 are verified in TypeScript; on-chain they use type 255 (pass-through).
- *  This allows new verifiers without a program redeploy.
+ *  Types 0-7, 9: verified on-chain by the Anchor program.
+ *  Type 8 (wasm_exec): TS-only — WASM can't run on-chain.
  */
 export const VERIFIER_TYPES = {
   exact_string: 0,
@@ -20,9 +20,10 @@ export const VERIFIER_TYPES = {
 } as const;
 
 /** Verifier types handled purely in TypeScript (on-chain type = 255 pass-through).
- *  Types 0-4 are verified by the Rust program on-chain — do NOT include them here.
+ *  Types 0-7 are verified by the Rust program on-chain — do NOT include them here.
+ *  wasm_exec (8) stays TS-only — WASM can't run on-chain.
  *  zk_rust (9) is ALSO on-chain (submit_zk_proof instruction) — not in this set. */
-export const TS_ONLY_VERIFIERS = new Set([5, 6, 7, 8]);
+export const TS_ONLY_VERIFIERS = new Set([8]);
 
 export type VerifierTypeName = keyof typeof VERIFIER_TYPES;
 

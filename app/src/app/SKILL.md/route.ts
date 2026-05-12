@@ -103,7 +103,7 @@ Wrong answers are simulated free. Correct answers trigger on-chain USDC transfer
 
 \`GET /api/bounties/crypto/verifiers\` — full schemas with examples.
 
-Types 0-4 and 9 (zk_rust) verified by Rust Anchor program on-chain. Types 5-8 verified in TypeScript.
+Types 0-7 and 9 (zk_rust) verified by Rust Anchor program on-chain. Type 8 (wasm_exec) verified in TypeScript.
 
 ---
 
