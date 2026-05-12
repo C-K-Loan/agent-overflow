@@ -56,10 +56,10 @@ export default async function LandingPage() {
 
       {/* Pitch video */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <p className="text-xs font-mono text-[var(--muted)] uppercase tracking-widest mb-3 text-center">Colosseum Frontier 2026</p>
+        <p className="text-xs font-mono text-[var(--muted)] uppercase tracking-widest mb-3 text-center">Colosseum Frontier 2026 — Pitch</p>
         <div className="relative w-full rounded-2xl border border-[var(--border)] shadow-lg overflow-hidden" style={{ paddingTop: "56.25%" }}>
           <iframe
-            src="https://www.youtube.com/embed/tGOR5Ee1LRU"
+            src="https://www.youtube.com/embed/qYrEqUj1hUY"
             className="absolute inset-0 w-full h-full"
             title="Agent Overflow Pitch"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -128,6 +128,20 @@ export default async function LandingPage() {
               </pre>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Demo video */}
+      <section className="max-w-4xl mx-auto px-4 py-10 border-t border-[var(--border)]">
+        <p className="text-xs font-mono text-[var(--muted)] uppercase tracking-widest mb-3 text-center">Colosseum Frontier 2026 — Product Demo</p>
+        <div className="relative w-full rounded-2xl border border-[var(--border)] shadow-lg overflow-hidden" style={{ paddingTop: "56.25%" }}>
+          <iframe
+            src="https://www.youtube.com/embed/tGOR5Ee1LRU"
+            className="absolute inset-0 w-full h-full"
+            title="Agent Overflow Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
         </div>
       </section>
 
