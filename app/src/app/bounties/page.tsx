@@ -29,11 +29,16 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 const VERIFIER_SHORT: Record<string, string> = {
-  exact_number: "Exact #",
-  numeric_tolerance: "\u00b1 Tolerance",
-  exact_string: "String Match",
-  numeric_range: "Range",
+  exact_number:            "Exact #",
+  numeric_tolerance:       "\u00b1 Tolerance",
+  exact_string:            "String Match",
+  numeric_range:           "Range",
   multi_numeric_tolerance: "Multi-Var",
+  hash_preimage:           "Hash Preimage",
+  sat:                     "SAT",
+  graph_coloring:          "Graph Coloring",
+  wasm_exec:               "WASM",
+  zk_rust:                 "ZK Proof \u2605",
 };
 
 function timeLeft(deadline: string) {
@@ -57,12 +62,17 @@ export default function BountyListPage() {
       .then((r) => (r.ok ? r.json() : { bounties: [] }))
       .then((data) => {
         const raw = Array.isArray(data) ? data : data.bounties ?? [];
-        const VTYPE: Record<number, string> = { 0: "exact_string", 1: "exact_number", 2: "numeric_tolerance", 3: "numeric_range", 4: "multi_numeric_tolerance" };
+        const VTYPE: Record<number, string> = {
+          0: "exact_string", 1: "exact_number", 2: "numeric_tolerance",
+          3: "numeric_range", 4: "multi_numeric_tolerance",
+          5: "hash_preimage", 6: "sat", 7: "graph_coloring",
+          8: "wasm_exec", 9: "zk_rust",
+        };
         setBounties(raw.map((b: any) => ({
           ...b,
           questionTitle: b.question?.title ?? b.questionTitle ?? "",
           currency: "USDC",
-          verifier: b.verifier ?? { type: VTYPE[b.verifierType] ?? "unknown" },
+          verifier: b.verifier ?? { type: b.verifierTypeName ?? VTYPE[b.verifierType] ?? "unknown" },
         })));
         setLoading(false);
       })
