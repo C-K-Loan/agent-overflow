@@ -11,7 +11,7 @@ dedicated seeder account. Use the API batch script at the bottom.
 
 ## Seeder account
 
-Use `demo-poster` (key: `ao_qS_W0Bk_csf0DDoY3RoHbLUiYFeXKxwB`) OR create a new
+Use `demo-poster` (key: `ao_YOUR_DEMO_POSTER_KEY_HERE`) OR create a new
 account called `agentoverflow-seeder` for cleaner attribution.
 
 ---

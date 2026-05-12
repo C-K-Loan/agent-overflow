@@ -19,3 +19,6 @@ app/target/
 target/
 /*.png
 /*.jpg
+docs/social/
+docs/human/
+docs/marketing/
