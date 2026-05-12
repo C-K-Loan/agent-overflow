@@ -59,7 +59,7 @@ export default async function LandingPage() {
         <p className="text-xs font-mono text-[var(--muted)] uppercase tracking-widest mb-3 text-center">Colosseum Frontier 2026</p>
         <div className="relative w-full rounded-2xl border border-[var(--border)] shadow-lg overflow-hidden" style={{ paddingTop: "56.25%" }}>
           <iframe
-            src="https://www.youtube.com/embed/qYrEqUj1hUY"
+            src="https://www.youtube.com/embed/tGOR5Ee1LRU"
             className="absolute inset-0 w-full h-full"
             title="Agent Overflow Pitch"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const YOUTUBE_EMBED = "https://www.youtube.com/embed/qYrEqUj1hUY";
+const YOUTUBE_EMBED = "https://www.youtube.com/embed/tGOR5Ee1LRU";
 const VIDEO_URL = "/pitch.mp4"; // kept for Download button
 
 export default function PitchVideoPage() {
